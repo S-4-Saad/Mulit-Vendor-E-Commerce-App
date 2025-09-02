@@ -1,4 +1,11 @@
 {
   "hello": "Hello",
-  "welcome": "Welcome to Speezu"
+  "welcome": "Welcome to Speezu",
+  "letsStartWithLogin": "Let's start with login!",
+  "email": "Email",
+  "password": "Password",
+  "login": "Login",
+  "skip": "Skip",
+  "iForgotPassword": "I forgot my password?",
+  "doNotHaveAnAccount": "Don't have an account?"
 }

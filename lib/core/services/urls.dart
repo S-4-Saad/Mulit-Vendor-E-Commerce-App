@@ -1,11 +1,11 @@
 //---------------API-base url-------------
-const String baseUrl = "https://dashboard.hibuyo.com/api";
-const String imageBaseUrl = "https://dashboard.hibuyo.com/";
+const String baseUrl = "https://speezu.com/public/api";
+const String imageBaseUrl = "https://speezu.com/public/";
 
 ///-----------Auth Apis-----------------///
-const String registerUser = "$baseUrl/register";
-const String loginUser = "$baseUrl/login";
-const String editProfileUrl = "$baseUrl/editProfile";
+const String registerUserUrl = "$baseUrl/register";
+const String loginUserUrl = "$baseUrl/login";
+const String resetPasswordUrl = "$baseUrl/send_reset_link_email";
 
 ///-----------Fetch Dashboard Banner Apis-----------------///
 const String dashboardBannersUrl = "$baseUrl/dashboard-banners";

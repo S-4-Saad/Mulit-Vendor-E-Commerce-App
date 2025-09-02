@@ -12,6 +12,8 @@ import 'package:speezu/widgets/custom_text_form_field.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_bloc/theme_bloc.dart';
 import 'core/theme/theme_bloc/theme_event.dart';
+import 'features/auth/presentation/login/login_screen.dart';
+import 'features/spalsh/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -59,57 +61,68 @@ class MyApp extends StatelessWidget {
           localizationsDelegates: context.localizationDelegates,
           supportedLocales: context.supportedLocales,
           locale: context.locale,
-          home: SplashScreen(),
+          home: LoginScreen(),
         );
       },
     );
   }
 }
-class SplashScreen extends StatelessWidget {
-  const SplashScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Center(child: Text('Splash Screen', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),)),
-          ListTile(
-            title: Text('Toggle Dark Mode'),
-            trailing: Switch(
-              value: context.watch<ThemeBloc>().state.themeMode == AppThemeMode.dark,
-              onChanged: (value) {
-                context.read<ThemeBloc>().add(SwitchThemeEvent(
-                  value ? AppThemeMode.dark : AppThemeMode.light,
-                ));
-              },
-              activeColor: Theme.of(context).colorScheme.secondary, // Uses second_color or second_dark_color
-            ),
-          ),
-          Wrap(
-            children: [
-              Container(height: 100, width: 100, color: Theme.of(context).scaffoldBackgroundColor,),
-              Container(height: 100, width: 100, color: Theme.of(context).colorScheme.primary,),
-              Container(height: 100, width: 100, color: Theme.of(context).colorScheme.secondary,),
-              Container(height: 100, width: 100, color: Theme.of(context).colorScheme.onSecondary,),
-              Container(height: 100, width: 100, color: Theme.of(context).colorScheme.onPrimary,),
-              Text(Labels.hello, style:TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
-
-              ) ),
-              Text('Sample Text', ),
-              Text('Sample Text', ),
-              Text('Sample Text',),
-              Text(Labels.welcome, style: Theme.of(context).textTheme.titleMedium,),
-              Text('Sample Text', style: Theme.of(context).textTheme.titleSmall,),
-
-              CustomTextFormField(validator: AppValidators.validateNumber, textEditingController: TextEditingController(), hint: 'Hello')
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
+// class SplashScreen extends StatelessWidget {
+//   const SplashScreen({super.key});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: Column(mainAxisAlignment: MainAxisAlignment.center,
+//         children: [
+//           Center(child: Text('Splash Screen', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),)),
+//           ListTile(
+//             title: Text('Toggle Dark Mode'),
+//             trailing: Switch(
+//               value: context.watch<ThemeBloc>().state.themeMode == AppThemeMode.dark,
+//               onChanged: (value) {
+//                 context.read<ThemeBloc>().add(SwitchThemeEvent(
+//                   value ? AppThemeMode.dark : AppThemeMode.light,
+//                 ));
+//               },
+//               activeColor: Theme.of(context).colorScheme.secondary, // Uses second_color or second_dark_color
+//             ),
+//           ),
+//           Wrap(
+//             children: [
+//               Container(height: 100, width: 100, color: Theme.of(context).scaffoldBackgroundColor,),
+//               Container(height: 100, width: 100, color: Theme.of(context).colorScheme.primary,),
+//               Container(height: 100, width: 100, color: Theme.of(context).colorScheme.secondary,),
+//               Container(height: 100, width: 100, color: Theme.of(context).colorScheme.onSecondary,),
+//               Container(height: 100, width: 100, color: Theme.of(context).colorScheme.onPrimary,),
+//               Text(Labels.hello, style:TextStyle(
+//                 color: Theme.of(context).colorScheme.onSurface,
+//
+//               ) ),
+//               Text('Sample Text', ),
+//               Text('Sample Text', ),
+//               Text('Sample Text',),
+//               Text(Labels.welcome, style: Theme.of(context).textTheme.titleMedium,),
+//               Text('Sample Text', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold,),),
+//               ElevatedButton(
+//                 onPressed: () {
+//                   if (context.locale.languageCode == 'en') {
+//                     context.setLocale(const Locale('ar'));
+//                   } else {
+//                     context.setLocale(const Locale('en'));
+//                   }
+//                 },
+//                 child: Text('Change Language'),
+//               ),
+//
+//
+//               CustomTextFormField(validator: AppValidators.validateNumber, textEditingController: TextEditingController(), hint: 'Hello')
+//             ],
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 
