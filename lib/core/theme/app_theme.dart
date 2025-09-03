@@ -39,7 +39,6 @@ class AppTheme {
         secondary: secondColor,
         onPrimary: Colors.white,
         onSecondary: Colors.black,
-
         surface: scaffoldColor,
         onSurface: textPrimaryLight,
         error: errorColor,

@@ -3,10 +3,12 @@ import 'package:equatable/equatable.dart';
 import '../../../models/user_model.dart';
 
 enum LoginStatus { initial, loading, success, error }
+
 enum ForgotPasswordStatus { initial, loading, success, error }
+
 enum SignUpStatus { initial, loading, success, error }
 
-class AuthState extends Equatable{
+class AuthState extends Equatable {
   final String message;
   final LoginStatus loginStatus;
   final ForgotPasswordStatus forgotPasswordStatus;
@@ -36,6 +38,7 @@ class AuthState extends Equatable{
       userModel: userModel ?? this.userModel,
     );
   }
+
   @override
   String toString() {
     return 'LoginState(message: $message, loginStatus: $loginStatus, forgotPasswordStatus: $forgotPasswordStatus, userModel: $userModel, signUpStatus: $signUpStatus)';
@@ -43,5 +46,11 @@ class AuthState extends Equatable{
 
   @override
   // TODO: implement props
-  List<Object?> get props => [message, loginStatus, userModel, forgotPasswordStatus, signUpStatus];
+  List<Object?> get props => [
+    message,
+    loginStatus,
+    userModel,
+    forgotPasswordStatus,
+    signUpStatus,
+  ];
 }

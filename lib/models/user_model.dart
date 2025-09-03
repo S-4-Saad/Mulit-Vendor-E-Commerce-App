@@ -59,7 +59,6 @@ class UserData {
         this.customFields,
         this.hasMedia,
         this.media});
-
   UserData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
@@ -74,14 +73,21 @@ class UserData {
     paypalEmail = json['paypal_email'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
-    customFields = json['custom_fields'] != null
-        ? new CustomFields.fromJson(json['custom_fields'])
-        : null;
+
+    // ✅ Fix custom_fields parsing
+    if (json['custom_fields'] != null && json['custom_fields'] is Map<String, dynamic>) {
+      customFields = CustomFields.fromJson(json['custom_fields']);
+    } else {
+      customFields = null;
+    }
+
     hasMedia = json['has_media'];
+
+    // ✅ media is safe, you already parse as List
     if (json['media'] != null) {
       media = <MediaModel>[];
       json['media'].forEach((v) {
-        media!.add(new MediaModel.fromJSON(v));
+        media!.add(MediaModel.fromJSON(v));
       });
     }
   }

@@ -7,5 +7,13 @@
   "login": "Login",
   "skip": "Skip",
   "iForgotPassword": "I forgot my password?",
-  "doNotHaveAnAccount": "Don't have an account?"
+  "doNotHaveAnAccount": "Don't have an account?",
+  "letsStartWithRegister": "Let's start with registration!",
+  "fullName": "Full Name",
+    "phoneNumber": "Phone Number",
+    "register": "Register",
+    "alreadyHaveAnAccount": "Already have an account?",
+  "emailToResetPassword": "Email to reset password",
+  "sendLink": "Send Link",
+  "iRememberMyPasswordReturnToLogin": "I remember my password, return to login"
 }
