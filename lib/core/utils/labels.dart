@@ -11,5 +11,13 @@ class Labels {
   static String get iForgotPassword => 'iForgotPassword'.tr();
   static String get doNotHaveAnAccount => 'doNotHaveAnAccount'.tr();
   static String get password => 'password'.tr();
+  static String get letsStartWithRegister => 'letsStartWithRegister'.tr();
+  static String get fullName => 'fullName'.tr();
+  static String get phoneNumber => 'phoneNumber'.tr();
+  static String get register => 'register'.tr();
+  static String get alreadyHaveAnAccount => 'alreadyHaveAnAccount'.tr();
+  static String get emailToResetPassword => 'emailToResetPassword'.tr();
+  static String get sendLink => 'sendLink'.tr();
+  static String get iRememberMyPasswordReturnToLogin => 'iRememberMyPasswordReturnToLogin'.tr();
 
 }

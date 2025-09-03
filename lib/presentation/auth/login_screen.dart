@@ -1,101 +1,109 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/assets/app_images.dart';
 import 'package:speezu/core/assets/font_family.dart';
 import 'package:speezu/core/utils/app_validators.dart';
 import 'package:speezu/core/utils/labels.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
+import 'package:speezu/core/utils/snackbar_helper.dart';
 import 'package:speezu/widgets/custom_text_form_field.dart';
 
-import '../../../../widgets/login_custom_elevated_button.dart';
+import '../../routes/route_names.dart';
+import '../../widgets/auth_loader.dart';
+import '../../widgets/login_custom_elevated_button.dart';
+import 'bloc/auth_bloc.dart';
+import 'bloc/auth_event.dart';
+import 'bloc/auth_state.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
+
   TextEditingController passwordController = TextEditingController();
+
   final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
+
   FocusNode emailFocusNode = FocusNode();
+
   FocusNode passwordFocusNode = FocusNode();
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          TextButton(
+            onPressed: () {
+              // Navigate to Forgot Password Screen
+              Navigator.pushNamed(context, RouteNames.forgotPassword);
+            },
+            child: Text(
+              Labels.iForgotPassword,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.secondary,
+                fontSize: context.scaledFont(13),
+                fontFamily: FontFamily.fontsPoppinsRegular,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              // Navigate to Sign Up Screen
+              Navigator.pushNamed(context, RouteNames.signUp);
+            },
+            child: Text(
+              Labels.doNotHaveAnAccount,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.secondary,
+                fontSize: context.scaledFont(13),
+                fontFamily: FontFamily.fontsPoppinsRegular,
+              ),
+            ),
+          ),
+          SizedBox(height: context.heightPct(.02)),
+        ],
+      ),
       body: Stack(
         alignment: Alignment.center,
         children: [
-          SizedBox(
-            height: double.infinity,
-            width: double.infinity,
-            child: Column(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: Container(
-                    color: Theme.of(context).colorScheme.primary,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      // crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            SizedBox(height: context.heightPct(.1)),
-                            Image.asset(
-                              AppImages.speezuLogo,
-                              height: context.widthPct(.2),
-                            ),
-                            SizedBox(height: context.heightPct(.015)),
-                            Text(
-                              Labels.letsStartWithLogin,
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onPrimary,
-                                fontSize: context.scaledFont(20),
-                                fontFamily: FontFamily.fontsPoppinsExtraBold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+          Column(
+            children: [
+              Container(
+                width: double.infinity,
+                height: context.heightPct(.35),
+                color: Theme.of(context).colorScheme.primary,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(height: context.heightPct(.1)),
+                    Image.asset(
+                      AppImages.speezuLogo,
+                      height: context.widthPct(.2),
                     ),
-                  ),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: Container(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton(
-                          onPressed: () {},
-                          child: Text(
-                            Labels.iForgotPassword,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.secondary,
-                              fontSize: context.scaledFont(13),
-                              fontFamily: FontFamily.fontsPoppinsRegular,
-                            ),
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {},
-                          child: Text(
-                            Labels.doNotHaveAnAccount,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.secondary,
-                              fontSize: context.scaledFont(13),
-                              fontFamily: FontFamily.fontsPoppinsRegular,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: context.heightPct(.02)),
-                      ],
+                    SizedBox(height: context.heightPct(.015)),
+                    Text(
+                      Labels.letsStartWithLogin,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        fontSize: context.scaledFont(20),
+                        fontFamily: FontFamily.fontsPoppinsExtraBold,
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
           Positioned(
             top: context.heightPct(.26),
@@ -157,11 +165,29 @@ class LoginScreen extends StatelessWidget {
                       focusNode: passwordFocusNode,
                     ),
                     SizedBox(height: context.heightPct(.04)),
-                    LoginCustomElevatedButton(
-                      title: Labels.login,
-                      onPressed: () {
-                        if (_loginFormKey.currentState!.validate()) {
-                          // Perform login action
+                    BlocConsumer<AuthBloc, AuthState>(
+                      builder:
+                          (context, state) =>state.loginStatus==LoginStatus.loading?AuthLoader(): LoginCustomElevatedButton(
+                            title: Labels.login,
+                            onPressed: () {
+                              if (_loginFormKey.currentState!.validate()) {
+                                context.read<AuthBloc>().add(
+                                      LoginEvent(
+                                        email: emailController.text.trim(),
+                                        password: passwordController.text.trim(),
+                                      ),
+                                    );
+                                // Perform login action
+                              }
+                            },
+                          ),
+                      listener: (context, state) {
+                        if (state.loginStatus == LoginStatus.success) {
+                          // Navigate to the next screen or show success message
+                          Navigator.pushReplacementNamed(
+                              context, RouteNames.home);
+                        } else if (state.loginStatus == LoginStatus.error) {
+                        SnackBarHelper.showError(context, state.message);
                         }
                       },
                     ),

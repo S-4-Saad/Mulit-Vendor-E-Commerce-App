@@ -6,14 +6,16 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/theme/theme_bloc/theme_state.dart';
 import 'package:speezu/core/utils/app_validators.dart';
-import 'package:speezu/core/utils/labels.dart';
+import 'package:speezu/presentation/auth/bloc/auth_bloc.dart';
+import 'package:speezu/presentation/auth/login_screen.dart';
+import 'package:speezu/routes/app_routes.dart';
+import 'package:speezu/routes/route_names.dart';
 import 'package:speezu/widgets/custom_text_form_field.dart';
 
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_bloc/theme_bloc.dart';
 import 'core/theme/theme_bloc/theme_event.dart';
-import 'features/auth/presentation/login/login_screen.dart';
-import 'features/spalsh/splash_screen.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,7 +30,7 @@ void main() async {
       child: MultiBlocProvider(
         providers: [
           BlocProvider<ThemeBloc>(create: (_) => ThemeBloc()),
-          // BlocProvider<DashboardBloc>(create: (_) => DashboardBloc()),
+          BlocProvider<AuthBloc>(create: (_) => AuthBloc()),
           // BlocProvider<AuthBloc>(create: (_) => AuthBloc()),
           // BlocProvider<CustomersBloc>(create: (_) => CustomersBloc()),
           // BlocProvider<EstimateBloc>(create: (_) => EstimateBloc()),
@@ -51,7 +53,7 @@ class MyApp extends StatelessWidget {
       builder: (context, theme) {
         return MaterialApp(
           title: 'RiverCity',
-          debugShowCheckedModeBanner: false,
+          debugShowCheckedModeBanner: true,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: theme.themeMode == AppThemeMode.light
@@ -61,7 +63,9 @@ class MyApp extends StatelessWidget {
           localizationsDelegates: context.localizationDelegates,
           supportedLocales: context.supportedLocales,
           locale: context.locale,
-          home: LoginScreen(),
+          // home: LoginScreen(),
+          initialRoute: RouteNames.splash,
+          onGenerateRoute: AppRoutes.generateRoute,
         );
       },
     );
