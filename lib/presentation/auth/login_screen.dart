@@ -185,7 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         if (state.loginStatus == LoginStatus.success) {
                           // Navigate to the next screen or show success message
                           Navigator.pushReplacementNamed(
-                              context, RouteNames.home);
+                              context, RouteNames.navBarScreen);
                         } else if (state.loginStatus == LoginStatus.error) {
                         SnackBarHelper.showError(context, state.message);
                         }
@@ -194,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(height: context.heightPct(.02)),
                     Center(
                       child: TextButton(
-                        onPressed: () {},
+                        onPressed: () => Navigator.pushReplacementNamed(context, RouteNames.navBarScreen),
                         child: Text(
                           Labels.skip,
                           style: TextStyle(

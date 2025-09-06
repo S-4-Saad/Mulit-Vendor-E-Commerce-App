@@ -6,6 +6,7 @@ import '../../../../models/user_model.dart';
 import '../../../core/services/api_services.dart';
 import '../../../core/services/localStorage/my-local-controller.dart';
 import '../../../core/utils/constants.dart';
+import '../../../repositories/user_repository.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 
@@ -13,7 +14,7 @@ class AuthBloc extends Bloc<AuthEvents, AuthState> {
   AuthBloc() : super(AuthState()) {
     on<LoginEvent>(_loginEvent);
     on<ResetPasswordEvent>(_resetPasswordEvent);
-    on<LoadUserDataEvent>(_loadInitialData);
+    // on<LoadUserDataEvent>(_loadInitialData);
     on<LogOutUserEvent>(_logOutUser);
     on<RegisterUserEvent>(_registerUserEvent);
   }
@@ -36,10 +37,7 @@ class AuthBloc extends Bloc<AuthEvents, AuthState> {
                   userModel: userModel,
                 ),
               );
-              await LocalStorage.saveData(
-                key: AppKeys.userData,
-                value: jsonEncode(userModel.toJson()),
-              );
+              await UserRepository().setUser(userModel);
 
               await LocalStorage.saveData(
                 key: AppKeys.authToken,
@@ -216,65 +214,66 @@ class AuthBloc extends Bloc<AuthEvents, AuthState> {
       );
     }
   }
-  void _loadInitialData(
-      LoadUserDataEvent event,
-      Emitter<AuthState> emit,
-      ) async {
-    print("🔄 Loading initial data...");
-    emit(state.copyWith(loginStatus: LoginStatus.loading));
-
-    try {
-      final savedUserData = await LocalStorage.getData(key: AppKeys.userData);
-      print("📦 Saved user data from storage: $savedUserData");
-
-      if (savedUserData != null) {
-        UserModel userModel = UserModel.fromJson(jsonDecode(savedUserData));
-        print("✅ UserModel successfully decoded: ${userModel.toJson()}");
-
-        emit(
-          state.copyWith(
-            loginStatus: LoginStatus.success,
-            message: 'Loaded from storage',
-            userModel: userModel,
-          ),
-        );
-        print("🚀 Emitted success state with userModel.");
-      } else {
-        emit(
-          state.copyWith(
-            loginStatus: LoginStatus.initial,
-            message: 'No user data found',
-          ),
-        );
-        print("⚠️ No user data found, emitted initial state.");
-      }
-    } catch (e) {
-      emit(
-        state.copyWith(
-          loginStatus: LoginStatus.error,
-          message: 'Failed to load initial data: $e',
-        ),
-      );
-      print("❌ Error loading data: $e");
-    }
-  }
+  // void _loadInitialData(
+  //     LoadUserDataEvent event,
+  //     Emitter<AuthState> emit,
+  //     ) async {
+  //   print("🔄 Loading initial data...");
+  //   emit(state.copyWith(loginStatus: LoginStatus.loading));
+  //
+  //   try {
+  //     final savedUserData = await LocalStorage.getData(key: AppKeys.userData);
+  //     print("📦 Saved user data from storage: $savedUserData");
+  //
+  //     if (savedUserData != null) {
+  //       UserModel userModel = UserModel.fromJson(jsonDecode(savedUserData));
+  //       print("✅ UserModel successfully decoded: ${userModel.toJson()}");
+  //
+  //       emit(
+  //         state.copyWith(
+  //           loginStatus: LoginStatus.success,
+  //           message: 'Loaded from storage',
+  //           userModel: userModel,
+  //         ),
+  //       );
+  //       print("🚀 Emitted success state with userModel.");
+  //     } else {
+  //       emit(
+  //         state.copyWith(
+  //           loginStatus: LoginStatus.initial,
+  //           message: 'No user data found',
+  //         ),
+  //       );
+  //       print("⚠️ No user data found, emitted initial state.");
+  //     }
+  //   } catch (e) {
+  //     emit(
+  //       state.copyWith(
+  //         loginStatus: LoginStatus.error,
+  //         message: 'Failed to load initial data: $e',
+  //       ),
+  //     );
+  //     print("❌ Error loading data: $e");
+  //   }
+  // }
 
   void _logOutUser(LogOutUserEvent event, Emitter<AuthState> emit) async {
-    emit(state.copyWith(loginStatus: LoginStatus.loading));
+    emit(state.copyWith(logoutStatus: LogoutStatus.loading));
     try {
       await LocalStorage.removeData(key: AppKeys.userData);
       await LocalStorage.removeData(key: AppKeys.authToken);
-      await LocalStorage.removeData(key: AppKeys.uRole);
+      await UserRepository().clearUser();
+
       emit(
         state.copyWith(
-          loginStatus: LoginStatus.initial,
+          logoutStatus: LogoutStatus.success,
           message: 'User logged out',
         ),
       );
     } catch (e) {
       emit(
         state.copyWith(
-          loginStatus: LoginStatus.error,
+          logoutStatus: LogoutStatus.error,
           message: 'Failed to log out: $e',
         ),
       );

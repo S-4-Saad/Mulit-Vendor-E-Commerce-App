@@ -20,7 +20,7 @@ class ResetPasswordEvent extends AuthEvents {
   List<Object?> get props => [email];
 }
 
-class LoadUserDataEvent extends AuthEvents {}
+// class LoadUserDataEvent extends AuthEvents {}
 class SignUpEvent extends AuthEvents {
   final String email;
   final String password;

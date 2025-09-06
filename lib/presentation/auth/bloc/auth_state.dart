@@ -8,16 +8,20 @@ enum ForgotPasswordStatus { initial, loading, success, error }
 
 enum SignUpStatus { initial, loading, success, error }
 
+enum LogoutStatus { initial, loading, success, error }
+
 class AuthState extends Equatable {
   final String message;
   final LoginStatus loginStatus;
   final ForgotPasswordStatus forgotPasswordStatus;
+  final LogoutStatus logoutStatus;
   final SignUpStatus signUpStatus;
   final UserModel? userModel; // Store the full response here
 
   const AuthState({
     this.message = '',
     this.loginStatus = LoginStatus.initial,
+    this.logoutStatus = LogoutStatus.initial,
     this.forgotPasswordStatus = ForgotPasswordStatus.initial,
     this.signUpStatus = SignUpStatus.initial,
     this.userModel,
@@ -27,6 +31,7 @@ class AuthState extends Equatable {
     String? message,
     LoginStatus? loginStatus,
     ForgotPasswordStatus? forgotPasswordStatus,
+    LogoutStatus? logoutStatus,
     SignUpStatus? signUpStatus,
     UserModel? userModel,
   }) {
@@ -34,6 +39,7 @@ class AuthState extends Equatable {
       message: message ?? this.message,
       loginStatus: loginStatus ?? this.loginStatus,
       forgotPasswordStatus: forgotPasswordStatus ?? this.forgotPasswordStatus,
+      logoutStatus: logoutStatus ?? this.logoutStatus,
       signUpStatus: signUpStatus ?? this.signUpStatus,
       userModel: userModel ?? this.userModel,
     );
@@ -41,7 +47,7 @@ class AuthState extends Equatable {
 
   @override
   String toString() {
-    return 'LoginState(message: $message, loginStatus: $loginStatus, forgotPasswordStatus: $forgotPasswordStatus, userModel: $userModel, signUpStatus: $signUpStatus)';
+    return 'LoginState(message: $message, loginStatus: $loginStatus, forgotPasswordStatus: $forgotPasswordStatus, logoutStatus: $logoutStatus, userModel: $userModel, signUpStatus: $signUpStatus)';
   }
 
   @override
@@ -52,5 +58,6 @@ class AuthState extends Equatable {
     userModel,
     forgotPasswordStatus,
     signUpStatus,
+    logoutStatus,
   ];
 }
