@@ -7,7 +7,7 @@ enum AppThemeMode { light, dark }
 
 class AppTheme {
   static const Color mainColor = Color(0xFF01035E);
-  static const Color mainDarkColor = Color(0xFF01035E);
+  static const Color mainDarkColor = Color(0xFF01285e);
   static const Color secondColor = Color(0xFF98CC33);
   static const Color secondDarkColor = Color(0xFF98CC33);
   static const Color accentColor = Color(0xFF8C98A8);

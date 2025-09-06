@@ -5,6 +5,9 @@ import '../presentation/auth/forgot_password_screen.dart';
 import '../presentation/auth/login_screen.dart';
 import '../presentation/auth/sign_up_screen.dart';
 import '../presentation/home/home_screen.dart';
+import '../presentation/languages/languages_screen.dart';
+import '../presentation/nav_bar_screen/nav_bar_screen.dart';
+import '../presentation/settings/settings_screen.dart';
 import '../presentation/spalsh/splash_screen.dart';
 
 class AppRoutes {
@@ -13,21 +16,25 @@ class AppRoutes {
       case RouteNames.splash:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
       case RouteNames.login:
-        return MaterialPageRoute(builder: (_) =>  LoginScreen());
+        return MaterialPageRoute(builder: (_) => LoginScreen());
       case RouteNames.signUp:
-        return MaterialPageRoute(builder: (_) =>  SignUpScreen(),);
+        return MaterialPageRoute(builder: (_) => SignUpScreen());
       case RouteNames.forgotPassword:
-        return MaterialPageRoute(builder: (_) =>  ForgotPasswordScreen());
+        return MaterialPageRoute(builder: (_) => ForgotPasswordScreen());
       case RouteNames.home:
-        return MaterialPageRoute(builder: (_) =>  HomeScreen());
-
+        return MaterialPageRoute(builder: (_) => HomeScreen());
+      case RouteNames.navBarScreen:
+        return MaterialPageRoute(builder: (_) => NavBarScreen());
+      case RouteNames.languagesScreen:
+        return MaterialPageRoute(builder: (_) => LanguageScreen());
+      case RouteNames.settingsScreen:
+        return MaterialPageRoute(builder: (_) => SettingsScreen());
       default:
         return MaterialPageRoute(
-          builder: (_) => const Scaffold(
-            body: Center(child: Text('No route found')),
-          ),
+          builder:
+              (_) =>
+                  const Scaffold(body: Center(child: Text('No route found'))),
         );
     }
   }
-
 }

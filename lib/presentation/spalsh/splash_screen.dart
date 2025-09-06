@@ -20,14 +20,11 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<AuthBloc>().add(LoadUserDataEvent());
+    // context.read<AuthBloc>().add(LoadUserDataEvent());
     Future.delayed(const Duration(seconds: 3), () {
-      if(context.read<AuthBloc>().state.userModel != null){
-        Navigator.pushReplacementNamed(context, RouteNames.home);
 
-      }else{
-        Navigator.pushReplacementNamed(context, RouteNames.login);
-      }
+        Navigator.pushReplacementNamed(context, RouteNames.navBarScreen);
+
 
     });
   }
