@@ -32,7 +32,7 @@ class DrawerWidget extends StatelessWidget {
             GestureDetector(
               onTap: () {
                 if (currentUser?.userData?.apiToken != null) {
-                  Navigator.of(context).pushNamed('/Profile');
+                  Navigator.of(context).pushNamed(RouteNames.profileInfoScreen);
                 } else {
                   Navigator.of(context).pushNamed(RouteNames.login);
                 }
@@ -61,6 +61,15 @@ class DrawerWidget extends StatelessWidget {
             ),
             _buildListTile(
               context,
+              icon: Icons.map,
+              text: Labels.mapExplorer,
+              onTap: () {
+                context.read<NavBarBloc>().add(const SelectTab(1));
+                Navigator.pop(context);
+              },
+            ),
+            _buildListTile(
+              context,
               icon: Icons.local_mall,
               text: Labels.myOrders,
               onTap: () {
@@ -77,17 +86,18 @@ class DrawerWidget extends StatelessWidget {
                 Navigator.pop(context);
               },
             ),
-          SizedBox(
-            height: context.heightPct(.01),
-          ),
+            SizedBox(height: context.heightPct(.01)),
 
-          Padding(
-            padding: const EdgeInsets.only(left: 10.0),
-            child: Text(Labels.applicationPreferences,style: TextStyle(
-              fontFamily: FontFamily.fontsPoppinsSemiBold,
-              color: Theme.of(context).colorScheme.onSecondary,
-            ),),
-          ),
+            Padding(
+              padding: const EdgeInsets.only(left: 10.0),
+              child: Text(
+                Labels.applicationPreferences,
+                style: TextStyle(
+                  fontFamily: FontFamily.fontsPoppinsSemiBold,
+                  color: Theme.of(context).colorScheme.onSecondary,
+                ),
+              ),
+            ),
 
             // ✅ Other Navigation (direct pages)
             // _buildListTile(
@@ -112,6 +122,12 @@ class DrawerWidget extends StatelessWidget {
             //     }
             //   },
             // ),
+            _buildListTile(
+              context,
+              icon: Icons.help_outline,
+              text: Labels.helpAndSupport,
+              onTap: () => Navigator.pushNamed(context, RouteNames.faqsScreen),
+            ),
             currentUser?.userData?.apiToken == null
                 ? SizedBox.shrink()
                 : _buildListTile(
@@ -252,7 +268,9 @@ class DrawerWidget extends StatelessWidget {
           Container(
             // margin: const EdgeInsets.only(top: 20, bottom: 1),
             padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-            color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
+            color: Theme.of(
+              context,
+            ).colorScheme.secondary.withValues(alpha: 0.1),
             child: Row(
               children: [
                 Icon(
@@ -272,8 +290,12 @@ class DrawerWidget extends StatelessWidget {
               ],
             ),
           ),
-          Divider(height: 0,
-              color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: .3)),
+          Divider(
+            height: 0,
+            color: Theme.of(
+              context,
+            ).colorScheme.onSecondary.withValues(alpha: .3),
+          ),
         ],
       );
     }
@@ -292,8 +314,8 @@ class DrawerWidget extends StatelessWidget {
         text,
         style: TextStyle(
           fontFamily: FontFamily.fontsPoppinsRegular,
-          fontSize: context.scaledFont(13),
-          color: Theme.of(context).colorScheme.secondary,
+          fontSize: context.scaledFont(12),
+          color: Theme.of(context).colorScheme.onSecondary,
         ),
       ),
       onTap: onTap,
