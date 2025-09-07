@@ -80,7 +80,7 @@ class MyApp extends StatelessWidget {
           localizationsDelegates: context.localizationDelegates,
           supportedLocales: context.supportedLocales,
           locale: context.locale,
-          // home: SettingsScreen(),
+          // home: CardInfoAddScreen(),
           initialRoute: RouteNames.splash,
           onGenerateRoute: AppRoutes.generateRoute,
         );

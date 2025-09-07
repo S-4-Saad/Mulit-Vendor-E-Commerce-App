@@ -6,10 +6,15 @@ import 'package:speezu/core/assets/font_family.dart';
 enum AppThemeMode { light, dark }
 
 class AppTheme {
-  static const Color mainColor = Color(0xFF01035E);
-  static const Color mainDarkColor = Color(0xFF01285e);
-  static const Color secondColor = Color(0xFF98CC33);
-  static const Color secondDarkColor = Color(0xFF98CC33);
+  // 🌿 Fresh Teal Green Theme
+// 🌿 Teal + Coral Contrast Theme
+  // 🌿 Teal + Fresh Lime Contrast Theme
+  static const Color mainColor = Color(0xFF008080);       // Teal Green
+  static const Color mainDarkColor = Color(0xFF004D4D);   // Darker Teal (headers / dark mode)
+  static const Color secondColor = Color(0xFF8BC34A);     // Fresh Lime Green (contrasts teal)
+  static const Color secondDarkColor = Color(0xFF689F38); // Dark Lime (for depth)
+
+
   static const Color accentColor = Color(0xFF8C98A8);
   static const Color accentDarkColor = Color(0xFF9999AA);
   static const Color scaffoldColor = Color(0xFFFAFAFA);

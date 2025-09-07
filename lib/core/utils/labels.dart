@@ -63,6 +63,18 @@ class Labels {
   static String get all => 'all'.tr();
   static String get reset => 'reset'.tr();
   static String get apply => 'apply'.tr();
+  static String get number => 'number'.tr();
+  static String get expiredDate => 'expiredDate'.tr();
+  static String get cvv => 'cvv'.tr();
+  static String get holderName => 'holderName'.tr();
+  static String get floatingCard => 'floatingCard'.tr();
+  static String get glassmorphism => 'glassmorphism'.tr();
+  static String get addNewCard => 'addNewCard'.tr();
+  static String get paymentSettings => 'paymentSettings'.tr();
+  static String get applicationSettings => 'applicationSettings'.tr();
+  static String get changePassword => 'changePassword'.tr();
+  static String get profile => 'profile'.tr();
+  static String get resentOrders => 'resentOrders'.tr();
 
 
 }
