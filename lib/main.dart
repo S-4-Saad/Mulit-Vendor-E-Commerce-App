@@ -8,12 +8,6 @@ import 'package:speezu/core/theme/theme_bloc/theme_state.dart';
 import 'package:speezu/core/utils/app_validators.dart';
 import 'package:speezu/presentation/auth/bloc/auth_bloc.dart';
 import 'package:speezu/presentation/auth/login_screen.dart';
-import 'package:speezu/presentation/languages/bloc/languages_bloc.dart';
-import 'package:speezu/presentation/languages/languages_screen.dart';
-import 'package:speezu/presentation/nav_bar_screen/nav_bar_screen.dart';
-import 'package:speezu/presentation/settings/settings_screen.dart';
-import 'package:speezu/presentation/spalsh/splash_screen.dart';
-import 'package:speezu/repositories/user_repository.dart';
 import 'package:speezu/routes/app_routes.dart';
 import 'package:speezu/routes/route_names.dart';
 import 'package:speezu/widgets/custom_text_form_field.dart';
@@ -26,34 +20,17 @@ import 'core/theme/theme_bloc/theme_event.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-  final userRepository = UserRepository();
-  await userRepository.init(); // ✅ loads user automatically
-
   // If you want immersive UI without hiding bars completely:
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   runApp(
     EasyLocalization(
-      supportedLocales: const [
-        Locale('en'),
-        Locale('ar'),
-        Locale('es'),
-        Locale('fr'),
-        Locale('fr', 'CA'),
-        Locale('pt', 'BR'),
-        Locale('ko'),
-      ],
+      supportedLocales: const [Locale('en'), Locale('ar')],
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
       child: MultiBlocProvider(
         providers: [
           BlocProvider<ThemeBloc>(create: (_) => ThemeBloc()),
           BlocProvider<AuthBloc>(create: (_) => AuthBloc()),
-          BlocProvider<LanguageBloc>(create: (_) => LanguageBloc()),
-          // BlocProvider<CustomersBloc>(create: (_) => CustomersBloc()),
-          // BlocProvider<EstimateBloc>(create: (_) => EstimateBloc()),
-          // BlocProvider<EstimateDetailBloc>(create: (_) => EstimateDetailBloc()),
-          // BlocProvider<EstimateItemsBloc>(create: (_) => EstimateItemsBloc()),
-          // BlocProvider<DropdownCubit<String>>(create: (_) => DropdownCubit<String>()),
         ],
         child: MyApp(),
       ),
@@ -68,21 +45,29 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ThemeBloc, ThemeState>(
       builder: (context, theme) {
-        return MaterialApp(
-          title: 'RiverCity',
-          debugShowCheckedModeBanner: true,
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
-          themeMode: theme.themeMode == AppThemeMode.light
-              ? ThemeMode.light
-              : ThemeMode.dark,
-
-          localizationsDelegates: context.localizationDelegates,
-          supportedLocales: context.supportedLocales,
-          locale: context.locale,
-          // home: CardInfoAddScreen(),
-          initialRoute: RouteNames.splash,
-          onGenerateRoute: AppRoutes.generateRoute,
+        return GestureDetector(
+          onTap: () {
+            FocusScopeNode currentFocus = FocusScope.of(context);
+            if (!currentFocus.hasPrimaryFocus &&
+                currentFocus.focusedChild != null) {
+              FocusManager.instance.primaryFocus?.unfocus();
+            }
+          },
+          child: MaterialApp(
+            title: 'RiverCity',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: theme.themeMode == AppThemeMode.light
+                ? ThemeMode.light
+                : ThemeMode.dark,
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: context.supportedLocales,
+            locale: context.locale,
+            // home: LoginScreen(),
+            initialRoute: RouteNames.splash,
+            onGenerateRoute: AppRoutes.generateRoute,
+          ),
         );
       },
     );

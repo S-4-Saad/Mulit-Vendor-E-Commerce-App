@@ -8,3 +8,6 @@ const String loginUserUrl = "$baseUrl/login";
 const String resetPasswordUrl = "$baseUrl/send_reset_link_email";
 const String faqsUrl = "$baseUrl/faqs";
 
+///-----------Fetch Dashboard Banner Apis-----------------///
+const String dashboardBannersUrl = "$baseUrl/slides";
+
