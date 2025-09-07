@@ -27,7 +27,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       scrolledUnderElevation: 0,
       backgroundColor:
-          backgroundColor ?? Theme.of(context).colorScheme.secondary,
+          backgroundColor ?? Theme.of(context).colorScheme.onPrimary,
       centerTitle: true,
       elevation: elevation,
       leading:
@@ -38,7 +38,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 },
                 icon: Icon(
                   backIcon,
-                  color: Theme.of(context).colorScheme.onPrimary,
+                  color: Theme.of(context).colorScheme.onSecondary,
                   size: context.scaledFont(23),
                 ),
               )
@@ -46,13 +46,23 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Text(
         title,
         style: TextStyle(
-          color: Theme.of(context).colorScheme.onPrimary,
+          color: Theme.of(
+            context,
+          ).colorScheme.onSecondary.withValues(alpha: .9),
           fontFamily: FontFamily.fontsPoppinsSemiBold,
-
           fontSize: context.scaledFont(19),
         ),
       ),
       actions: [action ?? const SizedBox.shrink()],
+      bottom: PreferredSize(
+        preferredSize: Size(1, 5),
+        child: Divider(
+          color: Theme.of(context).colorScheme.secondary.withValues(alpha: .5),
+          height: 1,
+
+          thickness: 1.5,
+        ),
+      ),
     );
   }
 

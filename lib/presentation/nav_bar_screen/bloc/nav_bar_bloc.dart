@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 // Screens
-import 'package:speezu/paractise/practise.dart';
 import 'package:speezu/presentation/home/home_screen.dart';
 
 // Bloc files
+import '../../../paractise.dart';
 import 'nav_bar_event.dart';
 import 'nav_bar_state.dart';
 

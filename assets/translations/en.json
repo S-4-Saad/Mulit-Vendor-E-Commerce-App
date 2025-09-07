@@ -59,5 +59,17 @@
   "opened": "Opened",
   "all": "All",
   "reset": "Reset",
-  "apply": "Apply"
+  "number": "Number",
+  "expiredDate": "Expired Date",
+  "cvv": "CVV",
+  "holderName": "Holder Name",
+  "floatingCard": "Floating Card",
+  "glassmorphism": "Glassmorphism",
+  "addNewCard": "Add New Card",
+  "paymentSettings": "Payment Settings",
+  "applicationSettings": "Application Settings",
+  "changePassword": "Change Password",
+  "resentOrders": "Resent Orders",
+  "profile": "Profile"
+
 }
