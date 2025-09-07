@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "423810083927",
+    "project_id": "speezu-e618c",
+    "storage_bucket": "speezu-e618c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:423810083927:android:98e08ace03dec7d4aa4712",
+        "android_client_info": {
+          "package_name": "com.speezu.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDgTJ0RQ_F6J3r5xJe7-QuXGkfUKQdbgVs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,4 +1,4 @@
-package com.example.speezu
+package com.speezu.app
 
 import io.flutter.embedding.android.FlutterActivity
 

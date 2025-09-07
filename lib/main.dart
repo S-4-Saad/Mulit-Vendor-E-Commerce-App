@@ -1,5 +1,7 @@
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,20 +10,48 @@ import 'package:speezu/core/theme/theme_bloc/theme_state.dart';
 import 'package:speezu/core/utils/app_validators.dart';
 import 'package:speezu/presentation/auth/bloc/auth_bloc.dart';
 import 'package:speezu/presentation/auth/login_screen.dart';
+import 'package:speezu/presentation/languages/bloc/languages_bloc.dart';
 import 'package:speezu/routes/app_routes.dart';
 import 'package:speezu/routes/route_names.dart';
 import 'package:speezu/widgets/custom_text_form_field.dart';
 
+import 'core/services/notification_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_bloc/theme_bloc.dart';
 import 'core/theme/theme_bloc/theme_event.dart';
+import 'firebase_options.dart';
 
+// This needs to be outside of any class
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  final notificationService = NotificationService();
+  await notificationService.initializeLocalNotifications();
+  await notificationService.showNotification(message);
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   // If you want immersive UI without hiding bars completely:
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  // Set the background message handler
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  // Initialize notification service
+  final notificationService = NotificationService();
+  await notificationService.initializeLocalNotifications();
+  notificationService.requestNotificationPermission();
+  notificationService.firebaseInit();
+  notificationService.setupInteractMessage();
+  notificationService.getDeviceToken();
+
+  // GetServerKey getServerKey = GetServerKey();
+  // String serverKey = await getServerKey.getServerKeyToken();
+  // printWrapped("Server Key: $serverKey");
   runApp(
     EasyLocalization(
       supportedLocales: const [Locale('en'), Locale('ar')],
@@ -31,6 +61,7 @@ void main() async {
         providers: [
           BlocProvider<ThemeBloc>(create: (_) => ThemeBloc()),
           BlocProvider<AuthBloc>(create: (_) => AuthBloc()),
+          BlocProvider<LanguageBloc>(create: (_) => LanguageBloc()),
         ],
         child: MyApp(),
       ),

@@ -49,6 +49,12 @@ dependencies:
   flutter_credit_card: ^4.1.0
   carousel_slider: ^5.1.1
   path_provider: ^2.1.4
+  firebase_core: ^4.1.0
+  flutter_local_notifications: ^19.4.1
+  firebase_messaging: ^16.0.1
+  googleapis_auth: ^2.0.0
+  app_settings: ^6.1.1
+
 
 dev_dependencies:
   flutter_test:
