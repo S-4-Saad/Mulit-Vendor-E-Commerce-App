@@ -17,6 +17,8 @@ class RestaurantModel {
   String? cuisineType;
   double? distance;
   bool? isFavorite;
+  double? latitude;
+  double? longitude;
 
   RestaurantModel({
     this.id,
@@ -35,6 +37,8 @@ class RestaurantModel {
     this.cuisineType,
     this.distance,
     this.isFavorite,
+    this.latitude,
+    this.longitude,
   });
 
   factory RestaurantModel.fromJson(Map<String, dynamic> json) {
@@ -59,6 +63,8 @@ class RestaurantModel {
       cuisineType: json['cuisine_type'],
       distance: json['distance']?.toDouble(),
       isFavorite: json['is_favorite'],
+      latitude: json['latitude']?.toDouble(),
+      longitude: json['longitude']?.toDouble(),
     );
   }
 
@@ -80,6 +86,8 @@ class RestaurantModel {
       'cuisine_type': cuisineType,
       'distance': distance,
       'is_favorite': isFavorite,
+      'latitude': latitude,
+      'longitude': longitude,
     };
   }
 }

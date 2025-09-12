@@ -11,6 +11,7 @@ import '../../../paractise.dart';
 import '../../orders/orders_tab_bar_screen.dart';
 import '../../product_detail/product_detail_screen.dart';
 import '../../shop_screen/shop/shop_detail_screen.dart';
+import '../../map_screen/map_screen.dart';
 import 'nav_bar_event.dart';
 import 'nav_bar_state.dart';
 

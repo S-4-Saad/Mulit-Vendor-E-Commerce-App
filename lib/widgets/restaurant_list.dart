@@ -7,7 +7,7 @@ class RestaurantList extends StatelessWidget {
   final VoidCallback? onRestaurantTap;
   final VoidCallback? onOpenTap;
   final VoidCallback? onPickupTap;
-  final VoidCallback? onFavoriteTap;
+  final Function(RestaurantModel)? onLocationTap;
   final double? height;
   final EdgeInsetsGeometry? padding;
 
@@ -17,7 +17,7 @@ class RestaurantList extends StatelessWidget {
     this.onRestaurantTap,
     this.onOpenTap,
     this.onPickupTap,
-    this.onFavoriteTap,
+    this.onLocationTap,
     this.height,
     this.padding,
   });
@@ -29,7 +29,7 @@ class RestaurantList extends StatelessWidget {
     }
 
     return Container(
-      height: height ?? 320,
+      height: height ?? 300,
       padding: padding ?? const EdgeInsets.symmetric(vertical: 8),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -43,7 +43,7 @@ class RestaurantList extends StatelessWidget {
               onTap: onRestaurantTap,
               onOpenTap: onOpenTap,
               onPickupTap: onPickupTap,
-              onFavoriteTap: onFavoriteTap,
+              onLocationTap: onLocationTap,
             ),
           );
         },

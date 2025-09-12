@@ -25,24 +25,16 @@ class NotificationScreen extends StatelessWidget {
     );
   }
 }
-
-class MapScreen extends StatelessWidget {
-  const MapScreen({super.key});
-
+class OrderScreen extends StatelessWidget {
+  const OrderScreen({super.key});
+  
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text(
-          'MapScreen Screen',
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-      ),
-    );
+    // TODO: implement build
+    throw UnimplementedError();
   }
+
 }
-
-
 
 class FavouriteScreen extends StatelessWidget {
   const FavouriteScreen({super.key});

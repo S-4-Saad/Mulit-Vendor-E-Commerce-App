@@ -623,10 +623,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         // Handle pickup action
                         print("Pickup tapped");
                       },
-                      onFavoriteTap: () {
-                        // Handle favorite toggle
-                        print("Favorite tapped");
-                      },
                     ),
                   ],
                 ),
