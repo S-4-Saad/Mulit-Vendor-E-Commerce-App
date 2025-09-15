@@ -12,6 +12,10 @@ class MapInitialized extends MapEvent {
   const MapInitialized();
 }
 
+class MapScreenShown extends MapEvent {
+  const MapScreenShown();
+}
+
 class MapLocationRequested extends MapEvent {
   const MapLocationRequested();
 }

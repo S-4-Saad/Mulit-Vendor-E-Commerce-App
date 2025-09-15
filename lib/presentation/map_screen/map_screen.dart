@@ -13,8 +13,8 @@ class MapScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => MapBloc()..add(const MapInitialized()),
+    return BlocProvider.value(
+      value: MapBloc.instance,
       child: const MapView(),
     );
   }
@@ -28,6 +28,15 @@ class MapView extends StatefulWidget {
 }
 
 class _MapViewState extends State<MapView> {
+  @override
+  void initState() {
+    super.initState();
+    // Trigger the map screen shown event
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<MapBloc>().add(const MapScreenShown());
+    });
+  }
+
   // Sample restaurant data - replace with API response
   List<RestaurantModel> _getSampleRestaurants([LatLng? currentLocation]) {
     final restaurants = [
@@ -108,11 +117,12 @@ class _MapViewState extends State<MapView> {
               SnackBar(
                 content: Text(state.error),
                 backgroundColor: Colors.red,
+                duration: const Duration(seconds: 5),
                 action: SnackBarAction(
-                  label: 'Retry',
+                  label: 'Use Default',
                   textColor: Colors.white,
                   onPressed: () {
-                    context.read<MapBloc>().add(const MapInitialized());
+                    context.read<MapBloc>().add(const MapUseDefaultLocation());
                   },
                 ),
               ),
@@ -122,11 +132,12 @@ class _MapViewState extends State<MapView> {
               SnackBar(
                 content: const Text('Location permission denied'),
                 backgroundColor: Colors.orange,
+                duration: const Duration(seconds: 5),
                 action: SnackBarAction(
-                  label: 'Retry',
+                  label: 'Use Default',
                   textColor: Colors.white,
                   onPressed: () {
-                    context.read<MapBloc>().add(const MapInitialized());
+                    context.read<MapBloc>().add(const MapUseDefaultLocation());
                   },
                 ),
               ),
@@ -136,11 +147,12 @@ class _MapViewState extends State<MapView> {
               SnackBar(
                 content: const Text('Location services are disabled'),
                 backgroundColor: Colors.orange,
+                duration: const Duration(seconds: 5),
                 action: SnackBarAction(
-                  label: 'Retry',
+                  label: 'Use Default',
                   textColor: Colors.white,
                   onPressed: () {
-                    context.read<MapBloc>().add(const MapInitialized());
+                    context.read<MapBloc>().add(const MapUseDefaultLocation());
                   },
                 ),
               ),
@@ -206,6 +218,7 @@ class _MapViewState extends State<MapView> {
     }
     return const SizedBox.shrink();
   }
+
 
   Widget _buildRestaurantList() {
     return BlocBuilder<MapBloc, MapState>(

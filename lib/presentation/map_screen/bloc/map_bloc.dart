@@ -15,9 +15,25 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   );
 
   final DirectionsService _directionsService = DirectionsService();
-
-  MapBloc() : super(const MapInitial()) {
+  
+  // Singleton instance
+  static MapBloc? _instance;
+  static MapBloc get instance {
+    _instance ??= MapBloc._internal();
+    return _instance!;
+  }
+  
+  // Private constructor for singleton
+  MapBloc._internal() : super(const MapInitial()) {
+    _initializeEventHandlers();
+  }
+  
+  // Public constructor for backward compatibility (creates singleton)
+  MapBloc() : this._internal();
+  
+  void _initializeEventHandlers() {
     on<MapInitialized>(_onMapInitialized);
+    on<MapScreenShown>(_onMapScreenShown);
     on<MapLocationPermissionRequested>(_onLocationPermissionRequested);
     on<MapLocationRequested>(_onLocationRequested);
     on<MapCurrentLocationFetched>(_onCurrentLocationFetched);
@@ -37,6 +53,19 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     MapInitialized event,
     Emitter<MapState> emit,
   ) async {
+    // If we already have a loaded state with location, don't reload
+    if (state is MapLoaded) {
+      final currentState = state as MapLoaded;
+      if (currentState.currentPosition != null) {
+        return;
+      }
+    }
+
+    // If we're already loading, don't start another loading process
+    if (state is MapLoading) {
+      return;
+    }
+
     // Show loading while getting current location
     emit(const MapLoading('Getting your current location...'));
 
@@ -44,13 +73,30 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     await _requestLocationWithTimeout();
   }
 
+  void _onMapScreenShown(
+    MapScreenShown event,
+    Emitter<MapState> emit,
+  ) {
+    // If we already have a loaded state, just return it
+    if (state is MapLoaded) {
+      print('MapBloc: Map screen shown, location already available');
+      return;
+    }
+
+    // If we're in initial state, initialize the map
+    if (state is MapInitial) {
+      print('MapBloc: Map screen shown, initializing for first time');
+      add(const MapInitialized());
+    }
+  }
+
   Future<void> _requestLocationWithTimeout() async {
     try {
       // Add a timeout for the entire location request process
       await Future.any([
         _performLocationRequest(),
-        Future.delayed(const Duration(seconds: 15), () {
-          throw TimeoutException('Location request timed out');
+        Future.delayed(const Duration(seconds: 20), () {
+          throw TimeoutException('Location request timed out after 20 seconds');
         }),
       ]);
     } catch (e) {
@@ -62,6 +108,74 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
   Future<void> _performLocationRequest() async {
     add(const MapLocationPermissionRequested());
+  }
+
+  Future<Position> _getCurrentPositionWithFallback(Emitter<MapState> emit) async {
+    // First, try to get last known location (faster)
+    try {
+      Position? lastKnownPosition = await Geolocator.getLastKnownPosition();
+      if (lastKnownPosition != null) {
+        // Check if the last known position is recent (within 5 minutes)
+        final now = DateTime.now();
+        final positionTime = lastKnownPosition.timestamp;
+        final age = now.difference(positionTime);
+        if (age.inMinutes < 5) {
+          return lastKnownPosition;
+        }
+      }
+    } catch (e) {
+      print('MapBloc: Last known location not available: $e');
+    }
+
+    // Try different accuracy levels in order of preference
+    final accuracyLevels = [
+      LocationAccuracy.low,      // Fastest, least accurate
+      LocationAccuracy.medium,   // Balanced
+      LocationAccuracy.high,     // More accurate, slower
+    ];
+
+    for (int i = 0; i < accuracyLevels.length; i++) {
+      try {
+        print('MapBloc: Trying accuracy level ${accuracyLevels[i]} (attempt ${i + 1})');
+        
+        // Update loading message to show current attempt
+        if (i > 0) {
+          emit(MapLoading('Trying different location settings... (${i + 1}/${accuracyLevels.length})'));
+        }
+        
+        // Adjust timeout based on attempt - give more time for higher accuracy
+        final timeoutSeconds = i == 0 ? 8 : (i == 1 ? 10 : 12);
+        final timeLimitSeconds = i == 0 ? 6 : (i == 1 ? 8 : 10);
+        
+        Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: accuracyLevels[i],
+          timeLimit: Duration(seconds: timeLimitSeconds),
+        ).timeout(
+          Duration(seconds: timeoutSeconds),
+          onTimeout: () {
+            throw TimeoutException('Location request timed out for ${accuracyLevels[i]}');
+          },
+        );
+        
+        print('MapBloc: Successfully got location with ${accuracyLevels[i]} accuracy');
+        return position;
+      } catch (e) {
+        print('MapBloc: Failed with ${accuracyLevels[i]} accuracy: $e');
+        
+        // If this is the last attempt, rethrow the error
+        if (i == accuracyLevels.length - 1) {
+          rethrow;
+        }
+        
+        // Wait a bit before trying the next accuracy level (exponential backoff)
+        final delay = Duration(milliseconds: 1000 * (i + 1)); // Increased delay
+        print('MapBloc: Waiting ${delay.inMilliseconds}ms before next attempt');
+        await Future.delayed(delay);
+      }
+    }
+    
+    // This should never be reached, but just in case
+    throw Exception('All location accuracy levels failed');
   }
 
   Future<void> _onLocationPermissionRequested(
@@ -103,18 +217,24 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         return;
       }
 
+      // Check location permission status
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        print('MapBloc: Location permission denied');
+        emit(const MapLocationPermissionDenied());
+        return;
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        print('MapBloc: Location permission permanently denied');
+        emit(const MapLocationPermissionDenied());
+        return;
+      }
+
       print('MapBloc: Requesting current position...');
 
-      // Get current position with timeout
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.medium,
-        timeLimit: const Duration(seconds: 8),
-      ).timeout(
-        const Duration(seconds: 10),
-        onTimeout: () {
-          throw TimeoutException('Location request timed out');
-        },
-      );
+      // Try to get current position with different accuracy levels
+      Position position = await _getCurrentPositionWithFallback(emit);
 
       final newPosition = LatLng(position.latitude, position.longitude);
       final newCameraPosition = CameraPosition(
@@ -136,8 +256,21 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       _moveToLocation(newPosition);
     } catch (e) {
       print('MapBloc: Location error - $e');
+      
+      // Provide more user-friendly error messages
+      String errorMessage;
+      if (e.toString().contains('TimeoutException')) {
+        errorMessage = 'Location request timed out. Please check your GPS settings and try again.';
+      } else if (e.toString().contains('LocationServiceDisabledException')) {
+        errorMessage = 'Location services are disabled. Please enable GPS in your device settings.';
+      } else if (e.toString().contains('PermissionDeniedException')) {
+        errorMessage = 'Location permission denied. Please enable location access in app settings.';
+      } else {
+        errorMessage = 'Unable to get your current location. Please check your GPS settings and try again.';
+      }
+      
       // Emit error state
-      emit(MapError('Failed to get your current location: $e'));
+      emit(MapError(errorMessage));
     }
   }
 
@@ -169,6 +302,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     if (state is MapLoaded) {
       emit(MapError(event.error, previousState: state as MapLoaded));
     } else {
+      // If we don't have a loaded state, show error with option to use default location
       emit(MapError(event.error));
     }
   }
@@ -243,6 +377,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   void toggleMapType(MapType mapType) {
     add(MapToggleMapType(mapType));
   }
+
 
   void _onUseDefaultLocation(
     MapUseDefaultLocation event,
