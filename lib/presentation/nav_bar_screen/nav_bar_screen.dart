@@ -43,7 +43,9 @@ class NavBarScreen extends StatelessWidget {
               backgroundColor: Theme.of(context).colorScheme.onPrimary,
               actions: [
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushNamed(context, RouteNames.cartScreen);
+                  },
                   icon: Icon(
                     Icons.shopping_cart,
                     color: Theme.of(context).colorScheme.secondary,

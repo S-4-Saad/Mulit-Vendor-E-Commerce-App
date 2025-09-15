@@ -23,11 +23,11 @@ class SlidesModel {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['success'] = this.success;
+    data['success'] = success;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
-    data['message'] = this.message;
+    data['message'] = message;
     return data;
   }
 }
@@ -104,29 +104,29 @@ class Slides {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['order'] = this.order;
-    data['text'] = this.text;
-    data['button'] = this.button;
-    data['text_position'] = this.textPosition;
-    data['text_color'] = this.textColor;
-    data['button_color'] = this.buttonColor;
-    data['background_color'] = this.backgroundColor;
-    data['indicator_color'] = this.indicatorColor;
-    data['image_fit'] = this.imageFit;
-    data['food_id'] = this.foodId;
-    data['restaurant_id'] = this.restaurantId;
-    data['enabled'] = this.enabled;
-    data['created_at'] = this.createdAt;
-    data['updated_at'] = this.updatedAt;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['order'] = order;
+    data['text'] = text;
+    data['button'] = button;
+    data['text_position'] = textPosition;
+    data['text_color'] = textColor;
+    data['button_color'] = buttonColor;
+    data['background_color'] = backgroundColor;
+    data['indicator_color'] = indicatorColor;
+    data['image_fit'] = imageFit;
+    data['food_id'] = foodId;
+    data['restaurant_id'] = restaurantId;
+    data['enabled'] = enabled;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
     // if (this.customFields != null) {
     //   data['custom_fields'] =
     //       this.customFields!.map((v) => v.toJson()).toList();
     // }
-    data['has_media'] = this.hasMedia;
-    if (this.media != null) {
-      data['media'] = this.media!.map((v) => v.toMap()).toList();
+    data['has_media'] = hasMedia;
+    if (media != null) {
+      data['media'] = media!.map((v) => v.toMap()).toList();
     }
     return data;
   }
@@ -149,10 +149,10 @@ class CustomProperties {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['uuid'] = this.uuid;
-    data['user_id'] = this.userId;
-    if (this.generatedConversions != null) {
-      data['generated_conversions'] = this.generatedConversions!.toJson();
+    data['uuid'] = uuid;
+    data['user_id'] = userId;
+    if (generatedConversions != null) {
+      data['generated_conversions'] = generatedConversions!.toJson();
     }
     return data;
   }
@@ -171,8 +171,8 @@ class GeneratedConversions {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['thumb'] = this.thumb;
-    data['icon'] = this.icon;
+    data['thumb'] = thumb;
+    data['icon'] = icon;
     return data;
   }
 }

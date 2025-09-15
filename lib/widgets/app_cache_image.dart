@@ -58,6 +58,7 @@ class AppCacheImage extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(round ?? 20),
           child: CachedNetworkImage(
+
             //memCacheWidth: width.toInt(),
             //memCacheHeight: height.toInt(),
             width: width,

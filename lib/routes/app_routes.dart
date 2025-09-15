@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:speezu/presentation/cart/cart_screen.dart';
+import 'package:speezu/presentation/category/category_screen.dart';
+import 'package:speezu/presentation/product/product_screen.dart';
+import 'package:speezu/presentation/shop_screen/shop_navbar_screen.dart';
 import 'package:speezu/routes/route_names.dart';
 import '../presentation/auth/forgot_password_screen.dart';
 import '../presentation/auth/login_screen.dart';
@@ -38,6 +42,15 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => FaqsScreen());
       case RouteNames.profileInfoScreen:
         return MaterialPageRoute(builder: (_) => ProfileInfoScreen());
+
+      case RouteNames.categoryScreen:
+        return MaterialPageRoute(builder: (_) => CategoryScreen());
+        case RouteNames.shopNavBarScreen:
+      return MaterialPageRoute(builder: (_) => ShopNavbarScreen());
+      case RouteNames.productScreen:
+      return MaterialPageRoute(builder: (_) => ProductScreen());
+      case RouteNames.cartScreen:
+      return MaterialPageRoute(builder: (_) => CartScreen());
       default:
         return MaterialPageRoute(
           builder:

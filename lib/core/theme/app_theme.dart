@@ -28,6 +28,8 @@ class AppTheme {
   static const Color errorColor = Color(0xFFB00020);
   static const Color successColor = Color(0xFF2ECC71);
   static const Color warningColor = Color(0xFFFFA726);
+  static const rattingYellow = Color(0xffFFCE31);
+  static const Color redColor = Colors.red;
 
   static ThemeData get lightTheme {
     return ThemeData(
@@ -47,6 +49,8 @@ class AppTheme {
         surface: scaffoldColor,
         onSurface: textPrimaryLight,
         error: errorColor,
+        onTertiary: redColor,
+        onSurfaceVariant: rattingYellow
       ),
       textTheme: TextTheme(
         displayLarge: TextStyle(
@@ -81,13 +85,13 @@ class AppTheme {
         backgroundColor: secondColor,
         foregroundColor: Colors.black,
       ),
-      cardTheme: CardTheme(
-        color: Colors.white,
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
+      // cardTheme: CardTheme(
+      //   color: Colors.white,
+      //   elevation: 2,
+      //   shape: RoundedRectangleBorder(
+      //     borderRadius: BorderRadius.circular(12),
+      //   ),
+      // ),
       inputDecorationTheme: InputDecorationTheme(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -124,6 +128,8 @@ class AppTheme {
         surface: scaffoldDarkColor,
         onSurface: textPrimaryDark,
         outline: accentDarkColor,
+        onTertiary: redColor,
+        onSurfaceVariant: rattingYellow,
 
         error: errorColor,
       ),
@@ -160,13 +166,13 @@ class AppTheme {
         backgroundColor: secondDarkColor,
         foregroundColor: Colors.white,
       ),
-      cardTheme: CardTheme(
-        color: Color(0xFF3A3A3A),
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
+      // cardTheme: CardTheme(
+      //   color: Color(0xFF3A3A3A),
+      //   elevation: 2,
+      //   shape: RoundedRectangleBorder(
+      //     borderRadius: BorderRadius.circular(12),
+      //   ),
+      // ),
       inputDecorationTheme: InputDecorationTheme(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),

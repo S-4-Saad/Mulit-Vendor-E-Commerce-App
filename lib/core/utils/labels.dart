@@ -18,7 +18,8 @@ class Labels {
   static String get alreadyHaveAnAccount => 'alreadyHaveAnAccount'.tr();
   static String get emailToResetPassword => 'emailToResetPassword'.tr();
   static String get sendLink => 'sendLink'.tr();
-  static String get iRememberMyPasswordReturnToLogin => 'iRememberMyPasswordReturnToLogin'.tr();
+  static String get iRememberMyPasswordReturnToLogin =>
+      'iRememberMyPasswordReturnToLogin'.tr();
   static String get home => 'home'.tr();
   static String get notifications => 'notifications'.tr();
   static String get myOrders => 'myOrders'.tr();
@@ -30,7 +31,8 @@ class Labels {
   static String get darkMode => 'darkMode'.tr();
   static String get logout => 'logout'.tr();
   static String get guest => 'guest'.tr();
-  static String get selectYourPreferredLanguage => 'selectYourPreferredLanguage'.tr();
+  static String get selectYourPreferredLanguage =>
+      'selectYourPreferredLanguage'.tr();
   static String get appLanguage => 'appLanguage'.tr();
   static String get logOut => 'logOut'.tr();
   static String get logIn => 'logIn'.tr();
@@ -75,6 +77,59 @@ class Labels {
   static String get changePassword => 'changePassword'.tr();
   static String get profile => 'profile'.tr();
   static String get resentOrders => 'resentOrders'.tr();
-
-
+  static String get sold => 'sold'.tr();
+  static String get buyNow => 'buyNow'.tr();
+  static String get searchMedicine => 'searchMedicine'.tr();
+  static String get searchFood => 'searchFood'.tr();
+  static String get searchRetailProducts => 'searchRetailProducts'.tr();
+  static String get searchSuperMarketProducts =>
+      'searchSuperMarketProducts'.tr();
+  static String get superMarket => 'superMarket'.tr();
+  static String get food => 'food'.tr();
+  static String get retailStore => 'retailStore'.tr();
+  static String get pharmacy => 'pharmacy'.tr();
+  static String get topTrendingFoods => 'topTrendingFoods'.tr();
+  static String get medicines => 'medicines'.tr();
+  static String get topTrendingProducts => 'topTrendingProducts'.tr();
+  static String get topSuperMarketProducts => 'topSuperMarketProducts'.tr();
+  static String get viewAll => 'viewAll'.tr();
+  static String get shop => 'shop'.tr();
+  static String get shopProducts => 'shopProducts'.tr();
+  static String get products => 'products'.tr();
+  static String get close => 'close'.tr();
+  static String get open => 'open'.tr();
+  static String get forMoreDetailsPleaseContactWithOurManagerOnWhatsApp =>
+      'forMoreDetailsPleaseContactWithOurManagerOnWhatsApp'.tr();
+  static String get rattingAndReviews => 'rattingAndReviews'.tr();
+  static String get reviews => 'reviews'.tr();
+  static String get seeAllReviews => 'seeAllReviews'.tr();
+  static String get information => 'information'.tr();
+  static String get businessHours => 'businessHours'.tr();
+  static String get opensAt => 'opensAt'.tr();
+  static String get closesAt => 'closesAt'.tr();
+  static String get noReviewsYet => 'noReviewsYet'.tr();
+  static String get featuredProducts => 'featuredProducts'.tr();
+  static String get closed => 'closed'.tr();
+  static String get topStores => 'topStores'.tr();
+  static String get trendingSubCategories => 'trendingSubCategories'.tr();
+  static String get available => 'available'.tr();
+  static String get unavailable => 'unavailable'.tr();
+  static String get description => 'description'.tr();
+  static String get viewStore => 'viewStore'.tr();
+  static String get addToCart => 'addToCart'.tr();
+  static String get youMightAlsoLike => 'youMightAlsoLike'.tr();
+  static String get quantity => 'quantity'.tr();
+  static String get yourCart => 'yourCart'.tr();
+  static String get cartProducts => 'cartProducts'.tr();
+  static String get placeOrder => 'placeOrder'.tr();
+  static String get summary => 'summary'.tr();
+  static String get itemsTotal => 'itemsTotal'.tr();
+  static String get deliveryFee => 'deliveryFee'.tr();
+  static String get tax => 'tax'.tr();
+  static String get totalAmount => 'totalAmount'.tr();
+  static String get checkout => 'checkout'.tr();
+  static String get selectPaymentMethod => 'selectPaymentMethod'.tr();
+  static String get selectDeliveryAddress => 'selectDeliveryAddress'.tr();
+  static String get item => 'item'.tr();
+  static String get grandTotal => 'grandTotal'.tr();
 }
