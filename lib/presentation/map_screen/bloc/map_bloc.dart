@@ -79,13 +79,11 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   ) {
     // If we already have a loaded state, just return it
     if (state is MapLoaded) {
-      print('MapBloc: Map screen shown, location already available');
       return;
     }
 
     // If we're in initial state, initialize the map
     if (state is MapInitial) {
-      print('MapBloc: Map screen shown, initializing for first time');
       add(const MapInitialized());
     }
   }
@@ -100,7 +98,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         }),
       ]);
     } catch (e) {
-      print('MapBloc: Location request failed or timed out - $e');
       // If location fails, show error state
       add(MapLocationError('Unable to get your current location: $e'));
     }
@@ -136,8 +133,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
     for (int i = 0; i < accuracyLevels.length; i++) {
       try {
-        print('MapBloc: Trying accuracy level ${accuracyLevels[i]} (attempt ${i + 1})');
-        
         // Update loading message to show current attempt
         if (i > 0) {
           emit(MapLoading('Trying different location settings... (${i + 1}/${accuracyLevels.length})'));
@@ -156,12 +151,9 @@ class MapBloc extends Bloc<MapEvent, MapState> {
             throw TimeoutException('Location request timed out for ${accuracyLevels[i]}');
           },
         );
-        
-        print('MapBloc: Successfully got location with ${accuracyLevels[i]} accuracy');
         return position;
       } catch (e) {
-        print('MapBloc: Failed with ${accuracyLevels[i]} accuracy: $e');
-        
+
         // If this is the last attempt, rethrow the error
         if (i == accuracyLevels.length - 1) {
           rethrow;
@@ -169,7 +161,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         
         // Wait a bit before trying the next accuracy level (exponential backoff)
         final delay = Duration(milliseconds: 1000 * (i + 1)); // Increased delay
-        print('MapBloc: Waiting ${delay.inMilliseconds}ms before next attempt');
         await Future.delayed(delay);
       }
     }
@@ -188,14 +179,12 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
       if (isEnabled) {
         // Automatically request current location when permission is granted
-        print('MapBloc: Location permission granted, fetching current location...');
         add(const MapLocationRequested());
       } else {
         // If permission denied, show error
         emit(MapError('Location permission denied. Please enable location access in settings.'));
       }
     } catch (e) {
-      print('MapBloc: Permission request failed - $e');
       emit(MapError('Failed to request location permission: $e'));
     }
   }
@@ -208,11 +197,9 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     emit(const MapLoading('Getting your current location...'));
 
     try {
-      print('MapBloc: Checking location services...');
       // Check if location services are enabled
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        print('MapBloc: Location services disabled');
         emit(const MapLocationServiceDisabled());
         return;
       }
@@ -220,18 +207,15 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       // Check location permission status
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
-        print('MapBloc: Location permission denied');
         emit(const MapLocationPermissionDenied());
         return;
       }
 
       if (permission == LocationPermission.deniedForever) {
-        print('MapBloc: Location permission permanently denied');
         emit(const MapLocationPermissionDenied());
         return;
       }
 
-      print('MapBloc: Requesting current position...');
 
       // Try to get current position with different accuracy levels
       Position position = await _getCurrentPositionWithFallback(emit);
@@ -255,8 +239,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       // Move camera to current location
       _moveToLocation(newPosition);
     } catch (e) {
-      print('MapBloc: Location error - $e');
-      
       // Provide more user-friendly error messages
       String errorMessage;
       if (e.toString().contains('TimeoutException')) {
