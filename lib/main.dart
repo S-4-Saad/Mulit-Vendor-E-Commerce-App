@@ -8,12 +8,17 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/theme/theme_bloc/theme_state.dart';
 import 'package:speezu/core/utils/app_validators.dart';
+import 'package:speezu/paractise.dart';
 import 'package:speezu/presentation/auth/bloc/auth_bloc.dart';
-import 'package:speezu/presentation/auth/login_screen.dart';
+import 'package:speezu/presentation/home/bloc/home_bloc.dart';
 import 'package:speezu/presentation/languages/bloc/languages_bloc.dart';
+import 'package:speezu/presentation/shop_screen/shop_navbar_screen.dart';
+import 'package:speezu/repositories/user_repository.dart';
 import 'package:speezu/routes/app_routes.dart';
 import 'package:speezu/routes/route_names.dart';
 import 'package:speezu/widgets/custom_text_form_field.dart';
+import 'package:speezu/widgets/search_animated_container.dart';
+import 'package:speezu/widgets/widget_bloc/banner_slider_bloc/banner_slider_bloc.dart';
 
 import 'core/services/notification_service.dart';
 import 'core/theme/app_theme.dart';
@@ -40,6 +45,8 @@ void main() async {
   );
   // Set the background message handler
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  final UserRepository userRepository = UserRepository();
+  userRepository.init();
 
   // Initialize notification service
   final notificationService = NotificationService();
@@ -62,6 +69,9 @@ void main() async {
           BlocProvider<ThemeBloc>(create: (_) => ThemeBloc()),
           BlocProvider<AuthBloc>(create: (_) => AuthBloc()),
           BlocProvider<LanguageBloc>(create: (_) => LanguageBloc()),
+          BlocProvider<HomeBloc>(create: (_) => HomeBloc()),
+          BlocProvider<BannerSliderBloc>(create: (_) => BannerSliderBloc()),
+          BlocProvider<SearchCubit>(create: (_) => SearchCubit()),
         ],
         child: MyApp(),
       ),
@@ -95,7 +105,7 @@ class MyApp extends StatelessWidget {
             localizationsDelegates: context.localizationDelegates,
             supportedLocales: context.supportedLocales,
             locale: context.locale,
-            // home: LoginScreen(),
+            // home: PractiseScreen(),
             initialRoute: RouteNames.splash,
             onGenerateRoute: AppRoutes.generateRoute,
           ),

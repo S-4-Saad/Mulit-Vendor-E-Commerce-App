@@ -5,7 +5,7 @@ class RestaurantModel {
   String? name;
   String? description;
   double? rating;
-  String? status; // "Open", "Closed", "Busy"
+  String? status;
   String? deliveryTime;
   String? pickupTime;
   double? deliveryFee;

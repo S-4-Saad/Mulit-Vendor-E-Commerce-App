@@ -10,4 +10,8 @@ class RouteNames {
   static const String cardInfoAddScreen = '/cardInfoAddScreen';
   static const String faqsScreen = '/faqsScreen';
   static const String profileInfoScreen = '/profileInfoScreen';
+  static const String categoryScreen = '/CategoryScreen';
+  static const String shopNavBarScreen = '/shopNavBarScreen';
+  static const String productScreen = '/productScreen';
+  static const String cartScreen = '/cartScreen';
 }
