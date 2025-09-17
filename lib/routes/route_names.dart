@@ -14,4 +14,7 @@ class RouteNames {
   static const String shopNavBarScreen = '/shopNavBarScreen';
   static const String productScreen = '/productScreen';
   static const String cartScreen = '/cartScreen';
+  static const String checkOutScreen = '/checkOutScreen';
+  static const String placeOrderScreen = '/placeOrderScreen';
+  static const String addAddressScreen = '/addAddressScreen';
 }

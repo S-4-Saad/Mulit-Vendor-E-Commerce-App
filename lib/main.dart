@@ -12,6 +12,7 @@ import 'package:speezu/paractise.dart';
 import 'package:speezu/presentation/auth/bloc/auth_bloc.dart';
 import 'package:speezu/presentation/home/bloc/home_bloc.dart';
 import 'package:speezu/presentation/languages/bloc/languages_bloc.dart';
+import 'package:speezu/presentation/shop_screen/bloc/shop_bloc.dart';
 import 'package:speezu/presentation/shop_screen/shop_navbar_screen.dart';
 import 'package:speezu/repositories/user_repository.dart';
 import 'package:speezu/routes/app_routes.dart';
@@ -72,6 +73,7 @@ void main() async {
           BlocProvider<HomeBloc>(create: (_) => HomeBloc()),
           BlocProvider<BannerSliderBloc>(create: (_) => BannerSliderBloc()),
           BlocProvider<SearchCubit>(create: (_) => SearchCubit()),
+          BlocProvider<ShopBloc>(create: (_) => ShopBloc()),
         ],
         child: MyApp(),
       ),

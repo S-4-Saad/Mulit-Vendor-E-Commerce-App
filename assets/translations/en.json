@@ -123,7 +123,30 @@
     "selectPaymentMethod": "Select Payment Method",
     "selectDeliveryAddress": "Select Delivery Address",
   "item": "Item",
-  "grandTotal": "Grand Total"
-
+  "grandTotal": "Grand Total",
+    "haveCouponCode": "Have Coupon Code?",
+  "enterYourCouponCode": "Enter your coupon code",
+  "pickUpYouItemFromStore": "Pick up your item from store",
+  "payOnPickUp": "Pay on Pick Up",
+  "selectToPayOnPickUp": "Select to Pay On Pick Up",
+  "selectTheDeliveryAddress": "Select the delivery address",
+  "pickUpFromStore": "Pick Up From Store",
+  "youShouldPayAtTheStore": "You should pay at the store",
+  "itemDeliverToYourAddress": "Item deliver to your address",
+  "addressTitle": "Address Title",
+  "customerName": "Customer Name",
+  "primaryPhoneNumber": "Primary Phone Number",
+    "secondaryPhoneNumber": "Secondary Phone Number",
+  "yourFullAddress": "Your Full Address",
+  "saveAddress": "Save Address",
+  "addNewAddress": "Add New Address",
+  "cashOnDelivery": "Cash On Delivery",
+  "payWhenYourOrderIsDeliveredToYou": "Pay when your order is delivered to you",
+  "onlinePayment": "Online Payment",
+    "paySecurelyWithYourCreditCard":" Pay securely with your credit card",
+    "orderPlaced": "Order Placed",
+    "confirmOrder": "Confirm Order",
+  "selectYourPaymentMethod": "Select Your Payment Method",
+  "allProducts": "All Products"
 
 }

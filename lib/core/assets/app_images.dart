@@ -9,5 +9,7 @@ class AppImages {
   static const String utilityStoreIcon = 'assets/images/utilityStore.png';
   static const String superMarketIcon = 'assets/images/superMarket.png';
   static const String pharmacyIcon = 'assets/images/pharmacyIcon.png';
+  static const String storeImage = 'assets/images/storeImage.jpg';
+  static const String allProducts = 'assets/images/allProducts.svg';
 
 }
