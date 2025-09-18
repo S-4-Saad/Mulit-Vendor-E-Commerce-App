@@ -147,6 +147,12 @@
     "orderPlaced": "Order Placed",
     "confirmOrder": "Confirm Order",
   "selectYourPaymentMethod": "Select Your Payment Method",
-  "allProducts": "All Products"
+  "allProducts": "All Products",
+  "editProfile": "Edit Profile",
+  "name": "Name",
+    "updateProfile": "Update Profile",
+  "bio": "Bio",
+    "changeYourProfilePicture": "Change your profile picture",
+  "addressBook": "Address Book"
 
 }

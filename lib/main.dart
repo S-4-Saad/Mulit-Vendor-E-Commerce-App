@@ -10,6 +10,7 @@ import 'package:speezu/core/theme/theme_bloc/theme_state.dart';
 import 'package:speezu/core/utils/app_validators.dart';
 import 'package:speezu/paractise.dart';
 import 'package:speezu/presentation/auth/bloc/auth_bloc.dart';
+import 'package:speezu/presentation/category/bloc/category_bloc.dart';
 import 'package:speezu/presentation/home/bloc/home_bloc.dart';
 import 'package:speezu/presentation/languages/bloc/languages_bloc.dart';
 import 'package:speezu/presentation/shop_screen/bloc/shop_bloc.dart';
@@ -74,6 +75,7 @@ void main() async {
           BlocProvider<BannerSliderBloc>(create: (_) => BannerSliderBloc()),
           BlocProvider<SearchCubit>(create: (_) => SearchCubit()),
           BlocProvider<ShopBloc>(create: (_) => ShopBloc()),
+          BlocProvider<CategoryBloc>(create: (_) => CategoryBloc()),
         ],
         child: MyApp(),
       ),
