@@ -4,6 +4,8 @@ import 'package:speezu/presentation/category/category_screen.dart';
 import 'package:speezu/presentation/check_out/check_out_screen.dart';
 import 'package:speezu/presentation/product/product_screen.dart';
 import 'package:speezu/presentation/settings/add_address_screen.dart';
+import 'package:speezu/presentation/settings/address_book_screen.dart';
+import 'package:speezu/presentation/settings/edit_profile_screen.dart';
 import 'package:speezu/presentation/shop_screen/shop_navbar_screen.dart';
 import 'package:speezu/routes/route_names.dart';
 import '../presentation/auth/forgot_password_screen.dart';
@@ -57,8 +59,10 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => CheckOutScreen());
       case RouteNames.addAddressScreen:
         return MaterialPageRoute(builder: (_) => AddNewAddressScreen());
-      // case RouteNames.placeOrderScreen:
-      //   return MaterialPageRoute(builder: (_) => PlaceOrderScreen());
+      case RouteNames.editProfileScreen:
+        return MaterialPageRoute(builder: (_) => EditProfileScreen());
+        case RouteNames.addressBookScreen:
+        return MaterialPageRoute(builder: (_) => AddressBookScreen());
       default:
         return MaterialPageRoute(
           builder:

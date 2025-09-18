@@ -91,7 +91,12 @@ class SettingsScreen extends StatelessWidget {
                         ),
                         Spacer(),
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pushNamed(
+                              context,
+                              RouteNames.editProfileScreen,
+                            );
+                          },
                           icon: Icon(
                             Icons.edit,
                             color: Theme.of(context).colorScheme.primary,

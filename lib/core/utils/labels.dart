@@ -156,4 +156,10 @@ class Labels {
   static String get confirmOrder => 'confirmOrder'.tr();
   static String get selectYourPaymentMethod => 'selectYourPaymentMethod'.tr();
   static String get allProducts => 'allProducts'.tr();
+  static String get editProfile => 'editProfile'.tr();
+  static String get name => 'name'.tr();
+  static String get updateProfile => 'updateProfile'.tr();
+  static String get bio => 'bio'.tr();
+  static String get changeYourProfilePicture => 'changeYourProfilePicture'.tr();
+  static String get addressBook => 'addressBook'.tr();
 }

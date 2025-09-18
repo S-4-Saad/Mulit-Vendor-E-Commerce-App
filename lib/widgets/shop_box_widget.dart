@@ -167,7 +167,7 @@ class ShopBox extends StatelessWidget {
                     onPressed:onDirectionTap,
                     child: Icon(
                       Icons.directions,
-                      color: Theme.of(context).colorScheme.onPrimary,
+                      color: Colors.white,
                       size: 25,
                     ),
                   ),
@@ -349,7 +349,7 @@ class ShopBoxBigWidget extends StatelessWidget {
                     onPressed:onDirectionTap,
                     child: Icon(
                       Icons.directions,
-                      color: Theme.of(context).colorScheme.onPrimary,
+                      color: Colors.white,
                       size: 25,
                     ),
                   ),
