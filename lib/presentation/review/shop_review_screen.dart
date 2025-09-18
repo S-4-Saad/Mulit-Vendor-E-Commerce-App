@@ -6,6 +6,7 @@ import 'package:speezu/core/utils/media_querry_extention.dart';
 import 'package:speezu/presentation/shop_screen/shop/shop_detail_screen.dart';
 
 import '../../core/assets/font_family.dart';
+import '../../models/store_model.dart';
 import '../../widgets/app_cache_image.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../widgets/image_gallery_viewer_widget.dart';

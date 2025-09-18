@@ -7,6 +7,7 @@ import 'package:speezu/presentation/product/product_screen.dart';
 import 'package:speezu/routes/route_names.dart';
 import 'package:speezu/widgets/product_box_widget.dart';
 import '../../core/assets/app_images.dart';
+import '../../models/product_model.dart';
 import '../../paractise.dart';
 import '../../widgets/carousel_slider_widget.dart';
 import '../../widgets/category_box_widget.dart';

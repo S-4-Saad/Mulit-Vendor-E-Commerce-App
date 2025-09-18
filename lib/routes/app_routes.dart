@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:speezu/presentation/cart/cart_screen.dart';
 import 'package:speezu/presentation/category/category_screen.dart';
+import 'package:speezu/presentation/check_out/check_out_screen.dart';
 import 'package:speezu/presentation/product/product_screen.dart';
+import 'package:speezu/presentation/settings/add_address_screen.dart';
 import 'package:speezu/presentation/shop_screen/shop_navbar_screen.dart';
 import 'package:speezu/routes/route_names.dart';
 import '../presentation/auth/forgot_password_screen.dart';
@@ -45,12 +47,18 @@ class AppRoutes {
 
       case RouteNames.categoryScreen:
         return MaterialPageRoute(builder: (_) => CategoryScreen());
-        case RouteNames.shopNavBarScreen:
-      return MaterialPageRoute(builder: (_) => ShopNavbarScreen());
+      case RouteNames.shopNavBarScreen:
+        return MaterialPageRoute(builder: (_) => ShopNavbarScreen());
       case RouteNames.productScreen:
-      return MaterialPageRoute(builder: (_) => ProductScreen());
+        return MaterialPageRoute(builder: (_) => ProductScreen());
       case RouteNames.cartScreen:
-      return MaterialPageRoute(builder: (_) => CartScreen());
+        return MaterialPageRoute(builder: (_) => CartScreen());
+      case RouteNames.checkOutScreen:
+        return MaterialPageRoute(builder: (_) => CheckOutScreen());
+      case RouteNames.addAddressScreen:
+        return MaterialPageRoute(builder: (_) => AddNewAddressScreen());
+      // case RouteNames.placeOrderScreen:
+      //   return MaterialPageRoute(builder: (_) => PlaceOrderScreen());
       default:
         return MaterialPageRoute(
           builder:

@@ -5,6 +5,7 @@ import 'package:speezu/core/utils/media_querry_extention.dart';
 import 'package:speezu/widgets/image_gallery_viewer_widget.dart';
 
 import '../../../core/utils/labels.dart';
+import '../../../models/store_model.dart';
 import '../../../widgets/app_cache_image.dart';
 import '../../../widgets/business_hours_widget.dart';
 import '../../../widgets/custom_action_container.dart';
@@ -20,6 +21,12 @@ class ShopDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dummyStore = Store(
+      ratting: 2.3,
+
+      isDelivering: true,
+      isOpen: true,
+      openingTime: '10 Am',
+      closingTime: "11 Pm",
       id: "1",
       name: "Blue Lagoon Cafe",
       image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5",
@@ -241,7 +248,7 @@ class ShopDetailScreen extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          OpenStatusContainer(isOpened: true),
+                          OpenStatusContainer(isOpened: true,isDelivering: true,),
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
@@ -316,8 +323,8 @@ class ShopDetailScreen extends StatelessWidget {
                       ),
                       SizedBox(height: context.heightPct(.01)),
                       BusinessHoursWidget(
-                        openingTime: "9:00 AM",
-                        closingTime: "11:00 PM",
+                        openingTime: dummyStore.openingTime,
+                        closingTime: dummyStore.closingTime,
                       ),
 
                       SizedBox(height: context.heightPct(.01)),
@@ -552,56 +559,3 @@ class ShopDetailScreen extends StatelessWidget {
   }
 }
 
-class Store {
-  final String id;
-  final String name;
-  final String image;
-  final List<String> moreImages;
-  final double latitude;
-  final double longitude;
-  final String description;
-  final String information;
-  final String whatsappNumber;
-  final String primaryNumber;
-  final String secondaryNumber;
-  final String address;
-  final List<Review> reviews;
-
-  Store({
-    required this.id,
-    required this.name,
-    required this.image,
-    required this.moreImages,
-    required this.latitude,
-    required this.longitude,
-    required this.description,
-    required this.information,
-    required this.whatsappNumber,
-    required this.primaryNumber,
-    required this.secondaryNumber,
-    required this.address,
-    required this.reviews,
-  });
-}
-
-class Review {
-  final String username;
-  final String id;
-  final String reviewerName;
-  final String reviewerImage;
-  final String reviewText;
-  final double rating;
-  final DateTime date;
-  final List<String> images;
-
-  Review({
-    required this.username,
-    required this.id,
-    required this.reviewerName,
-    required this.reviewerImage,
-    required this.reviewText,
-    required this.rating,
-    required this.date,
-    this.images = const [],
-  });
-}

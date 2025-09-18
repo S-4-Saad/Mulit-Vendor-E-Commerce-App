@@ -10,6 +10,7 @@ import 'package:speezu/widgets/rating_display_widget.dart';
 import '../../core/assets/font_family.dart';
 import '../../core/utils/labels.dart';
 import '../../models/product_detail_model.dart';
+import '../../models/product_model.dart';
 import '../../paractise.dart';
 import '../../widgets/custom_action_container.dart';
 import '../../widgets/image_gallery_viewer_widget.dart';

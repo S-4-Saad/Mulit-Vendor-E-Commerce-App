@@ -218,6 +218,7 @@ class ProductBox extends StatelessWidget {
             top: 8,
             right: 8,
             child: FloatingActionButton(
+              heroTag: 'favourite_$productTitle',
               onPressed: onFavouriteTap,
 
               shape: RoundedRectangleBorder(

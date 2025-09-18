@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:speezu/widgets/image_type_extention.dart';
 
 import '../core/assets/font_family.dart';
 import '../core/utils/currency_icon.dart';
@@ -12,12 +13,14 @@ class SubCategoryBox extends StatefulWidget {
   final VoidCallback onTap;
   final double? imageHeight;
   final EdgeInsets marginPadding;
+  final bool isSelected;
 
   const SubCategoryBox({
     super.key,
     required this.imageUrl,
     required this.onTap,
     required this.title,
+    this.isSelected=false,
     this.marginPadding =  const EdgeInsets.symmetric(horizontal: 3, vertical: 5),
     this.boxWidget,
     this.imageHeight,
@@ -68,10 +71,10 @@ class _SubCategoryBoxState extends State<SubCategoryBox> with SingleTickerProvid
         width: widget.boxWidget ?? 115,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.onPrimary,
+          color:widget.isSelected?Theme.of(context).colorScheme.primary.withValues(alpha: .1): Theme.of(context).colorScheme.onPrimary,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.15),
+            color:widget.isSelected?Theme.of(context).colorScheme.primary:  Theme.of(context).colorScheme.outline.withValues(alpha: 0.15),
             width: 1,
           ),
           boxShadow: [
@@ -86,12 +89,12 @@ class _SubCategoryBoxState extends State<SubCategoryBox> with SingleTickerProvid
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image Section
-            AppCacheImage(
+            CustomImageView(
               width: double.infinity,
               height: widget.imageHeight ?? 90,
-              round: 0,
-              boxFit: BoxFit.cover,
-              imageUrl: widget.imageUrl,
+
+              fit: BoxFit.cover,
+              imagePath: widget.imageUrl,
             ),
             // Details Section
             Padding(
@@ -103,7 +106,7 @@ class _SubCategoryBoxState extends State<SubCategoryBox> with SingleTickerProvid
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+                      color: widget.isSelected?Theme.of(context).colorScheme.onPrimary: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Row(
