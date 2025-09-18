@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:speezu/core/services/urls.dart';
@@ -24,7 +23,11 @@ class AuthBloc extends Bloc<AuthEvents, AuthState> {
     try {
       await ApiService.postMethod(
         apiUrl: loginUserUrl,
-        postData: {'email': event.email, 'password': event.password},
+        postData: {
+          'email': event.email,
+          'password': event.password,
+          'user_role': "customer"
+        },
         executionMethod: (bool success, dynamic responseData) async {
           if (success) {
             try {
@@ -33,7 +36,7 @@ class AuthBloc extends Bloc<AuthEvents, AuthState> {
               emit(
                 state.copyWith(
                   loginStatus: LoginStatus.success,
-                  message: responseData['message'] ?? 'Login successful',
+                  message: responseData['message'],
                   userModel: userModel,
                 ),
               );
@@ -41,7 +44,7 @@ class AuthBloc extends Bloc<AuthEvents, AuthState> {
 
               await LocalStorage.saveData(
                 key: AppKeys.authToken,
-                value: responseData['data']['api_token'],
+                value: responseData['token'],
               );
 
               log(
@@ -93,7 +96,8 @@ class AuthBloc extends Bloc<AuthEvents, AuthState> {
           'email': event.email,
           'password': event.password,
           'name': event.username,
-          'phone': event.phone,
+          'phone_no': event.phone,
+          'user_role': "customer",
         },
         executionMethod: (bool success, dynamic responseData) async {
           if (success) {
@@ -101,62 +105,38 @@ class AuthBloc extends Bloc<AuthEvents, AuthState> {
               emit(
                 state.copyWith(
                   signUpStatus: SignUpStatus.success,
-                  message: responseData['message'] ?? 'Sign Up successful',
+                  message: responseData['message'] ?? 'Registration successful! Please login to continue.',
                 ),
               );
-              // Parse into UserModel only when success is true
-              // UserModel userModel = UserModel.fromJson(responseData);
-              // emit(
-              //   state.copyWith(
-              //     signUpStatus: SignUpStatus.success,
-              //     message: responseData['message'] ?? 'Sign Up successful',
-              //     userModel: userModel,
-              //   ),
-              // );
-              // await LocalStorage.saveData(
-              //   key: AppKeys.userData,
-              //   value: jsonEncode(userModel.toJson()),
-              // );
-              // print('User data saved to local storage');
-              //
-              // await LocalStorage.saveData(
-              //   key: AppKeys.authToken,
-              //   value: responseData['data']['api_token'],
-              // );
-              // print('Auth token saved to local storage');
-              //
-              // log(
-              //   'Stored token: ${await LocalStorage.getData(key: AppKeys.authToken)}',
-              // );
-              //
-              // log('User name: ${userModel.userData?.name ?? "No name"}');
-            } catch (e, stack) {
+              log('Registration successful: ${responseData['message']}');
+            } catch (e) {
+              log('Registration parsing error: $e');
               emit(
                 state.copyWith(
                   signUpStatus: SignUpStatus.error,
-                  message: 'Parsing failed',
+                  message: 'Registration successful but failed to process response',
                 ),
               );
             }
           } else {
-            // Only handle error case here
-            print(
-              'Login failed with message: ${responseData['message'] ?? "Unknown error"}',
-            );
+            // Handle error case with proper error message
+            final errorMessage = responseData['message'] ?? 'Registration failed. Please try again.';
+            log('Registration failed: $errorMessage');
             emit(
               state.copyWith(
                 signUpStatus: SignUpStatus.error,
-                message: responseData['message'] ?? 'Sign Up failed',
+                message: errorMessage,
               ),
             );
           }
         },
       );
     } catch (e) {
+      log('Registration exception: $e');
       emit(
         state.copyWith(
           signUpStatus: SignUpStatus.error,
-          message: 'Sign Up failed: $e',
+          message: 'Registration failed: ${e.toString()}',
         ),
       );
     }

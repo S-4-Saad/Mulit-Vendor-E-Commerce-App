@@ -6,7 +6,6 @@ import 'package:speezu/widgets/app_cache_image.dart';
 import 'package:speezu/widgets/custom_app_bar.dart';
 
 import '../../core/utils/labels.dart';
-import '../../routes/route_names.dart';
 
 class ProfileInfoScreen extends StatelessWidget {
   ProfileInfoScreen({super.key});
@@ -51,8 +50,7 @@ class ProfileInfoScreen extends StatelessWidget {
                 SizedBox(
                   width: context.widthPct(.8),
                   child: Text(
-                    currentUser?.userData?.customFields?.address?.view ??
-                        'No Address Found',
+                    currentUser?.userData?.phoneNo ?? 'No Phone Found',
                     maxLines: 2,
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -93,8 +91,7 @@ class ProfileInfoScreen extends StatelessWidget {
                 ),
                 SizedBox(height: context.heightPct(.02)),
                 Text(
-                  currentUser?.userData?.customFields?.bio?.view ??
-                      'No Bio Found',
+                  currentUser?.userData?.email ?? 'No Email Found',
                   style: TextStyle(
                     fontSize: context.scaledFont(12),
                     fontFamily: FontFamily.fontsPoppinsRegular,

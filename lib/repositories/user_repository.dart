@@ -25,14 +25,14 @@ class UserRepository {
 
       if (savedUserData != null) {
         _currentUser = UserModel.fromJson(jsonDecode(savedUserData));
-        log("✅ UserModel successfully decoded: ${_currentUser!.toJson()}");
+        log("UserModel successfully decoded: ${_currentUser!.toJson()}");
         return _currentUser;
       } else {
-        log("⚠️ No user data found, returning null.");
+        log("No user data found, returning null.");
         return null;
       }
     } catch (e) {
-      log("❌ Error loading data: $e");
+      log("Error loading data: $e");
       return null;
     }
   }

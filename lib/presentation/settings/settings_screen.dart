@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:speezu/core/assets/font_family.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
-import 'package:speezu/models/user_model.dart';
 import 'package:speezu/repositories/user_repository.dart';
 import 'package:speezu/routes/route_names.dart';
 import 'package:speezu/widgets/app_cache_image.dart';
@@ -153,8 +152,7 @@ class SettingsScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          userRepo?.customFields?.phone?.name?.toUpperCase() ??
-                              '',
+                          'PHONE',
                           style: TextStyle(
                             fontSize: context.scaledFont(13),
                             color: Theme.of(context).colorScheme.onSecondary,
@@ -162,68 +160,11 @@ class SettingsScreen extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          userRepo?.customFields?.phone?.value ?? '',
+                          userRepo?.phoneNo ?? 'No Phone',
                           style: TextStyle(
                             fontSize: context.scaledFont(13),
                             color: Theme.of(context).colorScheme.outline,
                             fontFamily: FontFamily.fontsPoppinsRegular,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: context.heightPct(.015)),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          userRepo?.customFields?.address?.name
-                                  ?.toUpperCase() ??
-                              '',
-                          style: TextStyle(
-                            fontSize: context.scaledFont(13),
-                            color: Theme.of(context).colorScheme.onSecondary,
-                            fontFamily: FontFamily.fontsPoppinsRegular,
-                          ),
-                        ),
-                        SizedBox(
-                          width: context.widthPct(.5),
-                          child: Text(
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            userRepo?.customFields?.address?.value ?? '',
-                            style: TextStyle(
-                              fontSize: context.scaledFont(13),
-                              color: Theme.of(context).colorScheme.outline,
-                              fontFamily: FontFamily.fontsPoppinsRegular,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: context.heightPct(.015)),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          userRepo?.customFields?.bio?.name?.toUpperCase() ??
-                              '',
-                          style: TextStyle(
-                            fontSize: context.scaledFont(13),
-                            color: Theme.of(context).colorScheme.onSecondary,
-                            fontFamily: FontFamily.fontsPoppinsRegular,
-                          ),
-                        ),
-                        SizedBox(
-                          width: context.widthPct(.5),
-                          child: Text(
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            userRepo?.customFields?.bio?.value ?? '',
-                            style: TextStyle(
-                              fontSize: context.scaledFont(13),
-                              color: Theme.of(context).colorScheme.outline,
-                              fontFamily: FontFamily.fontsPoppinsRegular,
-                            ),
                           ),
                         ),
                       ],
