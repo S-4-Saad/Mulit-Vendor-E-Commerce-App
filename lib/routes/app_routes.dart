@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:speezu/presentation/cart/cart_screen.dart';
 import 'package:speezu/presentation/category/category_screen.dart';
 import 'package:speezu/presentation/check_out/check_out_screen.dart';
-import 'package:speezu/presentation/product/product_screen.dart';
+import 'package:speezu/presentation/product_detail/product_detail_screen.dart';
 import 'package:speezu/presentation/settings/add_address_screen.dart';
 import 'package:speezu/presentation/settings/address_book_screen.dart';
 import 'package:speezu/presentation/settings/edit_profile_screen.dart';
@@ -52,7 +52,7 @@ class AppRoutes {
       case RouteNames.shopNavBarScreen:
         return MaterialPageRoute(builder: (_) => ShopNavbarScreen());
       case RouteNames.productScreen:
-        return MaterialPageRoute(builder: (_) => ProductScreen());
+        return MaterialPageRoute(builder: (_) => ProductDetailScreen());
       case RouteNames.cartScreen:
         return MaterialPageRoute(builder: (_) => CartScreen());
       case RouteNames.checkOutScreen:

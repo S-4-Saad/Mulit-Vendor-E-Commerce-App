@@ -3,7 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/assets/font_family.dart';
 import 'package:speezu/core/utils/labels.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
-import 'package:speezu/presentation/product/product_screen.dart';
+import 'package:speezu/presentation/nav_bar_screen/bloc/nav_bar_bloc.dart';
+import 'package:speezu/presentation/nav_bar_screen/bloc/nav_bar_event.dart';
+import 'package:speezu/presentation/product_detail/product_detail_screen.dart';
+import 'package:speezu/presentation/products/bloc/products_bloc.dart';
 import 'package:speezu/routes/route_names.dart';
 import 'package:speezu/widgets/product_box_widget.dart';
 import '../../core/assets/app_images.dart';
@@ -18,6 +21,7 @@ import '../../widgets/title_widget.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/restaurant_list.dart';
 import '../../models/restaurant_model.dart';
+import '../products/bloc/products_event.dart';
 import '../shop_screen/shop_navbar_screen.dart';
 import 'home.dart';
 
@@ -409,7 +413,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     SizedBox(height: context.heightPct(.02)),
                     HomeHeaderTile(
                       title: Labels.topTrendingFoods,
-                      onViewAllTap: () {},
+                      onViewAllTap: () {
+                        context.read<NavBarBloc>().add(SelectTab(0));
+                        context.read<ProductsBloc>().add(ChangeTabEvent(0));
+                      },
                     ),
                     SizedBox(height: context.heightPct(.01)),
                     SingleChildScrollView(
@@ -432,7 +439,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => ProductScreen(),
+                                      builder:
+                                          (context) => ProductDetailScreen(),
                                     ),
                                   );
                                 },
@@ -445,7 +453,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     SizedBox(height: context.heightPct(.02)),
                     HomeHeaderTile(
                       title: Labels.topSuperMarketProducts,
-                      onViewAllTap: () {},
+                      onViewAllTap: () {
+                        context.read<NavBarBloc>().add(SelectTab(0));
+                        context.read<ProductsBloc>().add(ChangeTabEvent(1));
+                      },
                     ),
                     SizedBox(height: context.heightPct(.01)),
                     SingleChildScrollView(
@@ -471,7 +482,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     SizedBox(height: context.heightPct(.02)),
                     HomeHeaderTile(
                       title: Labels.topTrendingProducts,
-                      onViewAllTap: () {},
+                      onViewAllTap: () {
+                        context.read<NavBarBloc>().add(SelectTab(0));
+                        context.read<ProductsBloc>().add(ChangeTabEvent(2));
+                      },
                     ),
                     SizedBox(height: context.heightPct(.01)),
                     SingleChildScrollView(
@@ -507,7 +521,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     SizedBox(height: context.heightPct(.02)),
                     HomeHeaderTile(
                       title: Labels.medicines,
-                      onViewAllTap: () {},
+                      onViewAllTap: () {
+                        context.read<NavBarBloc>().add(SelectTab(0));
+                        context.read<ProductsBloc>().add(ChangeTabEvent(3));
+                      },
                     ),
                     SizedBox(height: context.heightPct(.01)),
                     SingleChildScrollView(

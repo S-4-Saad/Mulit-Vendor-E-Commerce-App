@@ -13,6 +13,9 @@ import 'package:speezu/presentation/auth/bloc/auth_bloc.dart';
 import 'package:speezu/presentation/category/bloc/category_bloc.dart';
 import 'package:speezu/presentation/home/bloc/home_bloc.dart';
 import 'package:speezu/presentation/languages/bloc/languages_bloc.dart';
+import 'package:speezu/presentation/orders/bloc/orders_bloc.dart';
+import 'package:speezu/presentation/product_detail/bloc/product_detail_bloc.dart';
+import 'package:speezu/presentation/products/bloc/products_bloc.dart';
 import 'package:speezu/presentation/shop_screen/bloc/shop_bloc.dart';
 import 'package:speezu/presentation/shop_screen/shop_navbar_screen.dart';
 import 'package:speezu/repositories/user_repository.dart';
@@ -76,6 +79,9 @@ void main() async {
           BlocProvider<SearchCubit>(create: (_) => SearchCubit()),
           BlocProvider<ShopBloc>(create: (_) => ShopBloc()),
           BlocProvider<CategoryBloc>(create: (_) => CategoryBloc()),
+          BlocProvider<ProductsBloc>(create: (_) => ProductsBloc()),
+          BlocProvider<ProductDetailBloc>(create: (_) => ProductDetailBloc()),
+          BlocProvider<OrdersBloc>(create: (_) => OrdersBloc()),
         ],
         child: MyApp(),
       ),

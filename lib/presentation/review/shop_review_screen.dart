@@ -14,7 +14,7 @@ import '../../widgets/rating_display_widget.dart';
 import '../../widgets/review_graph_widget.dart';
 
 class ProductReviewsScreen extends StatelessWidget {
-  final Store store; // Pass the product to access its reviews
+  final Store store; // Pass the product_detail to access its reviews
 
   const ProductReviewsScreen({super.key, required this.store});
 

@@ -3,10 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 // Screens
 import 'package:speezu/presentation/home/home_screen.dart';
+import 'package:speezu/presentation/products/products_tab_bar.dart';
 import 'package:speezu/presentation/shop_screen/shop/shop_products_screen.dart';
 
 // Bloc files
 import '../../../paractise.dart';
+import '../../orders/orders_tab_bar_screen.dart';
+import '../../product_detail/product_detail_screen.dart';
 import '../../shop_screen/shop/shop_detail_screen.dart';
 import 'nav_bar_event.dart';
 import 'nav_bar_state.dart';
@@ -47,13 +50,13 @@ class NavBarBloc extends Bloc<NavBarEvent, NavBarState> {
   Widget _mapIndexToPage(int index) {
     switch (index) {
       case 0:
-        return const NotificationScreen();
+        return ProductsTabBarScreen(initialIndex: 0,);
       case 1:
         return const MapScreen();
       case 2:
         return const HomeScreen();
       case 3:
-        return const OrderScreen();
+        return const OrdersTabBarScreen();
       case 4:
         return const FavouriteScreen();
       default:

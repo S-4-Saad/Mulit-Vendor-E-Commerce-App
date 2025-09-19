@@ -312,45 +312,43 @@ class ShopProductsScreen extends StatelessWidget {
 
               // Products for selected category
               SingleChildScrollView(
-                child: Expanded(
-                  child: BlocBuilder<ShopBloc, ShopState>(
-                    builder: (context, state) {
-                      final selectedCategory =
-                          categoriesWithAll[state.tabCurrentIndex];
-                      final products = selectedCategory.products;
+                child: BlocBuilder<ShopBloc, ShopState>(
+                  builder: (context, state) {
+                    final selectedCategory =
+                        categoriesWithAll[state.tabCurrentIndex];
+                    final products = selectedCategory.products;
 
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: StaggeredGrid.count(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 10,
-                          crossAxisSpacing: 10,
-                          children: List.generate(products.length, (index) {
-                            var product = products[index];
-                            return StaggeredGridTile.fit(
-                              crossAxisCellCount: 1,
-                              child: ProductBox(
-                                marginPadding: const Padding(
-                                  padding: EdgeInsets.all(0),
-                                ),
-                                productWidth: 200,
-                                productPrice: product.productPrice,
-                                productOriginalPrice:
-                                    product.productOriginalPrice,
-                                productCategory: product.productCategory,
-                                productRating: product.productRating,
-                                isProductFavourite: product.isProductFavourite,
-                                onFavouriteTap: () {},
-                                onProductTap: () {},
-                                productImageUrl: product.productImageUrl,
-                                productTitle: product.productTitle,
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: StaggeredGrid.count(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 10,
+                        crossAxisSpacing: 10,
+                        children: List.generate(products.length, (index) {
+                          var product = products[index];
+                          return StaggeredGridTile.fit(
+                            crossAxisCellCount: 1,
+                            child: ProductBox(
+                              marginPadding: const Padding(
+                                padding: EdgeInsets.all(0),
                               ),
-                            );
-                          }),
-                        ),
-                      );
-                    },
-                  ),
+                              productWidth: 200,
+                              productPrice: product.productPrice,
+                              productOriginalPrice:
+                                  product.productOriginalPrice,
+                              productCategory: product.productCategory,
+                              productRating: product.productRating,
+                              isProductFavourite: product.isProductFavourite,
+                              onFavouriteTap: () {},
+                              onProductTap: () {},
+                              productImageUrl: product.productImageUrl,
+                              productTitle: product.productTitle,
+                            ),
+                          );
+                        }),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],

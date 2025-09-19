@@ -153,6 +153,29 @@
     "updateProfile": "Update Profile",
   "bio": "Bio",
     "changeYourProfilePicture": "Change your profile picture",
-  "addressBook": "Address Book"
+  "addressBook": "Address Book",
+  "defaultShippingAddress": "Default Shipping Address",
+  "areYouSureYouWantToSelectThisAddressAsYourDefaultShippingAddress": "Are you sure you want to select this address as your default shipping address?",
+  "selectAddress": "Select Address",
+  "delete": "Delete",
+  "areYouSureYouWantToDeleteThisAddress": "Are you sure you want to delete this address?",
+  "deleteAddress": "Delete Address",
+  "completedOrders": "Completed Orders",
+  "activeOrders": "Active Orders",
+  "cancelledOrders": "Cancelled Orders",
+  "orderIdNumber": "Order ID #",
+  "viewDetails": "View Details",
+  "orderDetails": "Order Details",
+  "orderStatus": "Order Status",
+  "shippingAddress": "Shipping Address",
+  "paymentDetails": "Payment Details",
+  "customer": "Customer",
+  "payment": "Payment",
+  "cancelOrder": "Cancel Order?",
+  "areYouSureYouWantToCancelThisOrder": "Are you sure you want to cancel order",
+  "reasonForCancellingTheOrder": "Reason for cancelling the order",
+  "reason": "Reason",
+  "submit": "Submit"
+
 
 }
