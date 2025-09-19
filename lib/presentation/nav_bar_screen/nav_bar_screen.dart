@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/assets/font_family.dart';
@@ -20,7 +21,7 @@ class NavBarScreen extends StatelessWidget {
   final userRepo = UserRepository();
   NavBarScreen({super.key, this.currentTab});
   List<String> screenTitles = [
-    Labels.notifications,
+    Labels.products,
     Labels.mapExplorer,
     Labels.speezu,
     Labels.myOrders,
@@ -111,7 +112,7 @@ class NavBarScreen extends StatelessWidget {
               onTap: (index) => bloc.add(SelectTab(index)),
               items: [
                 const BottomNavigationBarItem(
-                  icon: Icon(Icons.notifications),
+                  icon: Icon(CupertinoIcons.archivebox_fill),
                   label: '',
                 ),
                 const BottomNavigationBarItem(

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/assets/font_family.dart';
@@ -52,8 +53,8 @@ class DrawerWidget extends StatelessWidget {
             ),
             _buildListTile(
               context,
-              icon: Icons.notifications,
-              text: Labels.notifications,
+              icon: CupertinoIcons.archivebox_fill,
+              text: Labels.products,
               onTap: () {
                 context.read<NavBarBloc>().add(const SelectTab(0));
                 Navigator.pop(context);

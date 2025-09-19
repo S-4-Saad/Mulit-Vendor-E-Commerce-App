@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:speezu/core/utils/currency_icon.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
+import 'package:speezu/presentation/product_detail/bloc/product_detail_bloc.dart';
 import 'package:speezu/routes/route_names.dart';
 import 'package:speezu/widgets/app_cache_image.dart';
 import 'package:speezu/widgets/rating_display_widget.dart';
@@ -19,15 +21,17 @@ import '../../widgets/open_status_container.dart';
 import '../../widgets/option_selector_widget.dart';
 import '../../widgets/product_box_widget.dart';
 import '../../widgets/shop_product_box.dart';
+import 'bloc/product_detail_event.dart';
+import 'bloc/product_detail_state.dart';
 
-class ProductScreen extends StatefulWidget {
-  ProductScreen({super.key});
+class ProductDetailScreen extends StatefulWidget {
+  ProductDetailScreen({super.key});
 
   @override
-  State<ProductScreen> createState() => _ProductScreenState();
+  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
 }
 
-class _ProductScreenState extends State<ProductScreen> {
+class _ProductDetailScreenState extends State<ProductDetailScreen> {
   final dummyProduct = ProductDetail(
     productDiscountPercentage: 22,
     isAvailable: true,
@@ -250,22 +254,16 @@ class _ProductScreenState extends State<ProductScreen> {
   // e.g. "Fajita"
   String? selectedChild;
   final ScrollController _scrollController = ScrollController();
-  bool _isBottomBarVisible = true;
+
   // e.g. "Medium"
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(() {
-      if (_scrollController.position.userScrollDirection ==
-          ScrollDirection.reverse) {
-        if (_isBottomBarVisible) {
-          setState(() => _isBottomBarVisible = false);
-        }
-      } else if (_scrollController.position.userScrollDirection ==
-          ScrollDirection.forward) {
-        if (!_isBottomBarVisible) {
-          setState(() => _isBottomBarVisible = true);
-        }
+      if (_scrollController.position.userScrollDirection == ScrollDirection.reverse) {
+        context.read<ProductDetailBloc>().add(HideBottomBar());
+      } else if (_scrollController.position.userScrollDirection == ScrollDirection.forward) {
+        context.read<ProductDetailBloc>().add(ShowBottomBar());
       }
     });
   }
@@ -660,16 +658,16 @@ class _ProductScreenState extends State<ProductScreen> {
               ),
             ],
           ),
-          SafeArea(
+          BlocBuilder<ProductDetailBloc, ProductDetailState>(builder:  (context, state) => SafeArea(
             child: Align(
               alignment: Alignment.bottomCenter,
               child: AnimatedSlide(
                 duration: const Duration(milliseconds: 400),
                 curve: Curves.easeInOut,
-                offset: _isBottomBarVisible ? Offset(0, 0) : Offset(0, 1),
+                offset: state.isBottomSheetVisible ? Offset(0, 0) : Offset(0, 1),
                 child: AnimatedOpacity(
                   duration: const Duration(milliseconds: 300),
-                  opacity: _isBottomBarVisible ? 1 : 0,
+                  opacity: state.isBottomSheetVisible ? 1 : 0,
                   child: Container(
                     padding:  const EdgeInsets.symmetric(
                       horizontal: 15.0,
@@ -706,7 +704,7 @@ class _ProductScreenState extends State<ProductScreen> {
                               style: TextStyle(
                                 fontFamily: FontFamily.fontsPoppinsSemiBold,
                                 color:
-                                    Theme.of(context).colorScheme.onSecondary,
+                                Theme.of(context).colorScheme.onSecondary,
                                 fontSize: 16,
                               ),
                             ),
@@ -717,7 +715,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                   icon: Icon(
                                     Icons.remove_circle_outline,
                                     color:
-                                        Theme.of(context).colorScheme.primary,
+                                    Theme.of(context).colorScheme.primary,
                                   ),
                                 ),
                                 SizedBox(width: 10),
@@ -726,9 +724,9 @@ class _ProductScreenState extends State<ProductScreen> {
                                   style: TextStyle(
                                     fontFamily: FontFamily.fontsPoppinsSemiBold,
                                     color:
-                                        Theme.of(
-                                          context,
-                                        ).colorScheme.onSecondary,
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.onSecondary,
                                     fontSize: 16,
                                   ),
                                 ),
@@ -738,7 +736,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                   icon: Icon(
                                     Icons.add_circle_outline,
                                     color:
-                                        Theme.of(context).colorScheme.primary,
+                                    Theme.of(context).colorScheme.primary,
                                   ),
                                 ),
                               ],
@@ -785,13 +783,13 @@ class _ProductScreenState extends State<ProductScreen> {
                                 onPressed: () {},
                                 child: Row(
                                   mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       Labels.addToCart,
                                       style: TextStyle(
                                         fontFamily:
-                                            FontFamily.fontsPoppinsSemiBold,
+                                        FontFamily.fontsPoppinsSemiBold,
                                         color: Colors.white,
                                         fontSize: 15,
                                       ),
@@ -800,7 +798,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                       '22\$',
                                       style: TextStyle(
                                         fontFamily:
-                                            FontFamily.fontsPoppinsSemiBold,
+                                        FontFamily.fontsPoppinsSemiBold,
                                         color: Colors.white,
                                         fontSize: 16,
                                       ),
@@ -817,7 +815,7 @@ class _ProductScreenState extends State<ProductScreen> {
                 ),
               ),
             ),
-          ),
+          ),),
           Positioned(
             top: 50,
             right: 20,

@@ -162,4 +162,21 @@ class Labels {
   static String get bio => 'bio'.tr();
   static String get changeYourProfilePicture => 'changeYourProfilePicture'.tr();
   static String get addressBook => 'addressBook'.tr();
+  static String get defaultShippingAddress => 'defaultShippingAddress'.tr();
+  static String get areYouSureYouWantToSelectThisAddressAsYourDefaultShippingAddress => 'areYouSureYouWantToSelectThisAddressAsYourDefaultShippingAddress'.tr();
+  static String get selectAddress => 'selectAddress'.tr();
+  static String get delete => 'delete'.tr();
+  static String get areYouSureYouWantToDeleteThisAddress => 'areYouSureYouWantToDeleteThisAddress'.tr();
+  static String get deleteAddress => 'deleteAddress'.tr();
+  static String get completedOrders => 'completedOrders'.tr();
+  static String get activeOrders => 'activeOrders'.tr();
+  static String get cancelledOrders => 'cancelledOrders'.tr();
+  static String get orderIdNumber => 'orderIdNumber'.tr();
+  static String get viewDetails => 'viewDetails'.tr();
+  static String get orderDetails => 'orderDetails'.tr();
+  static String get orderStatus => 'orderStatus'.tr();
+  static String get shippingAddress => 'shippingAddress'.tr();
+  static String get paymentDetails => 'paymentDetails'.tr();
+  static String get customer => 'customer'.tr();
+  static String get payment => 'payment'.tr();
 }

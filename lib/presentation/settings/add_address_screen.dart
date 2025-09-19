@@ -93,6 +93,10 @@ class AddNewAddressScreen extends StatelessWidget {
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     minimumSize: Size(double.infinity, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                   ),
                   onPressed: () {
                     if (_addAddressKey.currentState!.validate()) {
@@ -109,7 +113,7 @@ class AddNewAddressScreen extends StatelessWidget {
                   child:  Text(Labels.saveAddress,style: TextStyle(
                     fontFamily: FontFamily.fontsPoppinsSemiBold,
                     fontSize: 16,
-                    color: Theme.of(context).colorScheme.onPrimary,
+                    color: Colors.white,
 
                   ),),
                 ),
