@@ -48,9 +48,11 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => ProfileInfoScreen());
 
       case RouteNames.categoryScreen:
-        return MaterialPageRoute(builder: (_) => CategoryScreen());
+        final String categoryName = settings.arguments as String? ?? 'Categories';
+        return MaterialPageRoute(builder: (_) => CategoryScreen(categoryName: categoryName));
       case RouteNames.shopNavBarScreen:
-        return MaterialPageRoute(builder: (_) => ShopNavbarScreen());
+        final int? storeId = settings.arguments as int?;
+        return MaterialPageRoute(builder: (_) => ShopNavbarScreen(storeId: storeId));
       case RouteNames.productScreen:
         return MaterialPageRoute(builder: (_) => ProductDetailScreen());
       case RouteNames.cartScreen:

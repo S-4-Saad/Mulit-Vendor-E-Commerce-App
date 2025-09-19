@@ -404,6 +404,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Navigator.pushNamed(
                                     context,
                                     RouteNames.categoryScreen,
+                                    arguments: category.name,
                                   );
                                 },
                               );

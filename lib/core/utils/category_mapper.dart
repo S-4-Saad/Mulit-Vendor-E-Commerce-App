@@ -1,8 +1,8 @@
 class CategoryMapper {
   static const Map<String, int> categoryMap = {
     'food': 1,
-    'supermarket': 2,
-    'retail stores': 3,
+    'retail stores': 2,
+    'supermarket': 3,
     'pharmacy': 4,
   };
 

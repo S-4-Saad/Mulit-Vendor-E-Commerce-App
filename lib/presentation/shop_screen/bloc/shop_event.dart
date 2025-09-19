@@ -12,3 +12,11 @@ class ChangeTabEvent extends ShopEvent{
   @override
   List<Object?> get props => [index];
 }
+
+class LoadShopDetailEvent extends ShopEvent {
+  final int storeId;
+  LoadShopDetailEvent({required this.storeId});
+  
+  @override
+  List<Object?> get props => [storeId];
+}

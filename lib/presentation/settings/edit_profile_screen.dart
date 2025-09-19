@@ -21,13 +21,13 @@ class EditProfileScreen extends StatelessWidget {
   );
   final TextEditingController phoneController = TextEditingController(
     text:
-        UserRepository().currentUser?.userData?.customFields?.phone?.value ??
+        UserRepository().currentUser?.userData?.phoneNo ??
         '',
   );
-  final TextEditingController bioController = TextEditingController(
-    text:
-        UserRepository().currentUser?.userData?.customFields?.bio?.value ?? '',
-  );
+  // final TextEditingController bioController = TextEditingController(
+  //   text:
+  //       UserRepository().currentUser?.userData?.customFields?.bio?.value ?? '',
+  // );
   FocusNode nameFocusNode = FocusNode();
   FocusNode emailFocusNode = FocusNode();
   FocusNode phoneFocusNode = FocusNode();
@@ -167,15 +167,6 @@ class EditProfileScreen extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: 5),
-                  CustomTextFormField(
-                    validator: AppValidators.noValidation,
-                    textEditingController: bioController,
-                    hint:
-                        currentUser?.userData?.customFields?.bio?.value ??
-                        Labels.bio,
-                    focusNode: bioFocusNode,
-                    maxLineLength: 2,
-                  ),
                   Row(
                     children: [
                       Icon(
@@ -206,41 +197,41 @@ class EditProfileScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  Container(
-                    width: double.infinity,
-
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.onPrimary,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.outline.withValues(alpha: .3),
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withValues(alpha: 0.1),
-                          spreadRadius: 1,
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Text(
-                      currentUser?.userData?.customFields?.address?.view ??
-                          'No Address Found',
-                      maxLines: 2,
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-                        fontSize: context.scaledFont(14),
-                        fontWeight: FontWeight.w400,
-                        fontFamily: FontFamily.fontsPoppinsRegular,
-                        color: Theme.of(context).colorScheme.onSecondary,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ),
+                  // Container(
+                  //   width: double.infinity,
+                  //
+                  //   padding: EdgeInsets.all(10),
+                  //   decoration: BoxDecoration(
+                  //     color: Theme.of(context).colorScheme.onPrimary,
+                  //     borderRadius: BorderRadius.circular(12),
+                  //     border: Border.all(
+                  //       color: Theme.of(
+                  //         context,
+                  //       ).colorScheme.outline.withValues(alpha: .3),
+                  //     ),
+                  //     boxShadow: [
+                  //       BoxShadow(
+                  //         color: Colors.grey.withValues(alpha: 0.1),
+                  //         spreadRadius: 1,
+                  //         blurRadius: 4,
+                  //         offset: const Offset(0, 2),
+                  //       ),
+                  //     ],
+                  //   ),
+                  //   child: Text(
+                  //     currentUser?.userData?.customFields?.address?.view ??
+                  //         'No Address Found',
+                  //     maxLines: 2,
+                  //     textAlign: TextAlign.start,
+                  //     style: TextStyle(
+                  //       fontSize: context.scaledFont(14),
+                  //       fontWeight: FontWeight.w400,
+                  //       fontFamily: FontFamily.fontsPoppinsRegular,
+                  //       color: Theme.of(context).colorScheme.onSecondary,
+                  //       overflow: TextOverflow.ellipsis,
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),

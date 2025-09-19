@@ -6,28 +6,32 @@ class NavBarState extends Equatable {
   final Widget currentPage;
   final Widget shopCurrentPage;
   final int shopCurrentTab;
+  final int? storeId;
 
   const NavBarState({
     required this.currentTab,
     required this.currentPage,
     required this.shopCurrentTab,
-    required this.shopCurrentPage
+    required this.shopCurrentPage,
+    this.storeId,
   });
 
   NavBarState copyWith({
     int? currentTab,
     Widget? currentPage,
     int? shopCurrentTab,
-    Widget? shopCurrentPage
+    Widget? shopCurrentPage,
+    int? storeId,
   }) {
     return NavBarState(
       currentTab: currentTab ?? this.currentTab,
       currentPage: currentPage ?? this.currentPage,
       shopCurrentTab: shopCurrentTab ?? this.shopCurrentTab,
-      shopCurrentPage: shopCurrentPage ?? this.shopCurrentPage
+      shopCurrentPage: shopCurrentPage ?? this.shopCurrentPage,
+      storeId: storeId ?? this.storeId,
     );
   }
 
   @override
-  List<Object?> get props => [currentTab, currentPage, shopCurrentTab, shopCurrentPage];
+  List<Object?> get props => [currentTab, currentPage, shopCurrentTab, shopCurrentPage, storeId];
 }
