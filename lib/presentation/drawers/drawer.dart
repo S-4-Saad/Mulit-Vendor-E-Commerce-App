@@ -10,6 +10,7 @@ import 'package:speezu/repositories/user_repository.dart';
 import 'package:speezu/routes/route_names.dart';
 import 'package:speezu/core/services/localStorage/my-local-controller.dart';
 import 'package:speezu/core/utils/constants.dart';
+import 'package:speezu/models/user_model.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/theme_bloc/theme_event.dart';
@@ -19,14 +20,12 @@ import '../nav_bar_screen/bloc/nav_bar_bloc.dart';
 import '../nav_bar_screen/bloc/nav_bar_event.dart';
 
 class DrawerWidget extends StatelessWidget {
-  final currentUser = UserRepository().currentUser;
-
   DrawerWidget({super.key});
 
   /// Helper method to check if user is authenticated
   Future<bool> _isUserAuthenticated() async {
     final token = await LocalStorage.getData(key: AppKeys.authToken);
-    return token != null && currentUser != null;
+    return token != null && UserRepository().currentUser != null;
   }
 
   @override
@@ -42,13 +41,7 @@ class DrawerWidget extends StatelessWidget {
             children: <Widget>[
               // ✅ User Account Header
               GestureDetector(
-                onTap: () {
-                  if (isAuthenticated) {
-                    Navigator.of(context).pushNamed(RouteNames.profileInfoScreen);
-                  } else {
-                    Navigator.of(context).pushNamed(RouteNames.login);
-                  }
-                },
+                onTap: () {},
                 child: _buildUserHeader(context, isAuthenticated),
               ),
 
@@ -239,32 +232,40 @@ class DrawerWidget extends StatelessWidget {
   /// ✅ User Header (Logged-in or Guest)
   Widget _buildUserHeader(BuildContext context, bool isAuthenticated) {
     if (isAuthenticated) {
-      return UserAccountsDrawerHeader(
-        currentAccountPicture: CircleAvatar(
-          child: const Icon(Icons.person, size: 32),
-        ),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
-        ),
-        arrowColor: Theme.of(context).colorScheme.onSecondary,
-        currentAccountPictureSize: const Size.square(70),
-        accountName: Text(
-          currentUser?.userData?.name ?? '',
-          style: TextStyle(
-            fontFamily: FontFamily.fontsPoppinsSemiBold,
-            color: Theme.of(context).colorScheme.onSecondary,
-            fontSize: context.scaledFont(16),
-          ),
-        ),
-        accountEmail: Text(
-          currentUser?.userData?.email ?? '',
-          style: TextStyle(
-            fontFamily: FontFamily.fontsPoppinsRegular,
-            color: Theme.of(context).colorScheme.onSecondary,
-            fontSize: context.scaledFont(12),
-            height: -0.2,
-          ),
-        ),
+      return StreamBuilder<UserModel?>(
+        stream: UserRepository().userStream,
+        initialData: UserRepository().currentUser,
+        builder: (context, snapshot) {
+          final userData = snapshot.data?.userData;
+          
+          return UserAccountsDrawerHeader(
+            currentAccountPicture: CircleAvatar(
+              child: const Icon(Icons.person, size: 32),
+            ),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
+            ),
+            arrowColor: Theme.of(context).colorScheme.onSecondary,
+            currentAccountPictureSize: const Size.square(70),
+            accountName: Text(
+              userData?.name ?? '',
+              style: TextStyle(
+                fontFamily: FontFamily.fontsPoppinsSemiBold,
+                color: Theme.of(context).colorScheme.onSecondary,
+                fontSize: context.scaledFont(16),
+              ),
+            ),
+            accountEmail: Text(
+              userData?.email ?? '',
+              style: TextStyle(
+                fontFamily: FontFamily.fontsPoppinsRegular,
+                color: Theme.of(context).colorScheme.onSecondary,
+                fontSize: context.scaledFont(12),
+                height: -0.2,
+              ),
+            ),
+          );
+        },
       );
     } else {
       return UserAccountsDrawerHeader(

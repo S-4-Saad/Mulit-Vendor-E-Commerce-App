@@ -43,7 +43,7 @@ class Labels {
   static String get phone => 'phone'.tr();
   static String get paymentsSettings => 'paymentsSettings'.tr();
   static String get edit => 'edit'.tr();
-  static String get defaultCreditCard => 'defaultCreditCard'.tr();
+  static String get creditCard => 'creditCard'.tr();
   static String get appSettings => 'appSettings'.tr();
   static String get deliveryAddresses => 'deliveryAddresses'.tr();
   static String get emailAddress => 'emailAddress'.tr();

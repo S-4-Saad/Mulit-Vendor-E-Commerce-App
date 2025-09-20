@@ -13,3 +13,4 @@ const String faqsUrl = "$baseUrl/faqs";
 const String dashboardBannersUrl = "$baseUrl/slides";
 const String shopsUrl = "$baseUrl/stores-category/";
 const String shopDetailUrl = "$baseUrl/store/";
+const String updateUserDetailsUrl = "$baseUrl/edit-profile";

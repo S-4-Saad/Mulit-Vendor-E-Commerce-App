@@ -16,7 +16,6 @@ import '../presentation/home/home_screen.dart';
 import '../presentation/languages/languages_screen.dart';
 import '../presentation/nav_bar_screen/nav_bar_screen.dart';
 import '../presentation/settings/payment/card_info_add_screen.dart';
-import '../presentation/settings/profile_info_screen.dart';
 import '../presentation/settings/settings_screen.dart';
 import '../presentation/spalsh/splash_screen.dart';
 
@@ -44,8 +43,6 @@ class AppRoutes {
 
       case RouteNames.faqsScreen:
         return MaterialPageRoute(builder: (_) => FaqsScreen());
-      case RouteNames.profileInfoScreen:
-        return MaterialPageRoute(builder: (_) => ProfileInfoScreen());
 
       case RouteNames.categoryScreen:
         final String categoryName = settings.arguments as String? ?? 'Categories';
