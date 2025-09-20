@@ -10,7 +10,7 @@ class AppTheme {
 // 🌿 Teal + Coral Contrast Theme
   // 🌿 Teal + Fresh Lime Contrast Theme
   static const Color mainColor = Color(0xFF008080);       // Teal Green
-  static const Color mainDarkColor = Color(0xFF004D4D);   // Darker Teal (headers / dark mode)
+  static const Color mainDarkColor = Color(0xFF03CDCD);   // Darker Teal (headers / dark mode)
   static const Color secondColor = Color(0xFF8BC34A);     // Fresh Lime Green (contrasts teal)
   static const Color secondDarkColor = Color(0xFF689F38); // Dark Lime (for depth)
 

@@ -175,7 +175,8 @@
   "areYouSureYouWantToCancelThisOrder": "Are you sure you want to cancel order",
   "reasonForCancellingTheOrder": "Reason for cancelling the order",
   "reason": "Reason",
-  "submit": "Submit"
+  "submit": "Submit",
+  "giveReview": "Give Review"
 
 
 }

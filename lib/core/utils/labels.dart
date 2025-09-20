@@ -179,4 +179,10 @@ class Labels {
   static String get paymentDetails => 'paymentDetails'.tr();
   static String get customer => 'customer'.tr();
   static String get payment => 'payment'.tr();
+  static String get cancelOrder => 'cancelOrder'.tr();
+  static String get areYouSureYouWantToCancelThisOrder => 'areYouSureYouWantToCancelThisOrder'.tr();
+  static String get reasonForCancellingTheOrder => 'reasonForCancellingTheOrder'.tr();
+  static String get reason => 'reason'.tr();
+  static String get submit => 'submit'.tr();
+  static String get giveReview => 'giveReview'.tr();
 }
