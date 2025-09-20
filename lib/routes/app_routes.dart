@@ -16,7 +16,6 @@ import '../presentation/home/home_screen.dart';
 import '../presentation/languages/languages_screen.dart';
 import '../presentation/nav_bar_screen/nav_bar_screen.dart';
 import '../presentation/settings/payment/card_info_add_screen.dart';
-import '../presentation/settings/profile_info_screen.dart';
 import '../presentation/settings/settings_screen.dart';
 import '../presentation/spalsh/splash_screen.dart';
 
@@ -44,13 +43,13 @@ class AppRoutes {
 
       case RouteNames.faqsScreen:
         return MaterialPageRoute(builder: (_) => FaqsScreen());
-      case RouteNames.profileInfoScreen:
-        return MaterialPageRoute(builder: (_) => ProfileInfoScreen());
 
       case RouteNames.categoryScreen:
-        return MaterialPageRoute(builder: (_) => CategoryScreen());
+        final String categoryName = settings.arguments as String? ?? 'Categories';
+        return MaterialPageRoute(builder: (_) => CategoryScreen(categoryName: categoryName));
       case RouteNames.shopNavBarScreen:
-        return MaterialPageRoute(builder: (_) => ShopNavbarScreen());
+        final int? storeId = settings.arguments as int?;
+        return MaterialPageRoute(builder: (_) => ShopNavbarScreen(storeId: storeId));
       case RouteNames.productScreen:
         return MaterialPageRoute(builder: (_) => ProductDetailScreen());
       case RouteNames.cartScreen:

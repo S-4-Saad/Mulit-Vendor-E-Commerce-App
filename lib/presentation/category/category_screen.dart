@@ -1,116 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
 import 'package:speezu/presentation/category/bloc/category_event.dart';
 import 'package:speezu/presentation/category/bloc/category_state.dart';
 import 'package:speezu/routes/route_names.dart';
-import 'package:speezu/widgets/app_cache_image.dart';
 import 'package:speezu/widgets/custom_app_bar.dart';
 import 'package:speezu/widgets/image_type_extention.dart';
 import 'package:speezu/widgets/rating_display_widget.dart';
 import 'package:speezu/widgets/search_animated_container.dart';
-import 'package:speezu/widgets/sub_category_widget.dart';
+import 'package:speezu/widgets/shop_shimmer_widget.dart';
 
 import '../../core/assets/font_family.dart';
 import '../../core/utils/labels.dart';
-import '../../paractise.dart';
 import '../../widgets/shop_box_widget.dart';
 import 'bloc/category_bloc.dart';
 
-class CategoryScreen extends StatelessWidget {
-  CategoryScreen({super.key});
-  final List<ShopModel> dummyShops = [
-    ShopModel(
-      imageUrl:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGUr0VYvQolmz3IkAsjFKavNsPcmmof6eWJg&s",
-      shopName: "Fresh Mart",
-      shopDescription: "Groceries & daily needs",
-      shopRating: 4.5,
-      isOpen: true,
-      isDelivering: true,
-    ),
-    ShopModel(
-      imageUrl: "https://picsum.photos/270/130?random=2",
-      shopName: "Pizza Palace",
-      shopDescription: "Italian & Fast Food",
-      shopRating: 4.2,
-      isOpen: false,
-      isDelivering: false,
-    ),
-    ShopModel(
-      imageUrl: "https://picsum.photos/270/130?random=3",
-      shopName: "Cafe Aroma",
-      shopDescription: "Coffee & Snacks",
-      shopRating: 4.8,
-      isOpen: true,
-      isDelivering: false,
-    ),
-    ShopModel(
-      imageUrl:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGUr0VYvQolmz3IkAsjFKavNsPcmmof6eWJg&s",
-      shopName: "Fresh Mart",
-      shopDescription: "Groceries & daily needs",
-      shopRating: 4.5,
-      isOpen: true,
-      isDelivering: true,
-    ),
-    ShopModel(
-      imageUrl:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGUr0VYvQolmz3IkAsjFKavNsPcmmof6eWJg&s",
-      shopName: "Fresh Mart",
-      shopDescription: "Groceries & daily needs",
-      shopRating: 4.5,
-      isOpen: true,
-      isDelivering: true,
-    ),
-    ShopModel(
-      imageUrl: "https://picsum.photos/270/130?random=2",
-      shopName: "Pizza Palace",
-      shopDescription: "Italian & Fast Food",
-      shopRating: 4.2,
-      isOpen: false,
-      isDelivering: false,
-    ),
-    ShopModel(
-      imageUrl: "https://picsum.photos/270/130?random=3",
-      shopName: "Cafe Aroma",
-      shopDescription: "Coffee & Snacks",
-      shopRating: 4.8,
-      isOpen: true,
-      isDelivering: false,
-    ),
-    ShopModel(
-      imageUrl:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGUr0VYvQolmz3IkAsjFKavNsPcmmof6eWJg&s",
-      shopName: "Fresh Mart",
-      shopDescription: "Groceries & daily needs",
-      shopRating: 4.5,
-      isOpen: true,
-      isDelivering: true,
-    ),
-    ShopModel(
-      imageUrl: "https://picsum.photos/270/130?random=2",
-      shopName: "Pizza Palace",
-      shopDescription: "Italian & Fast Food",
-      shopRating: 4.2,
-      isOpen: false,
-      isDelivering: false,
-    ),
-    ShopModel(
-      imageUrl: "https://picsum.photos/270/130?random=3",
-      shopName: "Cafe Aroma",
-      shopDescription: "Coffee & Snacks",
-      shopRating: 4.8,
-      isOpen: true,
-      isDelivering: false,
-    ),
-  ];
+class CategoryScreen extends StatefulWidget {
+  final String categoryName;
+  
+  const CategoryScreen({super.key, required this.categoryName});
+
+  @override
+  State<CategoryScreen> createState() => _CategoryScreenState();
+}
+
+class _CategoryScreenState extends State<CategoryScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Load shops when the screen initializes
+    context.read<CategoryBloc>().add(LoadShopsEvent(category: widget.categoryName));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: 'Categories',
+        title: widget.categoryName,
         action: BlocBuilder<CategoryBloc, CategoryState>(
           builder:
               (context, state) => IconButton(
@@ -158,10 +84,59 @@ class CategoryScreen extends StatelessWidget {
               BlocBuilder<CategoryBloc, CategoryState>(
                 builder: (context, state) {
                   bool isGridView = state.isGridView;
+                  
+                  if (state.shopStatus == ShopStatus.loading) {
+                    return ShimmerLoadingWidget(
+                      isGridView: isGridView,
+                      itemCount: 6,
+                    );
+                  }
+                  
+                  if (state.shopStatus == ShopStatus.error) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.error_outline, size: 64, color: Colors.red),
+                          SizedBox(height: 16),
+                          Text(
+                            state.message ?? 'Failed to load shops',
+                            style: TextStyle(fontSize: 16),
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: () {
+                              context.read<CategoryBloc>().add(LoadShopsEvent(category: widget.categoryName));
+                            },
+                            child: Text('Retry'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  
+                  if (state.shops.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.store_outlined, size: 64, color: Colors.grey),
+                          SizedBox(height: 16),
+                          Text(
+                            'No shops found for ${widget.categoryName}',
+                            style: TextStyle(fontSize: 16),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  
                   return isGridView
                       ? Column(
                         children:
-                            dummyShops.map((shop) {
+                            state.shops.map((shop) {
                               return ShopBoxBigWidget(
                                 imageUrl: shop.imageUrl,
                                 shopName: shop.shopName,
@@ -173,6 +148,7 @@ class CategoryScreen extends StatelessWidget {
                                   Navigator.pushNamed(
                                     context,
                                     RouteNames.shopNavBarScreen,
+                                    arguments: shop.id,
                                   );
                                 },
                                 onDirectionTap: () {
@@ -183,10 +159,10 @@ class CategoryScreen extends StatelessWidget {
                       )
                       : ListView.separated(
                         padding: EdgeInsets.zero,
-                        itemCount: dummyShops.length,
+                        itemCount: state.shops.length,
                         separatorBuilder: (_, __) => SizedBox(height: 10),
                         itemBuilder: (context, index) {
-                          final shop = dummyShops[index];
+                          final shop = state.shops[index];
                           return Container(
                             clipBehavior: Clip.antiAlias,
                             margin: EdgeInsets.only(

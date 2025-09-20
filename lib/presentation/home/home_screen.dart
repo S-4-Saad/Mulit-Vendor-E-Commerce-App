@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:speezu/core/assets/font_family.dart';
 import 'package:speezu/core/utils/labels.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
 import 'package:speezu/presentation/nav_bar_screen/bloc/nav_bar_bloc.dart';
@@ -15,11 +14,7 @@ import '../../paractise.dart';
 import '../../widgets/carousel_slider_widget.dart';
 import '../../widgets/category_box_widget.dart';
 import '../../widgets/home_header_tile.dart';
-import '../../widgets/home_slider_widget.dart';
 import '../../widgets/search_animated_container.dart';
-import '../../widgets/title_widget.dart';
-import '../../widgets/custom_button.dart';
-import '../../widgets/restaurant_list.dart';
 import '../../models/restaurant_model.dart';
 import '../products/bloc/products_event.dart';
 import '../shop_screen/shop_navbar_screen.dart';
@@ -404,6 +399,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Navigator.pushNamed(
                                     context,
                                     RouteNames.categoryScreen,
+                                    arguments: category.name,
                                   );
                                 },
                               );
@@ -547,87 +543,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             }).toList(),
                       ),
                     ),
-
-                    // HomeSliderWidget(slides: state.slidesModel?.data),
-
-                    // Top Restaurants with action buttons
-                    TitleWidget(
-                      title: "Top Restaurants",
-                      actionButtons: [
-                        CustomButton(
-                          text: "Delivery",
-                          onPressed: () {},
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.onSecondary.withValues(alpha: .1),
-                          textColor: Theme.of(context).colorScheme.onSecondary,
-                        ),
-                        CustomButton(
-                          text: "Pickup",
-                          onPressed: () {},
-                          backgroundColor:
-                              Theme.of(context).colorScheme.onTertiary,
-                          textColor: Theme.of(context).colorScheme.onPrimary,
-                          isSelected: true,
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Trending This Week with subtitle
-                    TitleWidget(
-                      leadingIcon: const Icon(
-                        Icons.trending_up,
-                        color: Color(0xFF2C3E50),
-                        size: 20,
-                      ),
-                      title: "Trending This Week",
-                      subtitle:
-                          "Click on the food to get more details about it",
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Food Categories with icon
-                    TitleWidget(
-                      leadingIcon: Container(
-                        width: 20,
-                        height: 20,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF2C3E50),
-                        ),
-                        child: const Icon(
-                          Icons.category,
-                          color: Colors.white,
-                          size: 12,
-                        ),
-                      ),
-                      title: "Food Categories",
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Top Restaurants List
-                    RestaurantList(
-                      restaurants: sampleRestaurants,
-                      onRestaurantTap: () {
-                        // Navigate to restaurant details
-                        print("Restaurant tapped");
-                      },
-                      onOpenTap: () {
-                        // Handle open action
-                        print("Open tapped");
-                      },
-                      onPickupTap: () {
-                        // Handle pickup action
-                        print("Pickup tapped");
-                      },
-                      onFavoriteTap: () {
-                        // Handle favorite toggle
-                        print("Favorite tapped");
-                      },
-                    ),
+                    SizedBox(height: context.heightPct(.02)),
                   ],
                 ),
               ),

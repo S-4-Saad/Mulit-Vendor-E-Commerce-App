@@ -11,6 +11,7 @@ import '../../../paractise.dart';
 import '../../orders/orders_tab_bar_screen.dart';
 import '../../product_detail/product_detail_screen.dart';
 import '../../shop_screen/shop/shop_detail_screen.dart';
+import '../../map_screen/map_screen.dart';
 import 'nav_bar_event.dart';
 import 'nav_bar_state.dart';
 
@@ -21,7 +22,8 @@ class NavBarBloc extends Bloc<NavBarEvent, NavBarState> {
           shopCurrentTab: 0,
           currentTab: 2,
           currentPage: const HomeScreen(),
-          shopCurrentPage: StoreScreen()
+          shopCurrentPage: StoreScreen(),
+          storeId: null,
         ),
       ) {
     on<InitPage>(_onInitPage);
@@ -66,11 +68,17 @@ class NavBarBloc extends Bloc<NavBarEvent, NavBarState> {
 
   void _shopInitPage(ShopInitPage event, Emitter<NavBarState> emit) {
     final tab = event.tab;
+    final storeId = event.storeId;
+
+    // Update store ID in state
+    if (storeId != null) {
+      emit(state.copyWith(storeId: storeId));
+    }
 
     if (tab is int) {
       add(ShopSelectTab(tab));
     } else {
-      // default to Home tab (2)
+      // default to Home tab (0)
       add(const ShopSelectTab(0));
     }
   }
@@ -84,13 +92,13 @@ class NavBarBloc extends Bloc<NavBarEvent, NavBarState> {
   Widget _shopMapIndexToPage(int index) {
     switch (index) {
       case 0:
-        return const ShopDetailScreen();
+        return ShopDetailScreen(storeId: state.storeId);
       case 1:
         return const ShopMapScreen();
       case 2:
         return  ShopProductsScreen();
       default:
-        return const ShopDetailScreen();
+        return ShopDetailScreen(storeId: state.storeId);
     }
   }
 }

@@ -1,170 +1,110 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/assets/font_family.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
 import 'package:speezu/widgets/image_gallery_viewer_widget.dart';
 
 import '../../../core/utils/labels.dart';
 import '../../../models/store_model.dart';
-import '../../../widgets/app_cache_image.dart';
 import '../../../widgets/business_hours_widget.dart';
 import '../../../widgets/custom_action_container.dart';
 import '../../../widgets/image_type_extention.dart';
 import '../../../widgets/open_status_container.dart';
 import '../../../widgets/product_review_box.dart';
 import '../../../widgets/rating_display_widget.dart';
+import '../../../widgets/shop_detail_shimmer_widget.dart';
 import '../../review/shop_review_screen.dart';
+import '../bloc/shop_bloc.dart';
+import '../bloc/shop_event.dart';
+import '../bloc/shop_state.dart';
 
-class ShopDetailScreen extends StatelessWidget {
-  const ShopDetailScreen({super.key});
+class ShopDetailScreen extends StatefulWidget {
+  final int? storeId;
+  
+  const ShopDetailScreen({super.key, this.storeId});
+
+  @override
+  State<ShopDetailScreen> createState() => _ShopDetailScreenState();
+}
+
+class _ShopDetailScreenState extends State<ShopDetailScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Load shop detail when the screen initializes
+    if (widget.storeId != null) {
+      context.read<ShopBloc>().add(LoadShopDetailEvent(storeId: widget.storeId!));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final dummyStore = Store(
-      ratting: 2.3,
+    return BlocBuilder<ShopBloc, ShopState>(
+      builder: (context, state) {
+        if (state.shopDetailStatus == ShopDetailStatus.loading) {
+          return const ShopDetailShimmerWidget();
+        }
+        
+        if (state.shopDetailStatus == ShopDetailStatus.error) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, size: 64, color: Colors.red),
+                SizedBox(height: 16),
+                Text(
+                  state.message,
+                  style: TextStyle(fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    if (widget.storeId != null) {
+                      context.read<ShopBloc>().add(LoadShopDetailEvent(storeId: widget.storeId!));
+                    }
+                  },
+                  child: Text('Retry'),
+                ),
+              ],
+            ),
+          );
+        }
+        
+        // Use API data if available, otherwise fallback to dummy data
+        final store = state.shopDetailStatus == ShopDetailStatus.success && state.storeDetail != null
+            ? state.storeDetail!.toStore()
+            : _getDummyStore();
+        
+        return _buildStoreDetail(context, store);
+      },
+    );
+  }
 
+  Store _getDummyStore() {
+    return Store(
+      ratting: 4.5,
       isDelivering: true,
       isOpen: true,
-      openingTime: '10 Am',
-      closingTime: "11 Pm",
+      openingTime: '9 AM',
+      closingTime: "10 PM",
       id: "1",
-      name: "Blue Lagoon Cafe",
-      image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5",
-      moreImages: [
-        "https://images.unsplash.com/photo-1551218808-94e220e084d2",
-        "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
-        "https://images.unsplash.com/photo-1504674900247-0877df9cc836",
-      ],
-      latitude: 31.5204,
-      longitude: 74.3587,
-      description:
-          "A cozy cafe with a modern touch, our space blends warmth and style to create the perfect spot for relaxation, work, or socializing. With inviting interiors, soft lighting, and comfortable seating, the ambiance strikes a balance between homely comfort and contemporary elegance. We serve a variety of freshly prepared dishes made from high-quality ingredients, along with a wide selection of beverages ranging from aromatic coffees and soothing teas to refreshing juices and specialty drinks. Whether you’re dropping by for a quick coffee, enjoying a hearty meal, or spending time with friends, our cafe offers a welcoming atmosphere, delicious food, and friendly service that makes every visit memorable.",
-      information:
-          "A modern yet cozy cafe designed to cater to diverse customer needs. The cafe serves a wide range of fresh food and beverages, including breakfast, lunch, snacks, coffee, and specialty drinks, in a comfortable and aesthetically pleasing environment. With a focus on quality ingredients, customer satisfaction, and contemporary ambiance, it appeals to students, professionals, and families alike.",
-      whatsappNumber: "+923001234567",
-      primaryNumber: "+924211234567",
-      secondaryNumber: "+923451234567",
-      address: "123 Main Street, Lahore, Pakistan",
-      reviews: [
-        Review(
-          username: "ali_khan",
-          images: [
-            "https://images.unsplash.com/photo-1551218808-94e220e084d2",
-            "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
-            "https://images.unsplash.com/photo-1504674900247-0877df9cc836",
-          ],
-          id: "r1",
-          reviewerName: "Ali Khan",
-          reviewerImage: "https://randomuser.me/api/portraits/men/1.jpg",
-          reviewText: "Amazing ambiance and great coffee! Highly recommend.",
-          rating: 4.5,
-          date: DateTime.now().subtract(const Duration(days: 1)),
-        ),
-        Review(
-          username: "sara_ahmed",
-          images: [
-            "https://images.unsplash.com/photo-1551218808-94e220e084d2",
-            "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
-            "https://images.unsplash.com/photo-1504674900247-0877df9cc836",
-          ],
-          id: "r2",
-          reviewerName: "Sara Ahmed",
-          reviewerImage: "https://randomuser.me/api/portraits/women/2.jpg",
-          reviewText: "Food was delicious but the service was a bit slow.",
-          rating: 3.8,
-          date: DateTime.now().subtract(const Duration(days: 3)),
-        ),
-        Review(
-          username: "sara_ahmed",
-          images: [
-            "https://images.unsplash.com/photo-1551218808-94e220e084d2",
-            "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
-            "https://images.unsplash.com/photo-1504674900247-0877df9cc836",
-          ],
-          id: "r2",
-          reviewerName: "Sara Ahmed",
-          reviewerImage: "https://randomuser.me/api/portraits/women/2.jpg",
-          reviewText: "Food was delicious but the service was a bit slow.",
-          rating: 3.8,
-          date: DateTime.now().subtract(const Duration(days: 3)),
-        ),
-        Review(
-          username: "ali_khan",
-          images: [
-            "https://images.unsplash.com/photo-1551218808-94e220e084d2",
-            "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
-            "https://images.unsplash.com/photo-1504674900247-0877df9cc836",
-          ],
-          id: "r1",
-          reviewerName: "Ali Khan",
-          reviewerImage: "https://randomuser.me/api/portraits/men/1.jpg",
-          reviewText: "Amazing ambiance and great coffee! Highly recommend.",
-          rating: 4.5,
-          date: DateTime.now().subtract(const Duration(days: 1)),
-        ),
-        Review(
-          username: "sara_ahmed",
-          images: [
-            "https://images.unsplash.com/photo-1551218808-94e220e084d2",
-            "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
-            "https://images.unsplash.com/photo-1504674900247-0877df9cc836",
-          ],
-          id: "r2",
-          reviewerName: "Sara Ahmed",
-          reviewerImage: "https://randomuser.me/api/portraits/women/2.jpg",
-          reviewText: "Food was delicious but the service was a bit slow.",
-          rating: 3.8,
-          date: DateTime.now().subtract(const Duration(days: 3)),
-        ),
-        Review(
-          username: "ali_khan",
-          images: [
-            "https://images.unsplash.com/photo-1551218808-94e220e084d2",
-            "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
-            "https://images.unsplash.com/photo-1504674900247-0877df9cc836",
-          ],
-          id: "r1",
-          reviewerName: "Ali Khan",
-          reviewerImage: "https://randomuser.me/api/portraits/men/1.jpg",
-          reviewText: "Amazing ambiance and great coffee! Highly recommend.",
-          rating: 4.5,
-          date: DateTime.now().subtract(const Duration(days: 1)),
-        ),
-        Review(
-          username: "sara_ahmed",
-          images: [
-            "https://images.unsplash.com/photo-1551218808-94e220e084d2",
-            "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
-            "https://images.unsplash.com/photo-1504674900247-0877df9cc836",
-          ],
-          id: "r2",
-          reviewerName: "Sara Ahmed",
-          reviewerImage: "https://randomuser.me/api/portraits/women/2.jpg",
-          reviewText: "Food was delicious but the service was a bit slow.",
-          rating: 3.8,
-          date: DateTime.now().subtract(const Duration(days: 3)),
-        ),
-      ],
+      name: "Sample Store",
+      image: "https://via.placeholder.com/400x300",
+      moreImages: [],
+      latitude: 0.0,
+      longitude: 0.0,
+      description: "Sample store description",
+      information: "Sample store information",
+      whatsappNumber: "",
+      primaryNumber: "",
+      secondaryNumber: "",
+      address: "Sample Address",
+      reviews: [],
     );
+  }
 
-    // 🔹 Dummy Data
-
-    final List<Map<String, String>> featuredFoods = [
-      {
-        "name": "Cheese Burger",
-        "image": "https://images.unsplash.com/photo-1550547660-d9450f859349",
-      },
-      {
-        "name": "Pepperoni Pizza",
-        "image": "https://images.unsplash.com/photo-1594007654729-407eedc4be3d",
-      },
-    ];
-    final List<String> reviews = [
-      "Amazing food, will order again!",
-      "Loved the pizza 🍕",
-      "Fast delivery and great taste 😋",
-    ];
-
+  Widget _buildStoreDetail(BuildContext context, Store store) {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -193,7 +133,7 @@ class ShopDetailScreen extends StatelessWidget {
               collapseMode: CollapseMode.parallax,
               background: CustomImageView(
                 fit: BoxFit.cover,
-                imagePath: dummyStore.image,
+                imagePath: store.image,
               ),
             ),
           ),
@@ -210,7 +150,7 @@ class ShopDetailScreen extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              dummyStore.name,
+                              store.name,
                               style: TextStyle(
                                 fontFamily: FontFamily.fontsPoppinsSemiBold,
                                 color:
@@ -232,7 +172,7 @@ class ShopDetailScreen extends StatelessWidget {
                               ),
                               const SizedBox(width: 5),
                               Text(
-                                "4.5",
+                                store.ratting.toStringAsFixed(1),
                                 style: TextStyle(
                                   fontFamily: FontFamily.fontsPoppinsLight,
                                   color:
@@ -280,7 +220,7 @@ class ShopDetailScreen extends StatelessWidget {
                       ),
                       SizedBox(height: context.heightPct(.02)),
                       Text(
-                        dummyStore.description,
+                        store.description,
                         style: TextStyle(
                           fontFamily: FontFamily.fontsPoppinsLight,
 
@@ -294,7 +234,7 @@ class ShopDetailScreen extends StatelessWidget {
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           padding: const EdgeInsets.all(12),
-                          itemCount: dummyStore.moreImages.length,
+                          itemCount: store.moreImages.length,
                           separatorBuilder:
                               (_, __) => const SizedBox(width: 10),
                           itemBuilder: (context, index) {
@@ -305,7 +245,7 @@ class ShopDetailScreen extends StatelessWidget {
                                   MaterialPageRoute(
                                     builder:
                                         (context) => ImageGalleryViewer(
-                                          imageUrls: dummyStore.moreImages,
+                                          imageUrls: store.moreImages,
                                           initialIndex: index,
                                         ),
                                   ),
@@ -314,7 +254,7 @@ class ShopDetailScreen extends StatelessWidget {
                               },
                               radius: BorderRadius.circular(10),
 
-                              imagePath: dummyStore.moreImages[index],
+                              imagePath: store.moreImages[index],
                               width: context.widthPct(.55),
                               fit: BoxFit.cover,
                             );
@@ -323,8 +263,8 @@ class ShopDetailScreen extends StatelessWidget {
                       ),
                       SizedBox(height: context.heightPct(.01)),
                       BusinessHoursWidget(
-                        openingTime: dummyStore.openingTime,
-                        closingTime: dummyStore.closingTime,
+                        openingTime: store.openingTime,
+                        closingTime: store.closingTime,
                       ),
 
                       SizedBox(height: context.heightPct(.01)),
@@ -337,14 +277,14 @@ class ShopDetailScreen extends StatelessWidget {
                       ),
                       SizedBox(height: context.heightPct(.01)),
                       CustomActionContainer(
-                        text: dummyStore.address,
+                        text: store.address,
                         icon: Icons.directions,
                         onTap: () {},
                       ),
                       SizedBox(height: context.heightPct(.01)),
                       CustomActionContainer(
                         text:
-                            '${dummyStore.primaryNumber}\n${dummyStore.secondaryNumber}',
+                            '${store.primaryNumber}\n${store.secondaryNumber}',
                         icon: Icons.phone,
                         onTap: () {},
                       ),
@@ -368,7 +308,7 @@ class ShopDetailScreen extends StatelessWidget {
                         ],
                       ),
                       Text(
-                        dummyStore.information,
+                        store.information,
                         style: TextStyle(
                           fontFamily: FontFamily.fontsPoppinsLight,
 
@@ -410,7 +350,7 @@ class ShopDetailScreen extends StatelessWidget {
                                 ),
                                 SizedBox(width: 5),
                                 Text(
-                                  '(${dummyStore.reviews.length ?? 0})',
+                                  '(${store.reviews.length})',
                                   style: TextStyle(
                                     fontSize: context.scaledFont(12),
                                     fontFamily: FontFamily.fontsPoppinsRegular,
@@ -424,13 +364,7 @@ class ShopDetailScreen extends StatelessWidget {
                                 Row(
                                   children: [
                                     Text(
-                                      dummyStore.reviews?.isNotEmpty == true
-                                          ? (dummyStore.reviews!
-                                                      .map((r) => r.rating!)
-                                                      .reduce((a, b) => a + b) /
-                                                  dummyStore.reviews!.length)
-                                              .toStringAsFixed(1)
-                                          : '0.0',
+                                      store.ratting.toStringAsFixed(1),
                                       style: TextStyle(
                                         fontSize: context.scaledFont(14),
                                         fontFamily: FontFamily.fontsPoppinsBold,
@@ -441,13 +375,7 @@ class ShopDetailScreen extends StatelessWidget {
                                       ),
                                     ),
                                     RatingDisplayWidget(
-                                      rating:
-                                          dummyStore.reviews?.isNotEmpty == true
-                                              ? dummyStore.reviews!
-                                                      .map((r) => r.rating!)
-                                                      .reduce((a, b) => a + b) /
-                                                  dummyStore.reviews!.length
-                                              : 0,
+                                      rating: store.ratting,
                                       starSize: context.scaledFont(16),
                                     ),
                                     // Icon(Icons.arrow_forward_ios_rounded, size: 15.w),
@@ -460,7 +388,7 @@ class ShopDetailScreen extends StatelessWidget {
                                       MaterialPageRoute(
                                         builder:
                                             (context) => ProductReviewsScreen(
-                                              store: dummyStore,
+                                              store: store,
                                             ),
                                       ),
                                     );
@@ -480,8 +408,7 @@ class ShopDetailScreen extends StatelessWidget {
                               ).colorScheme.outline.withValues(alpha: 0.3),
                             ),
                             // Display up to 4 reviews
-                            if (dummyStore.reviews != null &&
-                                dummyStore.reviews!.isNotEmpty)
+                            if (store.reviews.isNotEmpty)
                               ListView.separated(
                                 padding: const EdgeInsets.only(top: 0),
                                 separatorBuilder:
@@ -494,29 +421,25 @@ class ShopDetailScreen extends StatelessWidget {
                                 physics: const NeverScrollableScrollPhysics(),
                                 shrinkWrap: true,
                                 itemCount:
-                                    dummyStore.reviews!.length > 3
+                                    store.reviews.length > 3
                                         ? 3
-                                        : dummyStore
-                                            .reviews!
-                                            .length, // Limit to 4 reviews
+                                        : store.reviews.length, // Limit to 4 reviews
                                 itemBuilder: (context, index) {
-                                  final review = dummyStore.reviews![index];
+                                  final review = store.reviews[index];
                                   return ProductReviewBox(
-                                    userName: review.username ?? 'Anonymous',
+                                    userName: review.username,
                                     review:
-                                        dummyStore.reviews[index].reviewText ??
-                                        'No review',
-                                    rating: review.rating?.toDouble() ?? 0.0,
+                                        review.reviewText,
+                                    rating: review.rating,
                                     imgUrl:
-                                        review.images?.isNotEmpty == true
-                                            ? review.images!.first
+                                        review.images.isNotEmpty
+                                            ? review.images.first
                                             : 'https://via.placeholder.com/55',
                                   );
                                 },
                               ),
                             // Show "See All Reviews" if there are more than 4 reviews
-                            if (dummyStore.reviews != null &&
-                                dummyStore.reviews!.length > 4)
+                            if (store.reviews.length > 4)
                               Center(
                                 child: TextButton(
                                   onPressed: () {
@@ -525,13 +448,13 @@ class ShopDetailScreen extends StatelessWidget {
                                       MaterialPageRoute(
                                         builder:
                                             (context) => ProductReviewsScreen(
-                                              store: dummyStore,
+                                              store: store,
                                             ),
                                       ),
                                     );
                                   },
                                   child: Text(
-                                    '${Labels.seeAllReviews} (${dummyStore.reviews.length ?? 0})',
+                                    '${Labels.seeAllReviews} (${store.reviews.length})',
                                     style: TextStyle(
                                       fontSize: context.scaledFont(12),
                                       fontFamily:

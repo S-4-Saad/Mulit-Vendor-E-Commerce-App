@@ -8,15 +8,20 @@ import '../../widgets/custom_text_form_field.dart';
 import '../../models/address_model.dart';
 import '../../repositories/user_repository.dart';
 
-class AddNewAddressScreen extends StatefulWidget {
-  AddNewAddressScreen({super.key});
+class EditAddressScreen extends StatefulWidget {
+  final AddressModel address;
+  
+  const EditAddressScreen({
+    super.key,
+    required this.address,
+  });
 
   @override
-  State<AddNewAddressScreen> createState() => _AddNewAddressScreenState();
+  State<EditAddressScreen> createState() => _EditAddressScreenState();
 }
 
-class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
-  final _addAddressKey = GlobalKey<FormState>();
+class _EditAddressScreenState extends State<EditAddressScreen> {
+  final _editAddressKey = GlobalKey<FormState>();
   final TextEditingController addressController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController primaryPhoneNumber = TextEditingController();
@@ -29,6 +34,17 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
   // Address type dropdown
   String? selectedAddressType;
   final List<String> addressTypes = ['Home Address', 'Office Address'];
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize form fields with existing address data
+    selectedAddressType = widget.address.title;
+    nameController.text = widget.address.customerName ?? '';
+    primaryPhoneNumber.text = widget.address.primaryPhoneNumber ?? '';
+    secondaryPhoneNumber.text = widget.address.secondaryPhoneNumber ?? '';
+    addressController.text = widget.address.address ?? '';
+  }
 
   @override
   void dispose() {
@@ -51,10 +67,10 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
       fontSize: 14,
     );
     return Scaffold(
-      appBar: CustomAppBar(title: Labels.addNewAddress),
+      appBar: CustomAppBar(title: 'Edit Address'),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Form(
-        key: _addAddressKey,
+        key: _editAddressKey,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: SingleChildScrollView(
@@ -171,15 +187,16 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                     backgroundColor: Theme.of(context).colorScheme.primary,
                   ),
                   onPressed: () async {
-                    if (_addAddressKey.currentState!.validate()) {
-                      // Create address model
-                      final address = AddressModel(
+                    if (_editAddressKey.currentState!.validate()) {
+                      // Create updated address model
+                      final updatedAddress = AddressModel(
+                        id: widget.address.id, // Keep the same ID
                         title: selectedAddressType!,
                         customerName: nameController.text.trim(),
                         primaryPhoneNumber: primaryPhoneNumber.text.trim(),
                         secondaryPhoneNumber: secondaryPhoneNumber.text.trim(),
                         address: addressController.text.trim(),
-                        isDefault: false, // Will be set to true if it's the first address
+                        isDefault: widget.address.isDefault, // Keep the same default status
                       );
 
                       // Show loading dialog
@@ -192,9 +209,9 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                       );
 
                       try {
-                        // Add address to user details and sync with server
+                        // Update address in user details and sync with server
                         final userRepo = UserRepository();
-                        final success = await userRepo.addAddressAndSync(address);
+                        final success = await userRepo.updateAddress(updatedAddress);
                         
                         // Close loading dialog
                         Navigator.pop(context);
@@ -203,7 +220,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                           // Show success message and go back
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Address saved successfully!'),
+                              content: Text('Address updated successfully!'),
                               backgroundColor: Colors.green,
                             ),
                           );
@@ -212,7 +229,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                           // Show error message
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Failed to save address. Please try again.'),
+                              content: Text('Failed to update address. Please try again.'),
                               backgroundColor: Colors.red,
                             ),
                           );
@@ -231,12 +248,11 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                       }
                     }
                   },
-                  child:  Text(Labels.saveAddress,style: TextStyle(
+                  child: Text('Update Address', style: TextStyle(
                     fontFamily: FontFamily.fontsPoppinsSemiBold,
                     fontSize: 16,
                     color: Colors.white,
-
-                  ),),
+                  )),
                 ),
               ],
             ),

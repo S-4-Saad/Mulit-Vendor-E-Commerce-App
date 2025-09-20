@@ -25,10 +25,11 @@ class SelectTab extends NavBarEvent {
 }
 class ShopInitPage extends NavBarEvent {
   final dynamic tab; // can be int or RouteArgument
-  const ShopInitPage(this.tab);
+  final int? storeId;
+  const ShopInitPage(this.tab, {this.storeId});
 
   @override
-  List<Object?> get props => [tab];
+  List<Object?> get props => [tab, storeId];
 }
 
 class ShopSelectTab extends NavBarEvent {

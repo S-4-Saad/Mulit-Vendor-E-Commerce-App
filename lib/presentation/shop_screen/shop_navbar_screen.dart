@@ -3,19 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/assets/font_family.dart';
 import 'package:speezu/core/utils/labels.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
-import 'package:speezu/presentation/drawers/end_drawer.dart';
-
-import '../../repositories/user_repository.dart';
-import '../../routes/route_names.dart';
-import '../drawers/drawer.dart';
 import '../nav_bar_screen/bloc/nav_bar_bloc.dart';
 import '../nav_bar_screen/bloc/nav_bar_event.dart';
 import '../nav_bar_screen/bloc/nav_bar_state.dart';
 
 class ShopNavbarScreen extends StatelessWidget {
   final dynamic shopCurrentTab;
+  final int? storeId;
 
-  ShopNavbarScreen({super.key, this.shopCurrentTab});
+  ShopNavbarScreen({super.key, this.shopCurrentTab, this.storeId});
   List<String> screenTitles = [
     Labels.shop,
     Labels.mapExplorer,
@@ -24,7 +20,7 @@ class ShopNavbarScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => NavBarBloc()..add(ShopInitPage(shopCurrentTab)),
+      create: (_) => NavBarBloc()..add(ShopInitPage(shopCurrentTab, storeId: storeId)),
       child: BlocBuilder<NavBarBloc, NavBarState>(
         builder: (context, state) {
           final bloc = context.read<NavBarBloc>();
