@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/assets/font_family.dart';
 import 'package:speezu/presentation/orders/bloc/order_state.dart';
 import 'package:speezu/presentation/orders/bloc/orders_bloc.dart';
+import 'package:speezu/presentation/orders/orders_tab_screens/cancelled_orders_screen.dart';
+import 'package:speezu/presentation/orders/orders_tab_screens/completed_orders_screen.dart';
 import 'package:speezu/presentation/products/products_tab_screen/food_products_screen.dart';
 import 'package:speezu/presentation/products/products_tab_screen/pharmacy_products_screen.dart';
 import 'package:speezu/presentation/products/products_tab_screen/retail_products_screen.dart';
@@ -132,8 +134,8 @@ class _OrdersTabBarScreenState extends State<OrdersTabBarScreen> with SingleTick
                     controller: _tabController,
                     children: [
                       ActiveOrdersScreen(),
-                      SupermarketProductsScreen(),
-                      RetailProductsScreen(),
+                      CompletedOrdersScreen(),
+                      CancelledOrdersScreen(),
                     ],
                   ),
                 ),

@@ -13,6 +13,7 @@ import 'package:speezu/presentation/auth/bloc/auth_bloc.dart';
 import 'package:speezu/presentation/category/bloc/category_bloc.dart';
 import 'package:speezu/presentation/home/bloc/home_bloc.dart';
 import 'package:speezu/presentation/languages/bloc/languages_bloc.dart';
+import 'package:speezu/presentation/order_details/order_details_screen.dart';
 import 'package:speezu/presentation/orders/bloc/orders_bloc.dart';
 import 'package:speezu/presentation/product_detail/bloc/product_detail_bloc.dart';
 import 'package:speezu/presentation/products/bloc/products_bloc.dart';
@@ -105,7 +106,7 @@ class MyApp extends StatelessWidget {
             }
           },
           child: MaterialApp(
-            title: 'RiverCity',
+            title: 'Speezu',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
@@ -115,7 +116,7 @@ class MyApp extends StatelessWidget {
             localizationsDelegates: context.localizationDelegates,
             supportedLocales: context.supportedLocales,
             locale: context.locale,
-            // home: PractiseScreen(),
+            // home: OrderDetailsScreen(),
             initialRoute: RouteNames.splash,
             onGenerateRoute: AppRoutes.generateRoute,
           ),
@@ -124,62 +125,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-// class SplashScreen extends StatelessWidget {
-//   const SplashScreen({super.key});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Column(mainAxisAlignment: MainAxisAlignment.center,
-//         children: [
-//           Center(child: Text('Splash Screen', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),)),
-//           ListTile(
-//             title: Text('Toggle Dark Mode'),
-//             trailing: Switch(
-//               value: context.watch<ThemeBloc>().state.themeMode == AppThemeMode.dark,
-//               onChanged: (value) {
-//                 context.read<ThemeBloc>().add(SwitchThemeEvent(
-//                   value ? AppThemeMode.dark : AppThemeMode.light,
-//                 ));
-//               },
-//               activeColor: Theme.of(context).colorScheme.secondary, // Uses second_color or second_dark_color
-//             ),
-//           ),
-//           Wrap(
-//             children: [
-//               Container(height: 100, width: 100, color: Theme.of(context).scaffoldBackgroundColor,),
-//               Container(height: 100, width: 100, color: Theme.of(context).colorScheme.primary,),
-//               Container(height: 100, width: 100, color: Theme.of(context).colorScheme.secondary,),
-//               Container(height: 100, width: 100, color: Theme.of(context).colorScheme.onSecondary,),
-//               Container(height: 100, width: 100, color: Theme.of(context).colorScheme.onPrimary,),
-//               Text(Labels.hello, style:TextStyle(
-//                 color: Theme.of(context).colorScheme.onSurface,
-//
-//               ) ),
-//               Text('Sample Text', ),
-//               Text('Sample Text', ),
-//               Text('Sample Text',),
-//               Text(Labels.welcome, style: Theme.of(context).textTheme.titleMedium,),
-//               Text('Sample Text', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold,),),
-//               ElevatedButton(
-//                 onPressed: () {
-//                   if (context.locale.languageCode == 'en') {
-//                     context.setLocale(const Locale('ar'));
-//                   } else {
-//                     context.setLocale(const Locale('en'));
-//                   }
-//                 },
-//                 child: Text('Change Language'),
-//               ),
-//
-//
-//               CustomTextFormField(validator: AppValidators.validateNumber, textEditingController: TextEditingController(), hint: 'Hello')
-//             ],
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-
