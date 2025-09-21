@@ -10,6 +10,7 @@ import 'package:speezu/presentation/auth/bloc/auth_bloc.dart';
 import 'package:speezu/presentation/category/bloc/category_bloc.dart';
 import 'package:speezu/presentation/home/bloc/home_bloc.dart';
 import 'package:speezu/presentation/languages/bloc/languages_bloc.dart';
+import 'package:speezu/presentation/order_details/bloc/order_details_bloc.dart';
 import 'package:speezu/presentation/orders/bloc/orders_bloc.dart';
 import 'package:speezu/presentation/product_detail/bloc/product_detail_bloc.dart';
 import 'package:speezu/presentation/products/bloc/products_bloc.dart';
@@ -77,6 +78,7 @@ void main() async {
           BlocProvider<ProductDetailBloc>(create: (_) => ProductDetailBloc()),
           BlocProvider<CartBloc>(create: (_) => CartBloc()),
           BlocProvider<OrdersBloc>(create: (_) => OrdersBloc()),
+          BlocProvider<OrderDetailsBloc>(create: (_) => OrderDetailsBloc()),
         ],
         child: MyApp(),
       ),
