@@ -45,7 +45,7 @@ class SearchContainer extends StatelessWidget {
             curve: Curves.easeInOut,
             height: context.heightPct(.055),
             width: double.infinity,
-            margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+            margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.onPrimary,

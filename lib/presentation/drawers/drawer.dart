@@ -57,8 +57,8 @@ class DrawerWidget extends StatelessWidget {
           ),
           _buildListTile(
             context,
-            icon: Icons.notifications,
-            text: Labels.notifications,
+            icon: CupertinoIcons.archivebox_fill,
+            text: Labels.products,
             onTap: () {
               context.read<NavBarBloc>().add(const SelectTab(0));
               Navigator.pop(context);
