@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/assets/font_family.dart';
 import 'package:speezu/core/utils/currency_icon.dart';
+import 'package:speezu/presentation/cart/bloc/cart_bloc.dart';
+import 'package:speezu/presentation/cart/bloc/cart_event.dart';
+import 'package:speezu/presentation/cart/bloc/cart_state.dart';
+import 'package:speezu/models/cart_model.dart';
 import 'package:speezu/routes/route_names.dart';
-import 'package:speezu/widgets/app_cache_image.dart';
 import 'package:speezu/widgets/custom_app_bar.dart';
 
 import '../../core/utils/labels.dart';
@@ -15,33 +19,57 @@ class CartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: Labels.yourCart),
+      body: BlocBuilder<CartBloc, CartState>(
+        builder: (context, state) {
+          if (state.isEmpty) {
+            return _buildEmptyCart(context);
+          }
 
-      body: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                SizedBox(height: 10),
-                CartListTile(
-                  imageUrl:
-                      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y2FydHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
-                  productName:
-                      'Lenovo 300e Intel Chip Loren chip loren iposum loren ipssum ',
-                  variationParentName: 'Processor',
-                  variationParentValue: "8th Gen",
-                  variationChildName: 'RAM',
-                  variationChildValue: 'DDR4 4 Gb',
-                  price: '20000',
-                  originalPrice: '22222',
-                  quantity: 1,
-                  onAdd: () {},
-                  onRemove: () {},
-                  onDelete: () {},
+          return Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    SizedBox(height: 10),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: state.items.length,
+                        itemBuilder: (context, index) {
+                          final cartItem = state.items[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 10.0),
+                            child: CartListTile(
+                              imageUrl: cartItem.imageUrl,
+                              productName: cartItem.name,
+                              variationParentName: cartItem.variationParentName,
+                              variationParentValue: cartItem.variationParentValue,
+                              variationChildName: cartItem.variationChildName,
+                              variationChildValue: cartItem.variationChildValue,
+                              price: cartItem.price.toStringAsFixed(2),
+                              originalPrice: cartItem.originalPrice.toStringAsFixed(2),
+                              quantity: cartItem.quantity,
+                              onAdd: () {
+                                context.read<CartBloc>().add(
+                                  IncrementCartItemQuantity(cartItemId: cartItem.id),
+                                );
+                              },
+                              onRemove: () {
+                                context.read<CartBloc>().add(
+                                  DecrementCartItemQuantity(cartItemId: cartItem.id),
+                                );
+                              },
+                              onDelete: () {
+                                _showDeleteConfirmationDialog(context, cartItem);
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
           Align(
             alignment: Alignment.bottomCenter,
             child: SafeArea(
@@ -154,12 +182,23 @@ class CartScreen extends StatelessWidget {
                             fontSize: 16,
                           ),
                         ),
+                        if (state.items.isNotEmpty) ...[
+                          SizedBox(height: 5),
+                          Text(
+                            'From: ${state.items.first.shopName}',
+                            style: TextStyle(
+                              fontFamily: FontFamily.fontsPoppinsRegular,
+                              color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.7),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                         SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              '${Labels.itemsTotal} ( 1 ${Labels.item} )',
+                              '${Labels.itemsTotal} ( ${state.totalItems} ${Labels.item}${state.totalItems > 1 ? 's' : ''} )',
                               style: TextStyle(
                                 fontFamily: FontFamily.fontsPoppinsRegular,
                                 color:
@@ -168,7 +207,7 @@ class CartScreen extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              '${CurrencyIcon.currencyIcon} 2222',
+                              '${CurrencyIcon.currencyIcon}${state.subtotal.toStringAsFixed(2)}',
                               style: TextStyle(
                                 fontFamily: FontFamily.fontsPoppinsRegular,
                                 color:
@@ -191,7 +230,7 @@ class CartScreen extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              '${CurrencyIcon.currencyIcon} 2222',
+                              '${CurrencyIcon.currencyIcon}${state.deliveryFee.toStringAsFixed(2)}',
                               style: TextStyle(
                                 fontFamily: FontFamily.fontsPoppinsRegular,
                                 color:
@@ -214,7 +253,7 @@ class CartScreen extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              '${CurrencyIcon.currencyIcon} 2222',
+                              '${CurrencyIcon.currencyIcon}${state.taxAmount.toStringAsFixed(2)}',
                               style: TextStyle(
                                 fontFamily: FontFamily.fontsPoppinsRegular,
                                 color:
@@ -237,7 +276,7 @@ class CartScreen extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              '${CurrencyIcon.currencyIcon} 2222',
+                              '${CurrencyIcon.currencyIcon}${state.totalAmount.toStringAsFixed(2)}',
                               style: TextStyle(
                                 fontFamily: FontFamily.fontsPoppinsSemiBold,
                                 color:
@@ -283,6 +322,204 @@ class CartScreen extends StatelessWidget {
                     ),
                   ),
                 ],
+              ),
+            ),
+          ),
+          ],
+        );
+        },
+      ),
+    );
+  }
+
+  void _showDeleteConfirmationDialog(BuildContext context, CartItem cartItem) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Remove Item',
+            style: TextStyle(
+              fontFamily: FontFamily.fontsPoppinsSemiBold,
+              fontSize: 18,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Are you sure you want to remove this item from your cart?',
+                style: TextStyle(
+                  fontFamily: FontFamily.fontsPoppinsRegular,
+                  fontSize: 14,
+                ),
+              ),
+              SizedBox(height: 12),
+              Container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  children: [
+                    // Product image
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(6),
+                        image: DecorationImage(
+                          image: NetworkImage(cartItem.imageUrl),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    // Product details
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            cartItem.name,
+                            style: TextStyle(
+                              fontFamily: FontFamily.fontsPoppinsSemiBold,
+                              fontSize: 12,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          if (cartItem.variationParentValue != null) ...[
+                            SizedBox(height: 2),
+                            Text(
+                              '${cartItem.variationParentName}: ${cartItem.variationParentValue}',
+                              style: TextStyle(
+                                fontFamily: FontFamily.fontsPoppinsRegular,
+                                fontSize: 10,
+                                color: Colors.grey[600],
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                          if (cartItem.variationChildValue != null) ...[
+                            Text(
+                              '${cartItem.variationChildName}: ${cartItem.variationChildValue}',
+                              style: TextStyle(
+                                fontFamily: FontFamily.fontsPoppinsRegular,
+                                fontSize: 10,
+                                color: Colors.grey[600],
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                          SizedBox(height: 4),
+                          Text(
+                            'Qty: ${cartItem.quantity} × ${CurrencyIcon.currencyIcon}${cartItem.price.toStringAsFixed(2)}',
+                            style: TextStyle(
+                              fontFamily: FontFamily.fontsPoppinsRegular,
+                              fontSize: 11,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  fontFamily: FontFamily.fontsPoppinsRegular,
+                  color: Theme.of(context).colorScheme.onSecondary,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                context.read<CartBloc>().add(
+                  RemoveFromCart(cartItemId: cartItem.id),
+                );
+              },
+              child: Text(
+                'Remove',
+                style: TextStyle(
+                  fontFamily: FontFamily.fontsPoppinsSemiBold,
+                  color: Colors.red,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildEmptyCart(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.shopping_cart_outlined,
+            size: 100,
+            color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.3),
+          ),
+          SizedBox(height: 20),
+          Text(
+            'Your cart is empty',
+            style: TextStyle(
+              fontFamily: FontFamily.fontsPoppinsSemiBold,
+              fontSize: 20,
+              color: Theme.of(context).colorScheme.onSecondary,
+            ),
+          ),
+          SizedBox(height: 10),
+          Text(
+            'Add some products to get started',
+            style: TextStyle(
+              fontFamily: FontFamily.fontsPoppinsRegular,
+              fontSize: 14,
+              color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.6),
+            ),
+          ),
+          SizedBox(height: 30),
+          ElevatedButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(
+                Theme.of(context).colorScheme.primary,
+              ),
+              padding: MaterialStateProperty.all(
+                EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+              ),
+              shape: MaterialStateProperty.all(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25),
+                ),
+              ),
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text(
+              'Continue Shopping',
+              style: TextStyle(
+                fontFamily: FontFamily.fontsPoppinsSemiBold,
+                color: Colors.white,
+                fontSize: 16,
               ),
             ),
           ),

@@ -5,10 +5,6 @@ import 'package:speezu/presentation/orders/bloc/order_state.dart';
 import 'package:speezu/presentation/orders/bloc/orders_bloc.dart';
 import 'package:speezu/presentation/orders/orders_tab_screens/cancelled_orders_screen.dart';
 import 'package:speezu/presentation/orders/orders_tab_screens/completed_orders_screen.dart';
-import 'package:speezu/presentation/products/products_tab_screen/food_products_screen.dart';
-import 'package:speezu/presentation/products/products_tab_screen/pharmacy_products_screen.dart';
-import 'package:speezu/presentation/products/products_tab_screen/retail_products_screen.dart';
-import 'package:speezu/presentation/products/products_tab_screen/supermarket_products_screen.dart';
 
 import '../../core/utils/labels.dart';
 import 'bloc/orders_event.dart';

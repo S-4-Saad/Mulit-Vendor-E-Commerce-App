@@ -9,7 +9,6 @@ import 'package:speezu/presentation/shop_screen/shop/shop_products_screen.dart';
 // Bloc files
 import '../../../paractise.dart';
 import '../../orders/orders_tab_bar_screen.dart';
-import '../../product_detail/product_detail_screen.dart';
 import '../../shop_screen/shop/shop_detail_screen.dart';
 import '../../map_screen/map_screen.dart';
 import 'nav_bar_event.dart';
@@ -96,7 +95,9 @@ class NavBarBloc extends Bloc<NavBarEvent, NavBarState> {
       case 1:
         return const ShopMapScreen();
       case 2:
-        return  ShopProductsScreen();
+        return state.storeId != null 
+            ? ShopProductsScreen(storeId: state.storeId!)
+            : const Center(child: Text('Store ID not available'));
       default:
         return ShopDetailScreen(storeId: state.storeId);
     }

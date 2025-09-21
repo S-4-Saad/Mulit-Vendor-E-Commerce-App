@@ -4,10 +4,7 @@ import 'package:speezu/core/assets/font_family.dart';
 import 'package:speezu/presentation/products/bloc/products_bloc.dart';
 import 'package:speezu/presentation/products/bloc/products_event.dart';
 import 'package:speezu/presentation/products/bloc/products_state.dart';
-import 'package:speezu/presentation/products/products_tab_screen/food_products_screen.dart';
-import 'package:speezu/presentation/products/products_tab_screen/pharmacy_products_screen.dart';
-import 'package:speezu/presentation/products/products_tab_screen/retail_products_screen.dart';
-import 'package:speezu/presentation/products/products_tab_screen/supermarket_products_screen.dart';
+import 'package:speezu/presentation/products/widgets/dynamic_products_screen.dart';
 
 import '../../core/utils/labels.dart';
 
@@ -100,10 +97,26 @@ class ProductsTabBarScreen extends StatelessWidget {
                 Expanded(
                   child: TabBarView(
                     children: [
-                      FoodProductsScreen(),
-                      SupermarketProductsScreen(),
-                      RetailProductsScreen(),
-                      PharmacyProductsScreen(),
+                      SizedBox(
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: const DynamicProductsScreen(categoryName: 'food'),
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: const DynamicProductsScreen(categoryName: 'supermarket'),
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: const DynamicProductsScreen(categoryName: 'retail stores'),
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: const DynamicProductsScreen(categoryName: 'pharmacy'),
+                      ),
                     ],
                   ),
                 ),
