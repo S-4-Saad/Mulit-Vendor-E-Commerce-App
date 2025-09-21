@@ -176,7 +176,20 @@
   "reasonForCancellingTheOrder": "Reason for cancelling the order",
   "reason": "Reason",
   "submit": "Submit",
-  "giveReview": "Give Review"
+  "giveReview": "Give Review",
+  "packaging": "Packaging",
+  "onTheRoad": "On The Road",
+  "outForDelivery": "Out For Delivery",
+  "delivered": "Delivered",
+  "orderPlacedOn": "Order Placed on",
+  "pickedByRider": "Picked by Rider",
+  "foodPreparation": "Food Preparation",
+  "giveRating": "Give Rating",
+    "writeYourFeedback": "Write your feedback",
+  "shareYourExperience": "Share your experience...",
+  "shareYourThoughts": "Share Your Thoughts",
+  "yourVoiceMatters": "Your Voice Matters",
+  "verify": "Verify"
 
 
 }

@@ -14,7 +14,7 @@ class OrderCard extends StatelessWidget {
   final String dateTime;
   final VoidCallback onViewDetails;
   final VoidCallback? onCancel;
-  final bool isCancellable;
+  final VoidCallback? onVerify;
 
   const OrderCard({
     super.key,
@@ -24,9 +24,9 @@ class OrderCard extends StatelessWidget {
     required this.paymentMethod,
     required this.amount,
     required this.dateTime,
+    this.onVerify,
     required this.onViewDetails,
      this.onCancel,
-    this.isCancellable=false
   });
 
   Color _getStatusColor() {
@@ -166,24 +166,53 @@ class OrderCard extends StatelessWidget {
         ),
 
         // Action Buttons
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            CustomMiniElevatedButton(
-              title: Labels.viewDetails,
-              onPressed: onViewDetails,
-              backgroundColor: Colors.blue,
-              textColor: Colors.white,
-            ),
-            if(isCancellable)
-            CustomMiniElevatedButton(
-              title: Labels.delete,
-              onPressed: onCancel??(){},
-              backgroundColor: Colors.red,
-              textColor: Colors.white,
-            ),
-          ],
-        ),
+        // Action Buttons
+        if (status.toLowerCase() == "active") ...[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              // ✅ Verify Button
+              CustomMiniElevatedButton(
+                title: Labels.verify,
+                onPressed: onVerify ?? () {},
+                backgroundColor: Colors.green,
+                textColor: Colors.white,
+              ),
+              const SizedBox(width: 8),
+
+                CustomMiniElevatedButton(
+                  title: Labels.cancel, // changed from delete -> cancel
+                  onPressed: onCancel ?? () {},
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                ),
+
+              const SizedBox(width: 8),
+
+              // 👁 View Details (always visible)
+              CustomMiniElevatedButton(
+                title: Labels.viewDetails,
+                onPressed: onViewDetails,
+                backgroundColor: Colors.blue,
+                textColor: Colors.white,
+              ),
+            ],
+          ),
+        ] else ...[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              // For completed/canceled orders -> Only view details
+              CustomMiniElevatedButton(
+                title: Labels.viewDetails,
+                onPressed: onViewDetails,
+                backgroundColor: Colors.blue,
+                textColor: Colors.white,
+              ),
+            ],
+          ),
+        ],
+
       ],
     );
   }
