@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/assets/font_family.dart';
@@ -11,10 +10,26 @@ class SearchContainer extends StatelessWidget {
   final VoidCallback onSearchTap;
 
   final List<Map<String, dynamic>> _searchItems = [
-    {"text": Labels.searchFood, "icon": Icons.fastfood, "color": Colors.orange},
-    {"text": Labels.searchSuperMarketProducts, "icon": Icons.local_grocery_store, "color": Colors.green},
-    {"text": Labels.searchMedicine, "icon": Icons.medical_services, "color": Colors.red},
-    {"text": Labels.searchRetailProducts, "icon": Icons.shopping_bag, "color": Colors.blue},
+    {
+      "text": Labels.searchFood,
+      "icon": Icons.fastfood,
+      "color": Colors.deepOrange,
+    },
+    {
+      "text": Labels.searchSuperMarketProducts,
+      "icon": Icons.local_grocery_store,
+      "color": Colors.teal,
+    },
+    {
+      "text": Labels.searchMedicine,
+      "icon": Icons.medical_services,
+      "color": Colors.indigo,
+    },
+    {
+      "text": Labels.searchRetailProducts,
+      "icon": Icons.shopping_bag,
+      "color": Colors.brown,
+    },
   ];
 
   @override
@@ -26,35 +41,50 @@ class SearchContainer extends StatelessWidget {
         return GestureDetector(
           onTap: onSearchTap,
           child: AnimatedContainer(
-
-            duration: const Duration(milliseconds: 500),
-            clipBehavior: Clip.hardEdge,
+            duration: const Duration(milliseconds: 400),
             curve: Curves.easeInOut,
-            height: context.heightPct(.05),
+            height: context.heightPct(.055),
             width: double.infinity,
-            margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
             decoration: BoxDecoration(
-              color: item["color"].withOpacity(0.1),
+              color: Theme.of(context).colorScheme.onPrimary,
               borderRadius: BorderRadius.circular(5),
-              border: Border.all(color: item["color"], width: 1.2),
+              border: Border.all(
+                color: item["color"].withOpacity(0.5),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Row(
               children: [
-                Icon(item["icon"], color: item["color"]),
-                const SizedBox(width: 12),
-                Expanded(
+                Container(
+                  clipBehavior: Clip.antiAlias,
+                  padding: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    color: item["color"].withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Icon(item["icon"], color: item["color"], size: 20),
+                ),
+                const SizedBox(width: 14),
+                Expanded( // 👈 ensures the text takes all remaining space
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 600),
                     transitionBuilder: (child, animation) {
                       final slideAnimation = Tween<Offset>(
-                        begin: const Offset(1.0, 0), // start off-screen right
+                        begin: const Offset(0.2, 0), // slide from right
                         end: Offset.zero,
                       ).animate(CurvedAnimation(
                         parent: animation,
                         curve: Curves.easeOut,
                       ));
-
                       return SlideTransition(
                         position: slideAnimation,
                         child: FadeTransition(
@@ -63,18 +93,22 @@ class SearchContainer extends StatelessWidget {
                         ),
                       );
                     },
-                    child: Text(
-                      item["text"],
+                    child: Align( // 👈 keeps it pinned to the start
+                      alignment: Alignment.centerLeft,
                       key: ValueKey(item["text"]),
-                      style: TextStyle(
-                        color: item["color"],
-                        fontFamily: FontFamily.fontsPoppinsRegular,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                      child: Text(
+                        item["text"],
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSecondary,
+                          fontFamily: FontFamily.fontsPoppinsRegular,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
                 ),
+
               ],
             ),
           ),

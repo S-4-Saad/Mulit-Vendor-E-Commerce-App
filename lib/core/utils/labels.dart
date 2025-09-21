@@ -149,8 +149,10 @@ class Labels {
   static String get saveAddress => 'saveAddress'.tr();
   static String get addNewAddress => 'addNewAddress'.tr();
   static String get cashOnDelivery => 'cashOnDelivery'.tr();
-  static String get payWhenYourOrderIsDeliveredToYou => 'payWhenYourOrderIsDeliveredToYou'.tr();
-  static String get paySecurelyWithYourCreditCard => 'paySecurelyWithYourCreditCard'.tr();
+  static String get payWhenYourOrderIsDeliveredToYou =>
+      'payWhenYourOrderIsDeliveredToYou'.tr();
+  static String get paySecurelyWithYourCreditCard =>
+      'paySecurelyWithYourCreditCard'.tr();
   static String get onlinePayment => 'onlinePayment'.tr();
   static String get orderPlaced => 'orderPlaced'.tr();
   static String get confirmOrder => 'confirmOrder'.tr();
@@ -163,10 +165,13 @@ class Labels {
   static String get changeYourProfilePicture => 'changeYourProfilePicture'.tr();
   static String get addressBook => 'addressBook'.tr();
   static String get defaultShippingAddress => 'defaultShippingAddress'.tr();
-  static String get areYouSureYouWantToSelectThisAddressAsYourDefaultShippingAddress => 'areYouSureYouWantToSelectThisAddressAsYourDefaultShippingAddress'.tr();
+  static String
+  get areYouSureYouWantToSelectThisAddressAsYourDefaultShippingAddress =>
+      'areYouSureYouWantToSelectThisAddressAsYourDefaultShippingAddress'.tr();
   static String get selectAddress => 'selectAddress'.tr();
   static String get delete => 'delete'.tr();
-  static String get areYouSureYouWantToDeleteThisAddress => 'areYouSureYouWantToDeleteThisAddress'.tr();
+  static String get areYouSureYouWantToDeleteThisAddress =>
+      'areYouSureYouWantToDeleteThisAddress'.tr();
   static String get deleteAddress => 'deleteAddress'.tr();
   static String get completedOrders => 'completedOrders'.tr();
   static String get activeOrders => 'activeOrders'.tr();
@@ -180,9 +185,24 @@ class Labels {
   static String get customer => 'customer'.tr();
   static String get payment => 'payment'.tr();
   static String get cancelOrder => 'cancelOrder'.tr();
-  static String get areYouSureYouWantToCancelThisOrder => 'areYouSureYouWantToCancelThisOrder'.tr();
-  static String get reasonForCancellingTheOrder => 'reasonForCancellingTheOrder'.tr();
+  static String get areYouSureYouWantToCancelThisOrder =>
+      'areYouSureYouWantToCancelThisOrder'.tr();
+  static String get reasonForCancellingTheOrder =>
+      'reasonForCancellingTheOrder'.tr();
   static String get reason => 'reason'.tr();
   static String get submit => 'submit'.tr();
+  static String get onTheRoad => 'onTheRoad'.tr();
+  static String get packaging => 'packaging'.tr();
+  static String get outForDelivery => 'outForDelivery'.tr();
+  static String get delivered => 'delivered'.tr();
   static String get giveReview => 'giveReview'.tr();
+  static String get orderPlacedOn => 'orderPlacedOn'.tr();
+  static String get pickedByRider => 'pickedByRider'.tr();
+  static String get foodPreparation => 'foodPreparation'.tr();
+  static String get giveRating => 'giveRating'.tr();
+  static String get writeYourFeedback => 'writeYourFeedback'.tr();
+  static String get shareYourExperience => 'shareYourExperience'.tr();
+  static String get shareYourThoughts => 'shareYourThoughts'.tr();
+  static String get yourVoiceMatters => 'yourVoiceMatters'.tr();
+  static String get verify => 'verify'.tr();
 }
