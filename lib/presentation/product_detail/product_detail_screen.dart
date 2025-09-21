@@ -2,22 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:speezu/core/utils/currency_icon.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
 import 'package:speezu/presentation/product_detail/bloc/product_detail_bloc.dart';
+import 'package:speezu/presentation/cart/bloc/cart_bloc.dart';
+import 'package:speezu/presentation/cart/bloc/cart_event.dart';
+import 'package:speezu/presentation/cart/bloc/cart_state.dart';
 import 'package:speezu/routes/route_names.dart';
-import 'package:speezu/widgets/app_cache_image.dart';
-import 'package:speezu/widgets/rating_display_widget.dart';
-
 import '../../core/assets/font_family.dart';
 import '../../core/utils/labels.dart';
 import '../../models/product_detail_model.dart';
-import '../../models/product_model.dart';
-import '../../paractise.dart';
-import '../../widgets/custom_action_container.dart';
 import '../../widgets/image_gallery_viewer_widget.dart';
 import '../../widgets/image_type_extention.dart';
-import '../../widgets/open_status_container.dart';
 import '../../widgets/option_selector_widget.dart';
 import '../../widgets/product_box_widget.dart';
 import '../../widgets/shop_product_box.dart';
@@ -25,230 +22,15 @@ import 'bloc/product_detail_event.dart';
 import 'bloc/product_detail_state.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  ProductDetailScreen({super.key});
+  final String productId;
+  
+  const ProductDetailScreen({super.key, required this.productId});
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
-  final dummyProduct = ProductDetail(
-    productDiscountPercentage: 22,
-    isAvailable: true,
-    isDeliveryAvailable: true,
-    price: 22.99,
-    originalPrice: 30.00,
-    rating: 4.5,
-    isFavourite: false,
-    name: "Delicious Pizza",
-    thumbnail:
-        "https://images.ctfassets.net/j8tkpy1gjhi5/5OvVmigx6VIUsyoKz1EHUs/b8173b7dcfbd6da341ce11bcebfa86ea/Salami-pizza-hero.jpg",
-    images: [
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeo_JMT1ZvwUNMHneItLQcNgYbwRsSs2mqYA&s",
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7YNVwJV-2IIK2-ZMOrNnfA0BU33gVgNX-bQ&s",
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSqEpYTIg-oPtHkAhKTfIrYzNvrtNTFKZmAw&s",
-    ],
-    categoryName: "Food",
-    subCategoryName: 'Pizza',
-    shopName: "Pizza Palace",
-    description:
-        "A delicious pizza with fresh ingredients and mouth-watering taste. A delicious pizza with fresh ingredients and mouth-watering taste. A delicious pizza with fresh ingredients and mouth-watering taste. A delicious pizza with fresh ingredients and mouth-watering taste. A delicious pizza with fresh ingredients and mouth-watering taste. A delicious pizza with fresh ingredients and mouth-watering taste. A delicious pizza with fresh ingredients and mouth-watering taste.",
-    shop: ShopBoxModel(
-      categoryName: "Food",
-      name: "Pizza Palace",
-      imageUrl: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5",
-      rating: 4.5,
-    ),
-    variations: [
-      ProductVariation(
-        parentName: "Fajita",
-        parentOptionName: "Flavor",
-        parentPrice: 1200,
-        children: [
-          ProductSubVariation(
-            name: "Small",
-            childOptionName: "Size",
-            price: 700,
-            stock: 10,
-            stockTotal: 20,
-          ),
-          ProductSubVariation(
-            name: "Medium",
-            childOptionName: "Size",
-            price: 1000,
-            stock: 5,
-            stockTotal: 15,
-          ),
-          ProductSubVariation(
-            name: "Large",
-            childOptionName: "Size",
-            price: 1500,
-            stock: 3,
-            stockTotal: 10,
-          ),
-        ],
-      ),
-      ProductVariation(
-        parentName: "Malai Boti",
-        parentOptionName: "Flavor",
-        parentPrice: 1300,
-        children: [
-          ProductSubVariation(
-            name: "Small",
-            childOptionName: "Size",
-            price: 800,
-            stock: 12,
-            stockTotal: 20,
-          ),
-          ProductSubVariation(
-            name: "Medium",
-            childOptionName: "Size",
-            price: 1100,
-            stock: 7,
-            stockTotal: 15,
-          ),
-          ProductSubVariation(
-            name: "Large",
-            childOptionName: "Size",
-            price: 1600,
-            stock: 2,
-            stockTotal: 10,
-          ),
-        ],
-      ),
-      ProductVariation(
-        parentName: "Special",
-        parentOptionName: "Flavor",
-        parentPrice: 1300,
-        children: [
-          ProductSubVariation(
-            name: "Small",
-            childOptionName: "Size",
-            price: 800,
-            stock: 12,
-            stockTotal: 20,
-          ),
-          ProductSubVariation(
-            name: "Medium",
-            childOptionName: "Size",
-            price: 1100,
-            stock: 7,
-            stockTotal: 15,
-          ),
-          ProductSubVariation(
-            name: "Large",
-            childOptionName: "Size",
-            price: 1600,
-            stock: 2,
-            stockTotal: 10,
-          ),
-        ],
-      ),
-    ],
-  );
-  final List<DummyProductModel> dummyFoodProducts = [
-    DummyProductModel(
-      id: "1",
-      productTitle: "Cheese Burger",
-      productPrice: 4.99,
-      productOriginalPrice: 6.99,
-      productImageUrl:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRctS9Fc8yYWbhqIqWuIJESV_PFF1e7Rg9i1Q&s",
-      productRating: 4.5,
-      productCategory: "Fast Food",
-      isProductFavourite: true,
-    ),
-    DummyProductModel(
-      id: "2",
-      productTitle: "Pepperoni Pizza",
-      productPrice: 8.99,
-      productOriginalPrice: 11.99,
-      productImageUrl:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHoML_RWrNhS3xbZNeWhpj9jjsyG7Ex-43aw&s",
-      productRating: 4.7,
-      productCategory: "Pizza",
-    ),
-    DummyProductModel(
-      id: "3",
-      productTitle: "Grilled Chicken Sandwich",
-      productPrice: 5.49,
-      productOriginalPrice: 7.49,
-      productImageUrl:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfDnZMDTRzMYUGZuC_bgHNaY8xUZRhypK3cw&s",
-      productRating: 4.3,
-      productCategory: "Sandwiches",
-    ),
-    DummyProductModel(
-      id: "4",
-      productTitle: "Caesar Salad",
-      productPrice: 3.99,
-      productOriginalPrice: 5.99,
-      productImageUrl:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQP9oCufjbqRr8NjbEffdJW7xaYlCw6EOShWg&s",
-      productRating: 4.0,
-      productCategory: "Salads",
-    ),
-    DummyProductModel(
-      id: "5",
-      productTitle: "Chocolate Milkshake",
-      productPrice: 2.99,
-      productOriginalPrice: 4.49,
-      productImageUrl:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzBfJl8vW3YMgLXZvhJp_qvSR803w6MHk2Uw&s",
-      productRating: 4.6,
-      productCategory: "Beverages",
-    ),
-    DummyProductModel(
-      id: "6",
-      productTitle: "French Fries",
-      productPrice: 1.99,
-      productOriginalPrice: 3.49,
-      productImageUrl:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8N0tUijh_HHnvvTSUA-vNph2IuwTKWUgoYg&s",
-      productRating: 4.2,
-      productCategory: "Snacks",
-      isProductFavourite: true,
-    ),
-    DummyProductModel(
-      id: "7",
-      productTitle: "Sushi Platter",
-      productPrice: 12.99,
-      productOriginalPrice: 15.99,
-      productImageUrl:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThQ21CGPbsX0XeK4WJXp3BoHy7ZHxuo6IIOg&s",
-      productRating: 4.8,
-      productCategory: "Japanese",
-    ),
-    DummyProductModel(
-      id: "8",
-      productTitle: "Pasta Alfredo",
-      productPrice: 7.49,
-      productOriginalPrice: 9.99,
-      productImageUrl:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNb-2E4TRtAxpHsCpXdaxHBSsHEdX_WO-tyQ&s",
-      productRating: 4.4,
-      productCategory: "Italian",
-    ),
-    DummyProductModel(
-      id: "9",
-      productTitle: "Tacos",
-      productPrice: 3.49,
-      productOriginalPrice: 3.49,
-      productImageUrl: "https://picsum.photos/200/300?food=9",
-      productRating: 4.1,
-      productCategory: "Mexican",
-    ),
-    DummyProductModel(
-      id: "10",
-      productTitle: "Ice Cream Sundae",
-      productPrice: 2.49,
-      productOriginalPrice: 3.99,
-      productImageUrl: "https://picsum.photos/200/300?food=10",
-      productRating: 4.9,
-      productCategory: "Desserts",
-      isProductFavourite: true,
-    ),
-  ];
 
   String? selectedParent;
   // e.g. "Fajita"
@@ -259,6 +41,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   void initState() {
     super.initState();
+    // Load product detail (quantity will be reset in BLoC)
+    context.read<ProductDetailBloc>().add(LoadProductDetail(productId: widget.productId));
+    
     _scrollController.addListener(() {
       if (_scrollController.position.userScrollDirection == ScrollDirection.reverse) {
         context.read<ProductDetailBloc>().add(HideBottomBar());
@@ -268,15 +53,272 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     });
   }
 
-  Widget build(BuildContext context) {
-    final parentNames =
-        dummyProduct.variations.map((e) => e.parentName).toList();
-    final selectedParentVariation = dummyProduct.variations.firstWhere(
+  // Calculate total price based on quantity from BLoC state
+  double calculateTotalPrice(ProductDetail product, int quantity) {
+    return product.price * quantity;
+  }
+
+  // Validate if required variations are selected
+  bool _areVariationsValid(ProductDetail product) {
+    // If no variations, always valid
+    if (product.variations.isEmpty) {
+      return true;
+    }
+
+    // If variations exist, check if parent is selected
+    if (selectedParent == null) {
+      return false;
+    }
+
+    // Find the selected parent variation
+    final selectedParentVariation = product.variations.firstWhere(
       (v) => v.parentName == selectedParent,
-      orElse: () => dummyProduct.variations.first,
+      orElse: () => product.variations.first,
     );
-    final childOptions =
-        selectedParent == null ? [] : selectedParentVariation.children;
+
+    // If parent variation has children, child must be selected
+    if (selectedParentVariation.children.isNotEmpty && selectedChild == null) {
+      return false;
+    }
+
+    return true;
+  }
+
+  // Get the missing variation message
+  String _getMissingVariationMessage(ProductDetail product) {
+    if (product.variations.isEmpty) {
+      return '';
+    }
+
+    if (selectedParent == null) {
+      final parentName = product.variations.first.parentOptionName;
+      return 'Please select a $parentName';
+    }
+
+    final selectedParentVariation = product.variations.firstWhere(
+      (v) => v.parentName == selectedParent,
+      orElse: () => product.variations.first,
+    );
+
+    if (selectedParentVariation.children.isNotEmpty && selectedChild == null) {
+      final childName = selectedParentVariation.children.first.childOptionName;
+      return 'Please select a $childName';
+    }
+
+    return '';
+  }
+
+  void _handleAddToCart(BuildContext context, ProductDetail product, int quantity) {
+    // Check if variations are required and selected
+    if (!_areVariationsValid(product)) {
+      _showVariationRequiredDialog(context, product);
+      return;
+    }
+    
+    // Add product to cart with selected variations
+    context.read<CartBloc>().add(AddToCart(
+      product: product,
+      quantity: quantity,
+      variationParentName: selectedParent,
+      variationParentValue: selectedParent,
+      variationChildName: selectedChild,
+      variationChildValue: selectedChild,
+    ));
+    
+    // Listen to cart state changes to handle store conflicts
+    context.read<CartBloc>().stream.listen((cartState) {
+      if (cartState.status == CartStatus.error && 
+          cartState.errorMessage != null &&
+          cartState.errorMessage!.startsWith('STORE_CONFLICT:')) {
+        _showStoreConflictDialog(context, cartState.errorMessage!, product);
+      }
+    });
+  }
+
+  void _showStoreConflictDialog(BuildContext context, String errorMessage, ProductDetail product) {
+    final parts = errorMessage.split(':');
+    final newStoreId = parts.length > 1 ? parts[1] : product.shopName;
+    final currentStoreId = parts.length > 2 ? parts[2] : 'Unknown Store';
+    final currentQuantity = context.read<ProductDetailBloc>().state.quantity;
+    
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Store Conflict',
+            style: TextStyle(
+              fontFamily: FontFamily.fontsPoppinsSemiBold,
+              fontSize: 18,
+            ),
+          ),
+          content: Text(
+            'You have items from "$currentStoreId" in your cart. '
+            'To add items from "$newStoreId", you need to either:\n\n'
+            '• Checkout current items first, or\n'
+            '• Clear your cart to add items from the new store',
+            style: TextStyle(
+              fontFamily: FontFamily.fontsPoppinsRegular,
+              fontSize: 14,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  fontFamily: FontFamily.fontsPoppinsRegular,
+                  color: Theme.of(context).colorScheme.onSecondary,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Navigate to cart
+                Navigator.pushNamed(context, RouteNames.cartScreen);
+              },
+              child: Text(
+                'Checkout',
+                style: TextStyle(
+                  fontFamily: FontFamily.fontsPoppinsSemiBold,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Clear cart and add new item
+                context.read<CartBloc>().add(ClearCartForNewStore(newStoreId: newStoreId));
+                
+                // Add the new item after clearing
+                Future.delayed(Duration(milliseconds: 100), () {
+                  context.read<CartBloc>().add(AddToCart(
+                    product: product,
+                    quantity: currentQuantity,
+                    variationParentName: selectedParent,
+                    variationParentValue: selectedParent,
+                    variationChildName: selectedChild,
+                    variationChildValue: selectedChild,
+                  ));
+                });
+              },
+              child: Text(
+                'Clear & Add',
+                style: TextStyle(
+                  fontFamily: FontFamily.fontsPoppinsSemiBold,
+                  color: Colors.red,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showVariationRequiredDialog(BuildContext context, ProductDetail product) {
+    final missingMessage = _getMissingVariationMessage(product);
+    
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Selection Required',
+            style: TextStyle(
+              fontFamily: FontFamily.fontsPoppinsSemiBold,
+              fontSize: 18,
+            ),
+          ),
+          content: Text(
+            missingMessage.isEmpty 
+                ? 'Please select your preferences before adding to cart.'
+                : missingMessage,
+            style: TextStyle(
+              fontFamily: FontFamily.fontsPoppinsRegular,
+              fontSize: 14,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'OK',
+                style: TextStyle(
+                  fontFamily: FontFamily.fontsPoppinsSemiBold,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ProductDetailBloc, ProductDetailState>(
+      builder: (context, state) {
+        if (state.status == ProductDetailStatus.loading) {
+          return const ProductDetailShimmer();
+        }
+        
+        if (state.status == ProductDetailStatus.error || state.productDetail == null) {
+          return Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error, size: 64, color: Colors.red),
+                  SizedBox(height: 16),
+                  Text(
+                    state.errorMessage ?? 'Failed to load product details',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.read<ProductDetailBloc>().add(LoadProductDetail(productId: widget.productId));
+                    },
+                    child: Text('Retry'),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        final product = state.productDetail!;
+        
+        // Handle different variation scenarios
+        final hasVariations = product.variations.isNotEmpty;
+        final parentNames = hasVariations ? product.variations.map((e) => e.parentName).toList() : [];
+        
+        ProductVariation selectedParentVariation = ProductVariation(
+          parentName: '',
+          parentOptionName: '',
+          parentPrice: 0,
+          children: [],
+        );
+        
+        if (hasVariations) {
+          selectedParentVariation = product.variations.firstWhere(
+      (v) => v.parentName == selectedParent,
+            orElse: () => product.variations.first,
+          );
+        }
+        
+        final childOptions = selectedParent == null ? [] : selectedParentVariation.children;
+        final hasChildVariations = childOptions.isNotEmpty;
 
     return Scaffold(
       body: Stack(
@@ -311,7 +353,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   collapseMode: CollapseMode.parallax,
                   background: CustomImageView(
                     fit: BoxFit.cover,
-                    imagePath: dummyProduct.thumbnail,
+                    imagePath: product.thumbnail,
                   ),
                 ),
               ),
@@ -325,43 +367,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         children: [
                           // Name + Rating
                           SizedBox(height: context.heightPct(.01)),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
                               Text(
-                                dummyProduct.shopName,
+                            product.shopName,
                                 style: TextStyle(
                                   fontFamily: FontFamily.fontsPoppinsRegular,
                                   color:
                                       Theme.of(context).colorScheme.onSecondary,
                                   fontSize: 13,
                                 ),
-                              ),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.star,
-                                    size: context.scaledFont(16),
-                                    color:
-                                        Theme.of(
-                                          context,
-                                        ).colorScheme.onSurfaceVariant,
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    "4.5",
-                                    style: TextStyle(
-                                      fontFamily: FontFamily.fontsPoppinsLight,
-                                      color:
-                                          Theme.of(
-                                            context,
-                                          ).colorScheme.onSecondary,
-                                      fontSize: context.scaledFont(12),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
                           ),
                           SizedBox(height: context.heightPct(.01)),
                           Row(
@@ -369,7 +382,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             children: [
                               Expanded(
                                 child: Text(
-                                  dummyProduct.name,
+                                  product.name,
                                   style: TextStyle(
                                     fontFamily: FontFamily.fontsPoppinsSemiBold,
                                     color:
@@ -381,7 +394,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 ),
                               ),
                               const SizedBox(width: 10),
-                              if (dummyProduct.productDiscountPercentage > 0)
+                              if (product.productDiscountPercentage > 0)
                                 Container(
                                   padding: EdgeInsets.symmetric(
                                     horizontal: 10,
@@ -395,7 +408,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     ),
                                   ),
                                   child: Text(
-                                    '-${dummyProduct.productDiscountPercentage}%',
+                                    '${product.productDiscountPercentage}% off',
                                     style: TextStyle(
                                       fontFamily:
                                           FontFamily.fontsPoppinsSemiBold,
@@ -415,7 +428,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               Row(
                                 children: [
                                   Text(
-                                    "${CurrencyIcon.currencyIcon}${dummyProduct.price.toStringAsFixed(2)}",
+                                    "${CurrencyIcon.currencyIcon}${product.price.toStringAsFixed(2)}",
                                     style: TextStyle(
                                       fontFamily:
                                           FontFamily.fontsPoppinsSemiBold,
@@ -425,10 +438,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     ),
                                   ),
                                   SizedBox(width: context.widthPct(.02)),
-                                  if (dummyProduct.originalPrice !=
-                                      dummyProduct.price)
+                                  if (product.originalPrice !=
+                                      product.price)
                                     Text(
-                                      "${CurrencyIcon.currencyIcon}${dummyProduct.originalPrice!.toStringAsFixed(2)}",
+                                      "${CurrencyIcon.currencyIcon}${product.originalPrice.toStringAsFixed(2)}",
                                       style: TextStyle(
                                         fontFamily:
                                             FontFamily.fontsPoppinsLight,
@@ -442,46 +455,90 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     ),
                                 ],
                               ),
-                              IsAvailableContainer(
-                                isAvailable: true,
-                                isDelivering: false,
-                              ),
                             ],
                           ),
                           SizedBox(height: context.heightPct(.02)),
-                          // if (dummyProduct.variations.isNotEmpty)
-                          OptionSelectorWidget(
-                            name:
-                                dummyProduct
-                                    .variations
-                                    .first
-                                    .parentOptionName, // "Flavor"
-                            options: parentNames,
-                            selectedOption: selectedParent,
-                            onSelect: (value) {
-                              setState(() {
-                                selectedParent = value;
-                                selectedChild =
-                                    null; // reset child when parent changes
-                              });
-                            },
-                          ),
-                          SizedBox(height: context.heightPct(.01)),
-                          if (selectedParent != null)
-                            OptionSelectorWidget(
-                              name:
-                                  selectedParentVariation
-                                      .children
-                                      .first
-                                      .childOptionName, // "Size"
-                              options: childOptions.map((e) => e.name).toList(),
-                              selectedOption: selectedChild,
-                              onSelect: (value) {
-                                setState(() {
-                                  selectedChild = value;
-                                });
-                              },
+                          
+                          // Show parent variation selector only if variations exist
+                          if (hasVariations) ...[
+                            // Parent variation selector with required indicator
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: OptionSelectorWidget(
+                                    name: product.variations.first.parentOptionName,
+                                    options: parentNames,
+                                    selectedOption: selectedParent,
+                                    onSelect: (value) {
+                                      setState(() {
+                                        selectedParent = value;
+                                        selectedChild = null; // reset child when parent changes
+                                      });
+                                    },
+                                  ),
+                                ),
+                                if (selectedParent == null) ...[
+                                  SizedBox(width: 8),
+                                  Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red.withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+                                    ),
+                                    child: Text(
+                                      'Required',
+                                      style: TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 10,
+                                        fontFamily: FontFamily.fontsPoppinsSemiBold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
+                            SizedBox(height: context.heightPct(.01)),
+                            
+                            // Show child variation selector only if parent is selected and has children
+                            if (selectedParent != null && hasChildVariations) ...[
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: OptionSelectorWidget(
+                                      name: selectedParentVariation.children.first.childOptionName,
+                                      options: childOptions.map((e) => e.name).toList(),
+                                      selectedOption: selectedChild,
+                                      onSelect: (value) {
+                                        setState(() {
+                                          selectedChild = value;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  if (selectedChild == null) ...[
+                                    SizedBox(width: 8),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red.withValues(alpha: 0.1),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+                                      ),
+                                      child: Text(
+                                        'Required',
+                                        style: TextStyle(
+                                          color: Colors.red,
+                                          fontSize: 10,
+                                          fontFamily: FontFamily.fontsPoppinsSemiBold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ],
+                          ],
 
                           SizedBox(height: 10),
 
@@ -490,7 +547,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             child: ListView.separated(
                               scrollDirection: Axis.horizontal,
                               padding: const EdgeInsets.all(12),
-                              itemCount: dummyProduct.images.length,
+                              itemCount: product.images.length,
                               separatorBuilder:
                                   (_, __) => const SizedBox(width: 10),
                               itemBuilder: (context, index) {
@@ -501,7 +558,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                       MaterialPageRoute(
                                         builder:
                                             (context) => ImageGalleryViewer(
-                                              imageUrls: dummyProduct.images,
+                                              imageUrls: product.images,
                                               initialIndex: index,
                                             ),
                                       ),
@@ -510,7 +567,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   },
                                   radius: BorderRadius.circular(10),
 
-                                  imagePath: dummyProduct.images[index],
+                                  imagePath: product.images[index],
                                   width: context.widthPct(.55),
                                   fit: BoxFit.cover,
                                 );
@@ -569,7 +626,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     horizontal: 10.0,
                                   ),
                                   child: Text(
-                                    dummyProduct.description,
+                                    product.description,
                                     style: TextStyle(
                                       fontFamily: FontFamily.fontsPoppinsLight,
 
@@ -587,15 +644,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           ),
                           SizedBox(height: 10),
                           ShopProductBox(
-                            categoryName: dummyProduct.shop.categoryName,
-                            shopImageUrl: dummyProduct.shop!.imageUrl,
-                            rating: dummyProduct.shop!.rating * 20,
-                            shopName: dummyProduct.shop!.name,
+                            categoryName: product.shop.categoryName,
+                            shopImageUrl: product.shop.imageUrl,
+                            rating: product.shop.rating * 20,
+                            shopName: product.shop.name,
                             onViewStoreTap: () {
                               Navigator.pushNamed(
-                                context,
-                                RouteNames.shopNavBarScreen,
-                              );
+                                    context,
+                                    RouteNames.shopNavBarScreen,
+                                    arguments: product.shop.id,
+                                  );
                               // Navigate to shop page
                             },
                           ),
@@ -615,10 +673,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             crossAxisCount: 2, // Defines 2 columns
                             mainAxisSpacing: 10,
                             crossAxisSpacing: 10,
-                            children: List.generate(dummyFoodProducts.length, (
+                            children: List.generate(product.relatedProducts.length, (
                               index,
                             ) {
-                              var product = dummyFoodProducts[index];
+                              var relatedProduct = product.relatedProducts[index];
                               return StaggeredGridTile.fit(
                                 crossAxisCellCount:
                                     1, // Each item takes 1 column space
@@ -628,23 +686,27 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   ),
                                   productWidth: 200,
                                   productPrice:
-                                      dummyFoodProducts[index].productPrice,
+                                      relatedProduct.price,
                                   productOriginalPrice:
-                                      dummyFoodProducts[index]
-                                          .productOriginalPrice,
+                                      relatedProduct.originalPrice,
                                   productCategory:
-                                      dummyFoodProducts[index].productCategory,
+                                      relatedProduct.categoryName,
                                   productRating:
-                                      dummyFoodProducts[index].productRating,
+                                      4.0, // Default rating since not provided in API
                                   isProductFavourite:
-                                      dummyFoodProducts[index]
-                                          .isProductFavourite,
+                                      false, // Default since not provided in API
                                   onFavouriteTap: () {},
-                                  onProductTap: () {},
+                                  onProductTap: () {
+                                    Navigator.pushReplacementNamed(
+                                      context, 
+                                      RouteNames.productScreen,
+                                      arguments: relatedProduct.id,
+                                    );
+                                  },
                                   productImageUrl:
-                                      dummyFoodProducts[index].productImageUrl,
+                                      relatedProduct.imageUrl,
                                   productTitle:
-                                      dummyFoodProducts[index].productTitle,
+                                      relatedProduct.name,
                                 ),
                               );
                             }),
@@ -711,7 +773,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             Row(
                               children: [
                                 IconButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    context.read<ProductDetailBloc>().add(DecrementQuantity());
+                                  },
                                   icon: Icon(
                                     Icons.remove_circle_outline,
                                     color:
@@ -720,7 +784,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 ),
                                 SizedBox(width: 10),
                                 Text(
-                                  "1",
+                                  "${state.quantity}",
                                   style: TextStyle(
                                     fontFamily: FontFamily.fontsPoppinsSemiBold,
                                     color:
@@ -732,7 +796,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 ),
                                 SizedBox(width: 10),
                                 IconButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    context.read<ProductDetailBloc>().add(IncrementQuantity());
+                                  },
                                   icon: Icon(
                                     Icons.add_circle_outline,
                                     color:
@@ -769,7 +835,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               child: ElevatedButton(
                                 style: ButtonStyle(
                                   backgroundColor: MaterialStateProperty.all(
-                                    Theme.of(context).colorScheme.primary,
+                                    _areVariationsValid(product) 
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Colors.grey.withValues(alpha: 0.6),
                                   ),
                                   minimumSize: MaterialStateProperty.all(
                                     Size(250, 50),
@@ -780,7 +848,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     ),
                                   ),
                                 ),
-                                onPressed: () {},
+                                onPressed: _areVariationsValid(product) 
+                                    ? () {
+                                        _handleAddToCart(context, product, state.quantity);
+                                      }
+                                    : () {
+                                        _showVariationRequiredDialog(context, product);
+                                      },
                                 child: Row(
                                   mainAxisAlignment:
                                   MainAxisAlignment.spaceBetween,
@@ -795,7 +869,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                       ),
                                     ),
                                     Text(
-                                      '22\$',
+                                      '${calculateTotalPrice(product, state.quantity).toStringAsFixed(2)}\$',
                                       style: TextStyle(
                                         fontFamily:
                                         FontFamily.fontsPoppinsSemiBold,
@@ -819,23 +893,325 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           Positioned(
             top: 50,
             right: 20,
-            child: FloatingActionButton(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(100),
+            child: BlocBuilder<CartBloc, CartState>(
+              builder: (context, cartState) {
+                final cartCount = cartState.totalItems;
+                return Stack(
+                  children: [
+                    FloatingActionButton(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      onPressed: () {
+                        Navigator.pushNamed(context, RouteNames.cartScreen);
+                      },
+                      child: Icon(
+                        Icons.shopping_cart_rounded,
+                        color: Colors.white,
+                        size: 25,
+                      ),
+                    ),
+                    if (cartCount > 0)
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 20,
+                            minHeight: 20,
+                          ),
+                          child: Text(
+                            cartCount.toString(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+      },
+    );
+  }
+}
+
+
+class ProductDetailShimmer extends StatelessWidget {
+  const ProductDetailShimmer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          CustomScrollView(
+            slivers: [
+              // Shimmer for app bar with image
+              SliverAppBar(
+                expandedHeight: 300,
+                pinned: true,
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Shimmer.fromColors(
+                    baseColor: Colors.grey[300]!,
+                    highlightColor: Colors.grey[100]!,
+                    child: Container(
+                      width: double.infinity,
+                      height: 300,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                leading: Container(
+                  margin: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                actions: [
+                  Container(
+                    margin: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      shape: BoxShape.circle,
+                    ),
+                    width: 40,
+                    height: 40,
+          ),
+        ],
+      ),
+              // Shimmer for content
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+                      // Shop name shimmer
+                      Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Container(
+                          width: 150,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      // Product name shimmer
+                      Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Container(
+                          width: double.infinity,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      // Price shimmer
+                      Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Container(
+                          width: 100,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      // Options shimmer
+                      Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Container(
+                          width: 80,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: List.generate(3, (index) => 
+                          Container(
+                            margin: const EdgeInsets.only(right: 10),
+                            child: Shimmer.fromColors(
+                              baseColor: Colors.grey[300]!,
+                              highlightColor: Colors.grey[100]!,
+                              child: Container(
+                                width: 60,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      // Images shimmer
+                      Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Container(
+                          width: double.infinity,
+                          height: 120,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      // Description shimmer
+                      Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Container(
+                          width: double.infinity,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      // Shop info shimmer
+                      Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Container(
+                          width: double.infinity,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      // Related products title shimmer
+                      Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Container(
+                          width: 200,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      // Related products grid shimmer
+                      StaggeredGrid.count(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 10,
+                        crossAxisSpacing: 10,
+                        children: List.generate(4, (index) =>
+                          StaggeredGridTile.fit(
+                            crossAxisCellCount: 1,
+                            child: Shimmer.fromColors(
+                              baseColor: Colors.grey[300]!,
+                              highlightColor: Colors.grey[100]!,
+                              child: Container(
+                                height: 200,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 100), // Space for bottom navigation
+                    ],
+                  ),
+                ),
               ),
-              // mini: true,
-              // elevation: 5,
-              // highlightElevation: 5,
-              // hoverElevation: 5,
-              // focusElevation: 5,
-              // disabledElevation: 5,
-              // splashColor: Colors.white,),
-              onPressed: () {},
-              child: Icon(
-                Icons.shopping_cart_rounded,
+            ],
+          ),
+          // Bottom navigation shimmer
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
                 color: Colors.white,
-                size: 25,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withValues(alpha: 0.3),
+                    spreadRadius: 1,
+                    blurRadius: 5,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: SafeArea(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Container(
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -844,3 +1220,4 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 }
+

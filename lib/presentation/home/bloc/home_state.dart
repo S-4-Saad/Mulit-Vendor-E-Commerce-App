@@ -1,32 +1,32 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../models/slide.dart';
+import '../../../models/dashboard_products_model.dart';
 
 enum HomeStatus { initial, loading, success, error }
 
 class HomeState extends Equatable {
   final String message;
   final HomeStatus status;
-  final SlidesModel? slidesModel;
+  final DashboardProductsModel? dashboardProducts;
 
   const HomeState({
     this.message = '',
     this.status = HomeStatus.initial,
-    this.slidesModel,
+    this.dashboardProducts,
   });
 
   HomeState copyWith({
     String? message,
     HomeStatus? status,
-    SlidesModel? slidesModel,
+    DashboardProductsModel? dashboardProducts,
   }) {
     return HomeState(
       message: message ?? this.message,
       status: status ?? this.status,
-      slidesModel: slidesModel ?? this.slidesModel,
+      dashboardProducts: dashboardProducts ?? this.dashboardProducts,
     );
   }
 
   @override
-  List<Object?> get props => [message, status,slidesModel];
+  List<Object?> get props => [message, status, dashboardProducts];
 }

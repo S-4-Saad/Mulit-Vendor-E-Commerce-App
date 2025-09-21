@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:speezu/presentation/cart/cart_screen.dart';
 import 'package:speezu/presentation/category/category_screen.dart';
-import 'package:speezu/presentation/check_out/check_out_screen.dart';
+import 'package:speezu/presentation/cart/check_out_screen.dart';
 import 'package:speezu/presentation/product_detail/product_detail_screen.dart';
 import 'package:speezu/presentation/settings/add_address_screen.dart';
 import 'package:speezu/presentation/settings/address_book_screen.dart';
@@ -51,7 +51,8 @@ class AppRoutes {
         final int? storeId = settings.arguments as int?;
         return MaterialPageRoute(builder: (_) => ShopNavbarScreen(storeId: storeId));
       case RouteNames.productScreen:
-        return MaterialPageRoute(builder: (_) => ProductDetailScreen());
+        final String? productId = settings.arguments as String?;
+        return MaterialPageRoute(builder: (_) => ProductDetailScreen(productId: productId ?? '1'));
       case RouteNames.cartScreen:
         return MaterialPageRoute(builder: (_) => CartScreen());
       case RouteNames.checkOutScreen:

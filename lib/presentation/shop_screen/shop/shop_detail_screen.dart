@@ -268,14 +268,14 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       ),
 
                       SizedBox(height: context.heightPct(.01)),
-                      CustomActionContainer(
-                        text:
-                            Labels
-                                .forMoreDetailsPleaseContactWithOurManagerOnWhatsApp,
-                        icon: Icons.chat,
-                        onTap: () {},
-                      ),
-                      SizedBox(height: context.heightPct(.01)),
+                      // CustomActionContainer(
+                      //   text:
+                      //       Labels
+                      //           .forMoreDetailsPleaseContactWithOurManagerOnWhatsApp,
+                      //   icon: Icons.chat,
+                      //   onTap: () {},
+                      // ),
+                      // SizedBox(height: context.heightPct(.01)),
                       CustomActionContainer(
                         text: store.address,
                         icon: Icons.directions,

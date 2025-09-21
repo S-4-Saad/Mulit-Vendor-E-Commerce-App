@@ -2,34 +2,27 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/theme/theme_bloc/theme_state.dart';
-import 'package:speezu/core/utils/app_validators.dart';
-import 'package:speezu/paractise.dart';
 import 'package:speezu/presentation/auth/bloc/auth_bloc.dart';
 import 'package:speezu/presentation/category/bloc/category_bloc.dart';
 import 'package:speezu/presentation/home/bloc/home_bloc.dart';
 import 'package:speezu/presentation/languages/bloc/languages_bloc.dart';
-import 'package:speezu/presentation/order_details/order_details_screen.dart';
 import 'package:speezu/presentation/orders/bloc/orders_bloc.dart';
 import 'package:speezu/presentation/product_detail/bloc/product_detail_bloc.dart';
 import 'package:speezu/presentation/products/bloc/products_bloc.dart';
 import 'package:speezu/presentation/shop_screen/bloc/shop_bloc.dart';
-import 'package:speezu/presentation/shop_screen/shop_navbar_screen.dart';
+import 'package:speezu/presentation/cart/bloc/cart_bloc.dart';
 import 'package:speezu/repositories/user_repository.dart';
 import 'package:speezu/routes/app_routes.dart';
 import 'package:speezu/routes/route_names.dart';
-import 'package:speezu/widgets/custom_text_form_field.dart';
 import 'package:speezu/widgets/search_animated_container.dart';
 import 'package:speezu/widgets/widget_bloc/banner_slider_bloc/banner_slider_bloc.dart';
-
 import 'core/services/notification_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_bloc/theme_bloc.dart';
-import 'core/theme/theme_bloc/theme_event.dart';
 import 'firebase_options.dart';
 
 // This needs to be outside of any class
@@ -82,6 +75,7 @@ void main() async {
           BlocProvider<CategoryBloc>(create: (_) => CategoryBloc()),
           BlocProvider<ProductsBloc>(create: (_) => ProductsBloc()),
           BlocProvider<ProductDetailBloc>(create: (_) => ProductDetailBloc()),
+          BlocProvider<CartBloc>(create: (_) => CartBloc()),
           BlocProvider<OrdersBloc>(create: (_) => OrdersBloc()),
         ],
         child: MyApp(),

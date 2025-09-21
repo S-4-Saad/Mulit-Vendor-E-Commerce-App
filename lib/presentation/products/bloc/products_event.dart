@@ -9,3 +9,11 @@ class ChangeTabEvent extends ProductsEvent{
   @override
   List<Object?> get props => [index];
 }
+
+class LoadProductsEvent extends ProductsEvent {
+  final String categoryName;
+  LoadProductsEvent({required this.categoryName});
+  
+  @override
+  List<Object?> get props => [categoryName];
+}

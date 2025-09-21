@@ -20,3 +20,27 @@ class LoadShopDetailEvent extends ShopEvent {
   @override
   List<Object?> get props => [storeId];
 }
+
+class LoadCategoriesEvent extends ShopEvent {
+  final int storeId;
+  LoadCategoriesEvent({required this.storeId});
+  
+  @override
+  List<Object?> get props => [storeId];
+}
+
+class LoadProductsEvent extends ShopEvent {
+  final int storeId;
+  final String categoryId;
+  LoadProductsEvent({required this.storeId, required this.categoryId});
+  
+  @override
+  List<Object?> get props => [storeId, categoryId];
+}
+
+class ClearStoreDataEvent extends ShopEvent {
+  ClearStoreDataEvent();
+  
+  @override
+  List<Object?> get props => [];
+}

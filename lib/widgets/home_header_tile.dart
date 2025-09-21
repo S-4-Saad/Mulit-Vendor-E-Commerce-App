@@ -8,10 +8,10 @@ class HomeHeaderTile extends StatelessWidget {
   const HomeHeaderTile({
     super.key,
     required this.title,
-    required this.onViewAllTap,
+    this.onViewAllTap,
   });
   final String title;
-  final VoidCallback onViewAllTap;
+  final VoidCallback? onViewAllTap;
 
   @override
   Widget build(BuildContext context) {
@@ -27,29 +27,30 @@ class HomeHeaderTile extends StatelessWidget {
             fontSize: context.scaledFont(15),
           ),
         ),
-        InkWell(
-          onTap: onViewAllTap,
-          borderRadius: BorderRadius.circular(50),
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(50),
-              border: Border.all(
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSecondary.withValues(alpha: .1),
+        if (onViewAllTap != null)
+          InkWell(
+            onTap: onViewAllTap,
+            borderRadius: BorderRadius.circular(50),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                border: Border.all(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSecondary.withValues(alpha: .1),
+                ),
               ),
-            ),
-            child: Text(
-              Labels.viewAll,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSecondary,
-                fontFamily: FontFamily.fontsPoppinsLight,
-                fontSize: context.scaledFont(10),
+              child: Text(
+                Labels.viewAll,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSecondary,
+                  fontFamily: FontFamily.fontsPoppinsLight,
+                  fontSize: context.scaledFont(10),
+                ),
               ),
             ),
           ),
-        ),
       ],
     );
   }
