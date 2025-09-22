@@ -13,6 +13,8 @@ class AddToCart extends CartEvent {
   final String? variationParentValue;
   final String? variationChildName;
   final String? variationChildValue;
+  final String? variationParentId;
+  final String? variationChildId;
 
   AddToCart({
     required this.product,
@@ -21,6 +23,8 @@ class AddToCart extends CartEvent {
     this.variationParentValue,
     this.variationChildName,
     this.variationChildValue,
+    this.variationParentId,
+    this.variationChildId,
   });
 
   @override
@@ -31,6 +35,8 @@ class AddToCart extends CartEvent {
         variationParentValue,
         variationChildName,
         variationChildValue,
+        variationParentId,
+        variationChildId,
       ];
 }
 

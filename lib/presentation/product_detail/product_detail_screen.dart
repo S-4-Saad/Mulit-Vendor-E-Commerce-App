@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -36,6 +37,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   // e.g. "Fajita"
   String? selectedChild;
   final ScrollController _scrollController = ScrollController();
+  StreamSubscription<CartState>? _cartSubscription;
 
   // e.g. "Medium"
   @override
@@ -51,6 +53,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         context.read<ProductDetailBloc>().add(ShowBottomBar());
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _cartSubscription?.cancel();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   // Calculate total price based on quantity from BLoC state
@@ -115,6 +124,49 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       return;
     }
     
+    // Set up stream listener for store conflicts BEFORE adding to cart
+    _cartSubscription?.cancel(); // Cancel any existing subscription
+    _cartSubscription = context.read<CartBloc>().stream.listen((cartState) {
+      print('Cart state changed: ${cartState.status}, error: ${cartState.errorMessage}');
+      if (mounted && 
+          cartState.status == CartStatus.error && 
+          cartState.errorMessage != null &&
+          cartState.errorMessage!.startsWith('STORE_CONFLICT:')) {
+        print('Showing store conflict dialog for product: ${product.name}');
+        _showStoreConflictDialog(context, cartState.errorMessage!, product);
+      }
+    });
+    
+    // Handle products with no variations
+    if (product.variations.isEmpty) {
+      context.read<CartBloc>().add(AddToCart(
+        product: product,
+        quantity: quantity,
+        variationParentName: null,
+        variationParentValue: null,
+        variationChildName: null,
+        variationChildValue: null,
+        variationParentId: null,
+        variationChildId: null,
+      ));
+      return;
+    }
+    
+    // Find the selected parent variation
+    final selectedParentVariation = product.variations.firstWhere(
+      (v) => v.parentName == selectedParent,
+      orElse: () => product.variations.first,
+    );
+    
+    // Find the selected child variation if child is selected and parent has children
+    ProductSubVariation? selectedChildVariation;
+    if (selectedChild != null && selectedParentVariation.children.isNotEmpty) {
+      selectedChildVariation = selectedParentVariation.children.firstWhere(
+        (child) => child.name == selectedChild,
+        orElse: () => selectedParentVariation.children.first,
+      );
+    }
+    
     // Add product to cart with selected variations
     context.read<CartBloc>().add(AddToCart(
       product: product,
@@ -123,19 +175,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       variationParentValue: selectedParent,
       variationChildName: selectedChild,
       variationChildValue: selectedChild,
+      variationParentId: selectedParentVariation.id,
+      variationChildId: selectedChildVariation?.id,
     ));
-    
-    // Listen to cart state changes to handle store conflicts
-    context.read<CartBloc>().stream.listen((cartState) {
-      if (cartState.status == CartStatus.error && 
-          cartState.errorMessage != null &&
-          cartState.errorMessage!.startsWith('STORE_CONFLICT:')) {
-        _showStoreConflictDialog(context, cartState.errorMessage!, product);
-      }
-    });
   }
 
   void _showStoreConflictDialog(BuildContext context, String errorMessage, ProductDetail product) {
+    // Check if the widget is still mounted before showing dialog
+    if (!mounted) return;
+    
     final parts = errorMessage.split(':');
     final newStoreId = parts.length > 1 ? parts[1] : product.shopName;
     final currentStoreId = parts.length > 2 ? parts[2] : 'Unknown Store';
@@ -197,6 +245,39 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 
                 // Add the new item after clearing
                 Future.delayed(Duration(milliseconds: 100), () {
+                  // Check if widget is still mounted before proceeding
+                  if (!mounted) return;
+                  
+                  // Handle products with no variations
+                  if (product.variations.isEmpty) {
+                    context.read<CartBloc>().add(AddToCart(
+                      product: product,
+                      quantity: currentQuantity,
+                      variationParentName: null,
+                      variationParentValue: null,
+                      variationChildName: null,
+                      variationChildValue: null,
+                      variationParentId: null,
+                      variationChildId: null,
+                    ));
+                    return;
+                  }
+                  
+                  // Find the selected parent variation
+                  final selectedParentVariation = product.variations.firstWhere(
+                    (v) => v.parentName == selectedParent,
+                    orElse: () => product.variations.first,
+                  );
+                  
+                  // Find the selected child variation if child is selected and parent has children
+                  ProductSubVariation? selectedChildVariation;
+                  if (selectedChild != null && selectedParentVariation.children.isNotEmpty) {
+                    selectedChildVariation = selectedParentVariation.children.firstWhere(
+                      (child) => child.name == selectedChild,
+                      orElse: () => selectedParentVariation.children.first,
+                    );
+                  }
+                  
                   context.read<CartBloc>().add(AddToCart(
                     product: product,
                     quantity: currentQuantity,
@@ -204,6 +285,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     variationParentValue: selectedParent,
                     variationChildName: selectedChild,
                     variationChildValue: selectedChild,
+                    variationParentId: selectedParentVariation.id,
+                    variationChildId: selectedChildVariation?.id,
                   ));
                 });
               },
@@ -304,6 +387,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         final parentNames = hasVariations ? product.variations.map((e) => e.parentName).toList() : [];
         
         ProductVariation selectedParentVariation = ProductVariation(
+          id: '',
           parentName: '',
           parentOptionName: '',
           parentPrice: 0,

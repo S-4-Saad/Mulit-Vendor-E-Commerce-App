@@ -107,6 +107,7 @@ class ProductDetailBloc extends Bloc<ProductDetailEvent, ProductDetailState> {
         if (variation['children'] != null && variation['children'] is List) {
           children = (variation['children'] as List).map((child) {
             return ProductSubVariation(
+              id: child['id']?.toString() ?? '',
               name: child['name']?.toString() ?? '',
               childOptionName: child['childOptionName']?.toString() ?? '',
               price: double.tryParse(child['discountedPrice']?.toString() ?? '0') ?? 0.0,
@@ -117,6 +118,7 @@ class ProductDetailBloc extends Bloc<ProductDetailEvent, ProductDetailState> {
         }
 
         return ProductVariation(
+          id: variation['id']?.toString() ?? '',
           parentName: variation['parentName']?.toString() ?? '',
           parentOptionName: variation['parentOptionName']?.toString() ?? '',
           parentPrice: double.tryParse(variation['parentPrice']?.toString() ?? '0') ?? 0.0,

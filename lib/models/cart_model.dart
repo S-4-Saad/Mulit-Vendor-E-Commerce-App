@@ -12,6 +12,8 @@ class CartItem {
   final String? variationParentValue;
   final String? variationChildName;
   final String? variationChildValue;
+  final String? variationParentId;
+  final String? variationChildId;
   final String shopName;
   final String categoryName;
   final String storeId;
@@ -28,6 +30,8 @@ class CartItem {
     this.variationParentValue,
     this.variationChildName,
     this.variationChildValue,
+    this.variationParentId,
+    this.variationChildId,
     required this.shopName,
     required this.categoryName,
     required this.storeId,
@@ -55,6 +59,8 @@ class CartItem {
     String? variationParentValue,
     String? variationChildName,
     String? variationChildValue,
+    String? variationParentId,
+    String? variationChildId,
     String? shopName,
     String? categoryName,
     String? storeId,
@@ -71,6 +77,8 @@ class CartItem {
       variationParentValue: variationParentValue ?? this.variationParentValue,
       variationChildName: variationChildName ?? this.variationChildName,
       variationChildValue: variationChildValue ?? this.variationChildValue,
+      variationParentId: variationParentId ?? this.variationParentId,
+      variationChildId: variationChildId ?? this.variationChildId,
       shopName: shopName ?? this.shopName,
       categoryName: categoryName ?? this.categoryName,
       storeId: storeId ?? this.storeId,
@@ -85,6 +93,8 @@ class CartItem {
     String? variationParentValue,
     String? variationChildName,
     String? variationChildValue,
+    String? variationParentId,
+    String? variationChildId,
     String? storeId,
   }) {
     // Create unique item ID using real server IDs
@@ -102,6 +112,8 @@ class CartItem {
       variationParentValue: variationParentValue,
       variationChildName: variationChildName,
       variationChildValue: variationChildValue,
+      variationParentId: variationParentId,
+      variationChildId: variationChildId,
       shopName: product.shopName,
       categoryName: product.categoryName,
       storeId: storeId ?? product.shop.id.toString(), // Real server store ID

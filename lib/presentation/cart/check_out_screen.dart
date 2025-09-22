@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/assets/app_images.dart';
@@ -107,21 +108,10 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
       'is_cod': isDelivery, // Delivery orders are COD by default
       'payment_method': isPickup ? 'store_payment' : 'cod',
       'items': cartState.items.map((item) => {
-        'item_id': item.id,
         'product_id': item.productId,
-        'product_name': item.name,
-        'product_image': item.imageUrl,
-        'variation_parent_name': item.variationParentName ?? 'No variation',
-        'variation_parent_value': item.variationParentValue ?? 'Standard',
-        'variation_child_name': item.variationChildName ?? 'No variation',
-        'variation_child_value': item.variationChildValue ?? 'Standard',
+        'variation_parent_id': item.variationParentId,
+        'variation_child_id': item.variationChildId,
         'quantity': item.quantity,
-        'unit_price': item.price,
-        'original_price': item.originalPrice,
-        'discount_percentage': item.discountPercentage,
-        'total_price': item.totalPrice,
-        'category_name': item.categoryName,
-        'shop_name': item.shopName,
         'store_id': item.storeId,
       }).toList(),
       'delivery_address': isDelivery && selectedAddress != null ? {
@@ -131,7 +121,6 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         'primary_phone': selectedAddress!.primaryPhoneNumber,
         'secondary_phone': selectedAddress!.secondaryPhoneNumber,
         'address': selectedAddress!.address,
-        'is_default': selectedAddress!.isDefault,
       } : null,
       'pickup_location': isPickup ? {
         'store_id': cartState.currentStoreId ?? 'unknown',
@@ -145,9 +134,8 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         'delivery_fee': dynamicDeliveryFee,
         'tax_amount': cartState.taxAmount,
         'total_amount': dynamicTotalAmount,
-        'currency': 'USD',
       },
-      'card_details': null, // Will be handled in future
+      'payment_details': null, // Will be handled in future
     };
 
     // Print formatted JSON
@@ -157,11 +145,9 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
   }
 
   void _printFormattedJson(Map<String, dynamic> data) {
-    // Simple JSON formatting for better readability
-    final jsonString = data.toString()
-        .replaceAll(', ', ',\n  ')
-        .replaceAll('{', '{\n  ')
-        .replaceAll('}', '\n}');
+    // Convert to properly formatted JSON
+    const encoder = JsonEncoder.withIndent('  ');
+    final jsonString = encoder.convert(data);
     print(jsonString);
   }
 
@@ -181,21 +167,10 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
       'is_cod': isCod,
       'payment_method': paymentType,
       'items': cartState.items.map((item) => {
-        'item_id': item.id,
         'product_id': item.productId,
-        'product_name': item.name,
-        'product_image': item.imageUrl,
-        'variation_parent_name': item.variationParentName ?? 'No variation',
-        'variation_parent_value': item.variationParentValue ?? 'Standard',
-        'variation_child_name': item.variationChildName ?? 'No variation',
-        'variation_child_value': item.variationChildValue ?? 'Standard',
+        'variation_parent_id': item.variationParentId,
+        'variation_child_id': item.variationChildId,
         'quantity': item.quantity,
-        'unit_price': item.price,
-        'original_price': item.originalPrice,
-        'discount_percentage': item.discountPercentage,
-        'total_price': item.totalPrice,
-        'category_name': item.categoryName,
-        'shop_name': item.shopName,
         'store_id': item.storeId,
       }).toList(),
       'delivery_address': selectedAddress != null ? {
@@ -205,7 +180,6 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         'primary_phone': selectedAddress!.primaryPhoneNumber,
         'secondary_phone': selectedAddress!.secondaryPhoneNumber,
         'address': selectedAddress!.address,
-        'is_default': selectedAddress!.isDefault,
         'delivery_instructions': 'Please deliver to the main entrance',
       } : null,
       'order_summary': {
@@ -215,9 +189,8 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         'delivery_fee': cartState.deliveryFee,
         'tax_amount': cartState.taxAmount,
         'total_amount': cartState.totalAmount,
-        'currency': 'USD',
       },
-      'card_details': isCod ? null : {
+      'payment_details': isCod ? null : {
         'card_type': 'Will be implemented in future',
         'last_four_digits': '****',
         'expiry_date': 'MM/YY',

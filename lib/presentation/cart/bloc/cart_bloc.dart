@@ -26,12 +26,15 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         variationParentValue: event.variationParentValue,
         variationChildName: event.variationChildName,
         variationChildValue: event.variationChildValue,
+        variationParentId: event.variationParentId,
+        variationChildId: event.variationChildId,
         storeId: event.product.shop.id.toString(), // Real server store ID
       );
 
       // Check if cart has items from a different store
       if (state.cart.isNotEmpty && 
           state.cart.currentStoreId != newCartItem.storeId) {
+        print('Store conflict detected: Current store: ${state.cart.currentStoreId}, New store: ${newCartItem.storeId}');
         emit(state.copyWith(
           status: CartStatus.error,
           errorMessage: 'STORE_CONFLICT:${newCartItem.storeId}:${state.cart.currentStoreId}',
