@@ -19,6 +19,7 @@ class OrderDetailsProductTile extends StatelessWidget {
     required this.onTrackTap,
     required this.shopName,
     required this.onReviewTap,
+    this.isReviewed = true,
   });
 
   final String imageUrl;
@@ -32,6 +33,7 @@ class OrderDetailsProductTile extends StatelessWidget {
   final VoidCallback onTrackTap;
   final String price;
   final String originalPrice;
+  final bool isReviewed ;
 
   @override
   Widget build(BuildContext context) {
@@ -86,6 +88,7 @@ class OrderDetailsProductTile extends StatelessWidget {
                           ),
                         ),
                         Spacer(),
+                        if(isReviewed)
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             tapTargetSize:

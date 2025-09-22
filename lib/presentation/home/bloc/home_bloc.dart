@@ -6,18 +6,33 @@ import 'home_event.dart';
 import 'home_state.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
+  DashboardProductsModel? _cachedDashboardProducts; // <-- cache
+
   HomeBloc() : super(const HomeState()) {
     on<LoadHomeData>((event, emit) async {
+      // If cached data exists and refresh not requested, return cached data
+      if (_cachedDashboardProducts != null && event.forceRefresh != true) {
+        emit(state.copyWith(
+          status: HomeStatus.success,
+          dashboardProducts: _cachedDashboardProducts,
+          message: "Loaded from cache",
+        ));
+        return;
+      }
+
       emit(state.copyWith(status: HomeStatus.loading));
 
       try {
-        // Load dashboard products only
         await ApiService.getMethod(
           apiUrl: dashboardProductsUrl,
           executionMethod: (bool productsSuccess, dynamic productsResponseData) async {
             if (productsSuccess) {
-              DashboardProductsModel dashboardProducts = DashboardProductsModel.fromJson(productsResponseData);
-              
+              DashboardProductsModel dashboardProducts =
+              DashboardProductsModel.fromJson(productsResponseData);
+
+              // Store in cache
+              _cachedDashboardProducts = dashboardProducts;
+
               emit(state.copyWith(
                 status: HomeStatus.success,
                 dashboardProducts: dashboardProducts,
@@ -42,3 +57,4 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     });
   }
 }
+

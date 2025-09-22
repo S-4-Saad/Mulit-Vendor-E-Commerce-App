@@ -25,12 +25,12 @@ class HomeShimmerWidget extends StatelessWidget {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(25),
+                  borderRadius: BorderRadius.circular(5),
                 ),
               ),
             ),
             
-            SizedBox(height: context.heightPct(.005)),
+            SizedBox(height: context.heightPct(.009)),
             
             // Banner shimmer
             Shimmer.fromColors(

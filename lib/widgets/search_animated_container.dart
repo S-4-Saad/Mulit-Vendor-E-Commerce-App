@@ -41,11 +41,12 @@ class SearchContainer extends StatelessWidget {
         return GestureDetector(
           onTap: onSearchTap,
           child: AnimatedContainer(
+
             duration: const Duration(milliseconds: 400),
             curve: Curves.easeInOut,
             height: context.heightPct(.055),
             width: double.infinity,
-            margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+            margin: const EdgeInsets.only(left: 5, bottom: 0,right: 5,top:0),
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.onPrimary,

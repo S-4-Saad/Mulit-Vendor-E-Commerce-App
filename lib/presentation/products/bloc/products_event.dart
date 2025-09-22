@@ -12,7 +12,8 @@ class ChangeTabEvent extends ProductsEvent{
 
 class LoadProductsEvent extends ProductsEvent {
   final String categoryName;
-  LoadProductsEvent({required this.categoryName});
+  final bool forceReload;
+  LoadProductsEvent({required this.categoryName,this.forceReload=false});
   
   @override
   List<Object?> get props => [categoryName];

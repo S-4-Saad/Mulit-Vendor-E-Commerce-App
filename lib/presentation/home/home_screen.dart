@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:speezu/core/utils/labels.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
 import 'package:speezu/presentation/nav_bar_screen/bloc/nav_bar_bloc.dart';
@@ -19,6 +20,7 @@ import '../products/bloc/products_event.dart';
 import '../shop_screen/shop_navbar_screen.dart';
 import 'home.dart';
 
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -27,6 +29,17 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final RefreshController _refreshController = RefreshController(
+    initialRefresh: false,
+  );
+
+  Future<void> _onRefresh() async {
+    context.read<HomeBloc>().add(LoadHomeData(forceRefresh: true));
+    // simulate network call
+    await Future.delayed(const Duration(seconds: 2));
+    _refreshController.refreshCompleted(); // ✅ must call this!
+  }
+
   // Sample restaurant data - replace with API response
   List<String> imageUrl = [
     'https://t3.ftcdn.net/jpg/04/65/46/52/360_F_465465254_1pN9MGrA831idD6zIBL7q8rnZZpUCQTy.jpg',
@@ -46,57 +59,49 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Helper methods to get API data
   List<DummyProductModel> getApiFoodProducts(HomeState state) {
-    if (state.dashboardProducts?.data.restaurant != null && 
+    if (state.dashboardProducts?.data.restaurant != null &&
         state.dashboardProducts!.data.restaurant.isNotEmpty) {
-      return state.dashboardProducts!.data.restaurant
-          .map((product) {
-            // Use real category name from the product data, fallback to "Fast Food"
-            String categoryName = product.category?.name ?? "Fast Food";
-            return product.toDummyProductModel(category: categoryName);
-          })
-          .toList();
+      return state.dashboardProducts!.data.restaurant.map((product) {
+        // Use real category name from the product data, fallback to "Fast Food"
+        String categoryName = product.category?.name ?? "Fast Food";
+        return product.toDummyProductModel(category: categoryName);
+      }).toList();
     }
     return []; // Return empty list if no API data
   }
 
   List<DummyProductModel> getApiSupermarketProducts(HomeState state) {
-    if (state.dashboardProducts?.data.supermarket != null && 
+    if (state.dashboardProducts?.data.supermarket != null &&
         state.dashboardProducts!.data.supermarket.isNotEmpty) {
-      return state.dashboardProducts!.data.supermarket
-          .map((product) {
-            // Use real category name from the product data, fallback to "Grocery"
-            String categoryName = product.category?.name ?? "Grocery";
-            return product.toDummyProductModel(category: categoryName);
-          })
-          .toList();
+      return state.dashboardProducts!.data.supermarket.map((product) {
+        // Use real category name from the product data, fallback to "Grocery"
+        String categoryName = product.category?.name ?? "Grocery";
+        return product.toDummyProductModel(category: categoryName);
+      }).toList();
     }
     return []; // Return empty list if no API data
   }
 
   List<DummyProductModel> getApiRetailProducts(HomeState state) {
-    if (state.dashboardProducts?.data.retail != null && 
+    if (state.dashboardProducts?.data.retail != null &&
         state.dashboardProducts!.data.retail.isNotEmpty) {
-      return state.dashboardProducts!.data.retail
-          .map((product) {
-            // Use real category name from the product data, fallback to "Clothing"
-            String categoryName = product.category?.name ?? "Clothing";
-            return product.toDummyProductModel(category: categoryName);
-          })
-          .toList();
+      return state.dashboardProducts!.data.retail.map((product) {
+        // Use real category name from the product data, fallback to "Clothing"
+        String categoryName = product.category?.name ?? "Clothing";
+        return product.toDummyProductModel(category: categoryName);
+      }).toList();
     }
     return []; // Return empty list if no API data
   }
 
   List<DummyProductModel> getApiPharmacyProducts(HomeState state) {
-    if (state.dashboardProducts?.data.pharmacy != null && 
+    if (state.dashboardProducts?.data.pharmacy != null &&
         state.dashboardProducts!.data.pharmacy.isNotEmpty) {
-      return state.dashboardProducts!.data.pharmacy
-          .map((product) {
-            // Use real category name from the product data, fallback to "Medicine"
-            String categoryName = product.category?.name ?? "Medicine";
-            return product.toDummyProductModel(category: categoryName);
-          })
-          .toList();
+      return state.dashboardProducts!.data.pharmacy.map((product) {
+        // Use real category name from the product data, fallback to "Medicine"
+        String categoryName = product.category?.name ?? "Medicine";
+        return product.toDummyProductModel(category: categoryName);
+      }).toList();
     }
     return []; // Return empty list if no API data
   }
@@ -112,7 +117,13 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: Center(
+      body: SmartRefresher(
+        enablePullDown: true,
+        onRefresh: _onRefresh,
+        header:  WaterDropMaterialHeader(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+        ),
+        controller: _refreshController,
         child: BlocBuilder<HomeBloc, HomeState>(
           builder: (context, state) {
             if (state.status == HomeStatus.loading) {
@@ -129,8 +140,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: context.heightPct(.01)),
-                    SearchContainer(onSearchTap: () {}),
-                    SizedBox(height: context.heightPct(.005)),
+                    // SearchContainer(onSearchTap: () {}),
+                    // SizedBox(height: context.heightPct(.005)),
                     EcommerceBanner(
                       imageUrls: imageUrl,
                       height: context.heightPct(.18),
@@ -158,216 +169,243 @@ class _HomeScreenState extends State<HomeScreen> {
                     SizedBox(height: context.heightPct(.02)),
                     HomeHeaderTile(
                       title: Labels.topTrendingFoods,
-                      onViewAllTap: getApiFoodProducts(state).isNotEmpty ? () {
-                        context.read<NavBarBloc>().add(SelectTab(0));
-                        context.read<ProductsBloc>().add(ChangeTabEvent(0));
-                      } : null,
+                      onViewAllTap:
+                          getApiFoodProducts(state).isNotEmpty
+                              ? () {
+                                context.read<NavBarBloc>().add(SelectTab(0));
+                                context.read<ProductsBloc>().add(
+                                  ChangeTabEvent(0),
+                                );
+                              }
+                              : null,
                     ),
                     SizedBox(height: context.heightPct(.01)),
                     getApiFoodProducts(state).isEmpty
                         ? Container(
-                            height: 120,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Center(
-                              child: Text(
-                                "No food products available",
-                                style: TextStyle(
-                                  color: Colors.grey[600],
-                                  fontSize: 16,
-                                ),
+                          height: 120,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Center(
+                            child: Text(
+                              "No food products available",
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 16,
                               ),
                             ),
-                          )
-                        : SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children:
-                                  getApiFoodProducts(state).map((category) {
-                                return ProductBox(
-                                  productPrice: category.productPrice,
-                                  productOriginalPrice:
-                                      category.productOriginalPrice,
-                                  productCategory: category.productCategory,
-                                  productRating: category.productRating,
-                                  isProductFavourite: category.isProductFavourite,
-                                  onFavouriteTap: () {
-                                    // TODO: Implement favourite functionality
-                                  },
-                                  onProductTap: () {
-                                    Navigator.pushNamed(
-                                      context, 
-                                      RouteNames.productScreen,
-                                      arguments: category.id,
-                                    );
-                                  },
-                                  productImageUrl: category.productImageUrl,
-                                  productTitle: category.productTitle,
-                                );
-                              }).toList(),
-                            ),
                           ),
+                        )
+                        : SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children:
+                                getApiFoodProducts(state).map((category) {
+                                  return ProductBox(
+                                    productPrice: category.productPrice,
+                                    productOriginalPrice:
+                                        category.productOriginalPrice,
+                                    productCategory: category.productCategory,
+                                    productRating: category.productRating,
+                                    isProductFavourite:
+                                        category.isProductFavourite,
+                                    onFavouriteTap: () {
+                                      // TODO: Implement favourite functionality
+                                    },
+                                    onProductTap: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        RouteNames.productScreen,
+                                        arguments: category.id,
+                                      );
+                                    },
+                                    productImageUrl: category.productImageUrl,
+                                    productTitle: category.productTitle,
+                                  );
+                                }).toList(),
+                          ),
+                        ),
                     SizedBox(height: context.heightPct(.02)),
                     HomeHeaderTile(
                       title: Labels.topSuperMarketProducts,
-                      onViewAllTap: getApiSupermarketProducts(state).isNotEmpty ? () {
-                        context.read<NavBarBloc>().add(SelectTab(0));
-                        context.read<ProductsBloc>().add(ChangeTabEvent(1));
-                      } : null,
+                      onViewAllTap:
+                          getApiSupermarketProducts(state).isNotEmpty
+                              ? () {
+                                context.read<NavBarBloc>().add(SelectTab(0));
+                                context.read<ProductsBloc>().add(
+                                  ChangeTabEvent(1),
+                                );
+                              }
+                              : null,
                     ),
                     SizedBox(height: context.heightPct(.01)),
                     getApiSupermarketProducts(state).isEmpty
                         ? Container(
-                            height: 120,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Center(
-                              child: Text(
-                                "No supermarket products available",
-                                style: TextStyle(
-                                  color: Colors.grey[600],
-                                  fontSize: 16,
-                                ),
+                          height: 120,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Center(
+                            child: Text(
+                              "No supermarket products available",
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 16,
                               ),
                             ),
-                          )
-                        : SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children:
-                                  getApiSupermarketProducts(state).map((category) {
-                                return ProductBox(
-                                  productPrice: category.productPrice,
-                                  productOriginalPrice:
-                                      category.productOriginalPrice,
-                                  productCategory: category.productCategory,
-                                  productRating: category.productRating,
-                                  isProductFavourite: category.isProductFavourite,
-                                  onFavouriteTap: () {},
-                                  onProductTap: () {
-                                    Navigator.pushNamed(
-                                      context, 
-                                      RouteNames.productScreen,
-                                      arguments: category.id,
-                                    );
-                                  },                                  productImageUrl: category.productImageUrl,
-                                  productTitle: category.productTitle,
-                                );
-                              }).toList(),
-                            ),
                           ),
+                        )
+                        : SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children:
+                                getApiSupermarketProducts(state).map((
+                                  category,
+                                ) {
+                                  return ProductBox(
+                                    productPrice: category.productPrice,
+                                    productOriginalPrice:
+                                        category.productOriginalPrice,
+                                    productCategory: category.productCategory,
+                                    productRating: category.productRating,
+                                    isProductFavourite:
+                                        category.isProductFavourite,
+                                    onFavouriteTap: () {},
+                                    onProductTap: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        RouteNames.productScreen,
+                                        arguments: category.id,
+                                      );
+                                    },
+                                    productImageUrl: category.productImageUrl,
+                                    productTitle: category.productTitle,
+                                  );
+                                }).toList(),
+                          ),
+                        ),
                     SizedBox(height: context.heightPct(.02)),
                     HomeHeaderTile(
                       title: Labels.topTrendingProducts,
-                      onViewAllTap: getApiRetailProducts(state).isNotEmpty ? () {
-                        context.read<NavBarBloc>().add(SelectTab(0));
-                        context.read<ProductsBloc>().add(ChangeTabEvent(2));
-                      } : null,
+                      onViewAllTap:
+                          getApiRetailProducts(state).isNotEmpty
+                              ? () {
+                                context.read<NavBarBloc>().add(SelectTab(0));
+                                context.read<ProductsBloc>().add(
+                                  ChangeTabEvent(2),
+                                );
+                              }
+                              : null,
                     ),
                     SizedBox(height: context.heightPct(.01)),
                     getApiRetailProducts(state).isEmpty
                         ? Container(
-                            height: 120,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Center(
-                              child: Text(
-                                "No retail products available",
-                                style: TextStyle(
-                                  color: Colors.grey[600],
-                                  fontSize: 16,
-                                ),
+                          height: 120,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Center(
+                            child: Text(
+                              "No retail products available",
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 16,
                               ),
                             ),
-                          )
-                        : SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children:
-                                  getApiRetailProducts(state).map((category) {
-                                return ProductBox(
-                                  productPrice: category.productPrice,
-                                  productOriginalPrice:
-                                      category.productOriginalPrice,
-                                  productCategory: category.productCategory,
-                                  productRating: category.productRating,
-                                  isProductFavourite: category.isProductFavourite,
-                                  onFavouriteTap: () {},
-                                  onProductTap: () {
-                                    Navigator.pushNamed(
-                                      context, 
-                                      RouteNames.productScreen,
-                                      arguments: category.id,
-                                    );
-                                  },
-                                  productImageUrl: category.productImageUrl,
-                                  productTitle: category.productTitle,
-                                );
-                              }).toList(),
-                            ),
                           ),
+                        )
+                        : SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children:
+                                getApiRetailProducts(state).map((category) {
+                                  return ProductBox(
+                                    productPrice: category.productPrice,
+                                    productOriginalPrice:
+                                        category.productOriginalPrice,
+                                    productCategory: category.productCategory,
+                                    productRating: category.productRating,
+                                    isProductFavourite:
+                                        category.isProductFavourite,
+                                    onFavouriteTap: () {},
+                                    onProductTap: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        RouteNames.productScreen,
+                                        arguments: category.id,
+                                      );
+                                    },
+                                    productImageUrl: category.productImageUrl,
+                                    productTitle: category.productTitle,
+                                  );
+                                }).toList(),
+                          ),
+                        ),
                     SizedBox(height: context.heightPct(.02)),
                     HomeHeaderTile(
                       title: Labels.medicines,
-                      onViewAllTap: getApiPharmacyProducts(state).isNotEmpty ? () {
-                        context.read<NavBarBloc>().add(SelectTab(0));
-                        context.read<ProductsBloc>().add(ChangeTabEvent(3));
-                      } : null,
+                      onViewAllTap:
+                          getApiPharmacyProducts(state).isNotEmpty
+                              ? () {
+                                context.read<NavBarBloc>().add(SelectTab(0));
+                                context.read<ProductsBloc>().add(
+                                  ChangeTabEvent(3),
+                                );
+                              }
+                              : null,
                     ),
                     SizedBox(height: context.heightPct(.01)),
                     getApiPharmacyProducts(state).isEmpty
                         ? Container(
-                            height: 120,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Center(
-                              child: Text(
-                                "No pharmacy products available",
-                                style: TextStyle(
-                                  color: Colors.grey[600],
-                                  fontSize: 16,
-                                ),
+                          height: 120,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Center(
+                            child: Text(
+                              "No pharmacy products available",
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 16,
                               ),
                             ),
-                          )
-                        : SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children:
-                                  getApiPharmacyProducts(state).map((category) {
-                                return ProductBox(
-                                  productPrice: category.productPrice,
-                                  productOriginalPrice:
-                                      category.productOriginalPrice,
-                                  productCategory: category.productCategory,
-                                  productRating: category.productRating,
-                                  isProductFavourite: category.isProductFavourite,
-                                  onFavouriteTap: () {},
-                                  onProductTap: () {
-                                    Navigator.pushNamed(
-                                      context, 
-                                      RouteNames.productScreen,
-                                      arguments: category.id,
-                                    );
-                                  },
-                                  productImageUrl: category.productImageUrl,
-                                  productTitle: category.productTitle,
-                                );
-                              }).toList(),
-                            ),
                           ),
+                        )
+                        : SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children:
+                                getApiPharmacyProducts(state).map((category) {
+                                  return ProductBox(
+                                    productPrice: category.productPrice,
+                                    productOriginalPrice:
+                                        category.productOriginalPrice,
+                                    productCategory: category.productCategory,
+                                    productRating: category.productRating,
+                                    isProductFavourite:
+                                        category.isProductFavourite,
+                                    onFavouriteTap: () {},
+                                    onProductTap: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        RouteNames.productScreen,
+                                        arguments: category.id,
+                                      );
+                                    },
+                                    productImageUrl: category.productImageUrl,
+                                    productTitle: category.productTitle,
+                                  );
+                                }).toList(),
+                          ),
+                        ),
                     SizedBox(height: context.heightPct(.02)),
                   ],
                 ),
