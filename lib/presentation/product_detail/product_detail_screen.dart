@@ -669,48 +669,48 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             ),
                           ),
                           SizedBox(height: 15),
-                          StaggeredGrid.count(
-                            crossAxisCount: 2, // Defines 2 columns
-                            mainAxisSpacing: 10,
-                            crossAxisSpacing: 10,
-                            children: List.generate(product.relatedProducts.length, (
-                              index,
-                            ) {
-                              var relatedProduct = product.relatedProducts[index];
-                              return StaggeredGridTile.fit(
-                                crossAxisCellCount:
-                                    1, // Each item takes 1 column space
-                                child: ProductBox(
-                                  marginPadding: const Padding(
-                                    padding: EdgeInsets.all(0),
+                            StaggeredGrid.count(
+                              crossAxisCount: 2, // Defines 2 columns
+                              mainAxisSpacing: 10,
+                              crossAxisSpacing: 10,
+                              children: List.generate(product.relatedProducts.length, (
+                                index,
+                              ) {
+                                var relatedProduct = product.relatedProducts[index];
+                                return StaggeredGridTile.fit(
+                                  crossAxisCellCount:
+                                      1, // Each item takes 1 column space
+                                  child: ProductBox(
+                                    marginPadding: const Padding(
+                                      padding: EdgeInsets.all(0),
+                                    ),
+                                    productWidth: 200,
+                                    productPrice:
+                                        relatedProduct.price,
+                                    productOriginalPrice:
+                                        relatedProduct.originalPrice,
+                                    productCategory:
+                                        relatedProduct.categoryName,
+                                    productRating:
+                                        4.0, // Default rating since not provided in API
+                                    isProductFavourite:
+                                        false, // Default since not provided in API
+                                    onFavouriteTap: () {},
+                                    onProductTap: () {
+                                      Navigator.pushReplacementNamed(
+                                        context,
+                                        RouteNames.productScreen,
+                                        arguments: relatedProduct.id,
+                                      );
+                                    },
+                                    productImageUrl:
+                                        relatedProduct.imageUrl,
+                                    productTitle:
+                                        relatedProduct.name,
                                   ),
-                                  productWidth: 200,
-                                  productPrice:
-                                      relatedProduct.price,
-                                  productOriginalPrice:
-                                      relatedProduct.originalPrice,
-                                  productCategory:
-                                      relatedProduct.categoryName,
-                                  productRating:
-                                      4.0, // Default rating since not provided in API
-                                  isProductFavourite:
-                                      false, // Default since not provided in API
-                                  onFavouriteTap: () {},
-                                  onProductTap: () {
-                                    Navigator.pushReplacementNamed(
-                                      context, 
-                                      RouteNames.productScreen,
-                                      arguments: relatedProduct.id,
-                                    );
-                                  },
-                                  productImageUrl:
-                                      relatedProduct.imageUrl,
-                                  productTitle:
-                                      relatedProduct.name,
-                                ),
-                              );
-                            }),
-                          ),
+                                );
+                              }),
+                            ),
                           SizedBox(height: 15),
                         ],
                       ),

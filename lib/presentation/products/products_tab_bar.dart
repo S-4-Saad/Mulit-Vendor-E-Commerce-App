@@ -92,34 +92,41 @@ class ProductsTabBarScreen extends StatelessWidget {
                 ),
 
                 const SizedBox(height: 10),
-
-                // Tab Content
                 Expanded(
                   child: TabBarView(
+                    physics: const NeverScrollableScrollPhysics(), // 🚫 disables swipe
                     children: [
-                      SizedBox(
-                        width: double.infinity,
-                        height: double.infinity,
-                        child: const DynamicProductsScreen(categoryName: 'food'),
-                      ),
-                      SizedBox(
-                        width: double.infinity,
-                        height: double.infinity,
-                        child: const DynamicProductsScreen(categoryName: 'supermarket'),
-                      ),
-                      SizedBox(
-                        width: double.infinity,
-                        height: double.infinity,
-                        child: const DynamicProductsScreen(categoryName: 'retail stores'),
-                      ),
-                      SizedBox(
-                        width: double.infinity,
-                        height: double.infinity,
-                        child: const DynamicProductsScreen(categoryName: 'pharmacy'),
-                      ),
+                      const DynamicProductsScreen(categoryName: 'food'),
+                      const DynamicProductsScreen(categoryName: 'supermarket'),
+                      const DynamicProductsScreen(categoryName: 'retail stores'),
+                      const DynamicProductsScreen(categoryName: 'pharmacy'),
                     ],
                   ),
                 ),
+
+                // Tab Content
+                // Expanded(
+                //   child: TabBarView(
+                //     children: [
+                //       const DynamicProductsScreen(categoryName: 'food'),
+                //       SizedBox(
+                //         width: double.infinity,
+                //         height: double.infinity,
+                //         child: const DynamicProductsScreen(categoryName: 'supermarket'),
+                //       ),
+                //       SizedBox(
+                //         width: double.infinity,
+                //         height: double.infinity,
+                //         child: const DynamicProductsScreen(categoryName: 'retail stores'),
+                //       ),
+                //       SizedBox(
+                //         width: double.infinity,
+                //         height: double.infinity,
+                //         child: const DynamicProductsScreen(categoryName: 'pharmacy'),
+                //       ),
+                //     ],
+                //   ),
+                // ),
               ],
             ),
           ),

@@ -1,4 +1,3 @@
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -40,9 +39,7 @@ void main() async {
   await EasyLocalization.ensureInitialized();
   // If you want immersive UI without hiding bars completely:
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // Set the background message handler
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   final UserRepository userRepository = UserRepository();
@@ -106,9 +103,10 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
-            themeMode: theme.themeMode == AppThemeMode.light
-                ? ThemeMode.light
-                : ThemeMode.dark,
+            themeMode:
+                theme.themeMode == AppThemeMode.light
+                    ? ThemeMode.light
+                    : ThemeMode.dark,
             localizationsDelegates: context.localizationDelegates,
             supportedLocales: context.supportedLocales,
             locale: context.locale,

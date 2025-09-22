@@ -1,39 +1,36 @@
+
 import 'package:equatable/equatable.dart';
+
 import '../../../models/product_model.dart';
-
 enum ProductsStatus { initial, loading, success, error }
-
 class ProductsState extends Equatable {
   final int selectedTabIndex;
-  final ProductsStatus status;
-  final List<DummyProductModel> products;
-  final String message;
-  final String currentCategoryName;
+  final Map<String, List<DummyProductModel>> productsByCategory;
+  final Map<String, ProductsStatus> statusByCategory;
+  final Map<String, String> messageByCategory;
 
   const ProductsState({
     this.selectedTabIndex = 0,
-    this.status = ProductsStatus.initial,
-    this.products = const [],
-    this.message = '',
-    this.currentCategoryName = '',
+    this.productsByCategory = const {},
+    this.statusByCategory = const {},
+    this.messageByCategory = const {},
   });
 
   ProductsState copyWith({
     int? selectedTabIndex,
-    ProductsStatus? status,
-    List<DummyProductModel>? products,
-    String? message,
-    String? currentCategoryName,
+    Map<String, List<DummyProductModel>>? productsByCategory,
+    Map<String, ProductsStatus>? statusByCategory,
+    Map<String, String>? messageByCategory,
   }) {
     return ProductsState(
       selectedTabIndex: selectedTabIndex ?? this.selectedTabIndex,
-      status: status ?? this.status,
-      products: products ?? this.products,
-      message: message ?? this.message,
-      currentCategoryName: currentCategoryName ?? this.currentCategoryName,
+      productsByCategory: productsByCategory ?? this.productsByCategory,
+      statusByCategory: statusByCategory ?? this.statusByCategory,
+      messageByCategory: messageByCategory ?? this.messageByCategory,
     );
   }
 
   @override
-  List<Object?> get props => [selectedTabIndex, status, products, message, currentCategoryName];
+  List<Object?> get props =>
+      [selectedTabIndex, productsByCategory, statusByCategory, messageByCategory];
 }
