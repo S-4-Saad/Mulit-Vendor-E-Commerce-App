@@ -112,35 +112,40 @@ class OrderCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         // Left Info
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "${Labels.orderIdNumber} $orderId",
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color:
-                                Theme.of(context).colorScheme.onSecondary,
-                                fontSize: 16,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "${Labels.orderIdNumber} $orderId",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color:
+                                  Theme.of(context).colorScheme.onSecondary,
+                                  fontSize: 16,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                            Text(
-                              "${Labels.customer}: $customerName",
-                              style: TextStyle(
-                                color:
-                                Theme.of(context).colorScheme.onSecondary,
-                                fontSize: 16,
+                              Text(
+                                "${Labels.customer}: $customerName",
+                                style: TextStyle(
+                                  color:
+                                  Theme.of(context).colorScheme.onSecondary,
+                                  fontSize: 16,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                            Text(
-                              "${Labels.payment}: $paymentMethod",
-                              style: TextStyle(
-                                color:
-                                Theme.of(context).colorScheme.onSecondary,
-                                fontSize: 16,
+                              Text(
+                                "${Labels.payment}: $paymentMethod",
+                                style: TextStyle(
+                                  color:
+                                  Theme.of(context).colorScheme.onSecondary,
+                                  fontSize: 16,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
 
                         // Right Info
@@ -180,14 +185,14 @@ class OrderCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
 
-                CustomMiniElevatedButton(
-                  title: Labels.cancel, // changed from delete -> cancel
-                  onPressed: onCancel ?? () {},
-                  backgroundColor: Colors.red,
-                  textColor: Colors.white,
-                ),
+              //   CustomMiniElevatedButton(
+              //     title: Labels.cancel, // changed from delete -> cancel
+              //     onPressed: onCancel ?? () {},
+              //     backgroundColor: Colors.red,
+              //     textColor: Colors.white,
+              //   ),
 
-              const SizedBox(width: 8),
+              // const SizedBox(width: 8),
 
               // 👁 View Details (always visible)
               CustomMiniElevatedButton(

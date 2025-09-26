@@ -47,6 +47,7 @@ dependencies:
   flutter_spinkit: ^5.2.2
   cached_network_image: ^3.4.1
   flutter_credit_card: ^4.1.0
+  flutter_dotenv: ^5.1.0
   carousel_slider: ^5.1.1
   path_provider: ^2.1.4
   firebase_core: ^4.1.0
@@ -66,6 +67,8 @@ dependencies:
   flutter_rating_bar: ^4.0.1
   mobile_scanner: ^7.0.1
   pull_to_refresh: ^2.0.0
+  paystack_flutter_sdk: ^0.0.1-alpha.2
+  url_launcher: ^6.2.5
 
 
 dev_dependencies:
@@ -95,6 +98,7 @@ flutter:
     - assets/images/
     - assets/svgs/
     - assets/translations/
+    - .env
   # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg

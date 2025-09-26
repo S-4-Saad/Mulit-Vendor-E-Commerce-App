@@ -1,5 +1,5 @@
 
 class CurrencyIcon {
   CurrencyIcon._();
-  static const String currencyIcon = '\$';
+  static const String currencyIcon = 'NGN ';
 }

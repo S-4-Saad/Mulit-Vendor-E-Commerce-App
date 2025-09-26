@@ -96,8 +96,9 @@ class ShopProductsScreen extends StatelessWidget {
                         builder: (context, state) {
                           final selectedCategory = categories[state.tabCurrentIndex];
                           
-                          // Load products when category changes
-                          if (state.currentCategoryId != selectedCategory.id) {
+                          // Load products when category changes or if products haven't been loaded yet
+                          if (state.currentCategoryId != selectedCategory.id || 
+                              (state.productsStatus == ProductsStatus.initial && state.currentProducts.isEmpty)) {
                             WidgetsBinding.instance.addPostFrameCallback((_) {
                               context.read<ShopBloc>().add(LoadProductsEvent(
                                 storeId: storeId,
@@ -107,7 +108,8 @@ class ShopProductsScreen extends StatelessWidget {
                           }
                           
                           // Show loading state for products
-                          if (state.productsStatus == ProductsStatus.loading) {
+                          if (state.productsStatus == ProductsStatus.loading || 
+                              (state.productsStatus == ProductsStatus.initial && state.currentProducts.isEmpty)) {
                             return const Padding(
                               padding: EdgeInsets.all(8.0),
                               child: ProductsOnlyShimmerWidget(),

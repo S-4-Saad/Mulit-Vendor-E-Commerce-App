@@ -10,6 +10,8 @@ import 'package:speezu/presentation/product_detail/bloc/product_detail_bloc.dart
 import 'package:speezu/presentation/cart/bloc/cart_bloc.dart';
 import 'package:speezu/presentation/cart/bloc/cart_event.dart';
 import 'package:speezu/presentation/cart/bloc/cart_state.dart';
+import 'package:speezu/core/services/localStorage/my-local-controller.dart';
+import 'package:speezu/core/utils/constants.dart';
 import 'package:speezu/routes/route_names.dart';
 import '../../core/assets/font_family.dart';
 import '../../core/utils/labels.dart';
@@ -62,9 +64,161 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     super.dispose();
   }
 
+  // Calculate the current price based on selected variations
+  double getCurrentPrice(ProductDetail product) {
+    // If no variations, return base price
+    if (product.variations.isEmpty) {
+      return product.price;
+    }
+    
+    // If no parent selected, return base price
+    if (selectedParent == null) {
+      return product.price;
+    }
+    
+    // Find the selected parent variation
+    final selectedParentVariation = product.variations.firstWhere(
+      (v) => v.parentName == selectedParent,
+      orElse: () => product.variations.first,
+    );
+    
+    // If parent has children and child is selected, use child price
+    if (selectedParentVariation.children.isNotEmpty && selectedChild != null) {
+      final selectedChildVariation = selectedParentVariation.children.firstWhere(
+        (child) => child.name == selectedChild,
+        orElse: () => selectedParentVariation.children.first,
+      );
+      return selectedChildVariation.price;
+    }
+    
+    // If parent has no children or child not selected, use parent price
+    return selectedParentVariation.parentPrice;
+  }
+
+  // Calculate the current original price based on selected variations
+  double getCurrentOriginalPrice(ProductDetail product) {
+    // If no variations, return base original price
+    if (product.variations.isEmpty) {
+      return product.originalPrice;
+    }
+    
+    // If no parent selected, return base original price
+    if (selectedParent == null) {
+      return product.originalPrice;
+    }
+    
+    // Find the selected parent variation
+    final selectedParentVariation = product.variations.firstWhere(
+      (v) => v.parentName == selectedParent,
+      orElse: () => product.variations.first,
+    );
+    
+    // If parent has children and child is selected, use child original price
+    if (selectedParentVariation.children.isNotEmpty && selectedChild != null) {
+      final selectedChildVariation = selectedParentVariation.children.firstWhere(
+        (child) => child.name == selectedChild,
+        orElse: () => selectedParentVariation.children.first,
+      );
+      return selectedChildVariation.originalPrice;
+    }
+    
+    // If parent has no children or child not selected, use parent original price
+    return selectedParentVariation.parentOriginalPrice;
+  }
+
+  // Calculate the current discount percentage based on selected variations
+  double getCurrentDiscountPercentage(ProductDetail product) {
+    // If no variations, return base discount percentage
+    if (product.variations.isEmpty) {
+      return product.productDiscountPercentage;
+    }
+    
+    // If no parent selected, return base discount percentage
+    if (selectedParent == null) {
+      return product.productDiscountPercentage;
+    }
+    
+    // Find the selected parent variation
+    final selectedParentVariation = product.variations.firstWhere(
+      (v) => v.parentName == selectedParent,
+      orElse: () => product.variations.first,
+    );
+    
+    // If parent has children and child is selected, use child discount percentage
+    if (selectedParentVariation.children.isNotEmpty && selectedChild != null) {
+      final selectedChildVariation = selectedParentVariation.children.firstWhere(
+        (child) => child.name == selectedChild,
+        orElse: () => selectedParentVariation.children.first,
+      );
+      return selectedChildVariation.discountPercentage;
+    }
+    
+    // If parent has no children or child not selected, use parent discount percentage
+    return selectedParentVariation.parentDiscountPercentage;
+  }
+
   // Calculate total price based on quantity from BLoC state
   double calculateTotalPrice(ProductDetail product, int quantity) {
-    return product.price * quantity;
+    return getCurrentPrice(product) * quantity;
+  }
+
+  // Check if user is authenticated
+  Future<bool> _isUserAuthenticated() async {
+    final token = await LocalStorage.getData(key: AppKeys.authToken);
+    return token != null && token.isNotEmpty;
+  }
+
+  // Show login required dialog
+  void _showLoginRequiredDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Login Required',
+            style: TextStyle(
+              fontFamily: FontFamily.fontsPoppinsSemiBold,
+              fontSize: 18,
+            ),
+          ),
+          content: Text(
+            'You need to be logged in to add items to your cart. Please login to continue.',
+            style: TextStyle(
+              fontFamily: FontFamily.fontsPoppinsRegular,
+              fontSize: 14,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  fontFamily: FontFamily.fontsPoppinsRegular,
+                  color: Theme.of(context).colorScheme.onSecondary,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Navigate to login screen
+                Navigator.pushNamed(context, RouteNames.login);
+              },
+              child: Text(
+                'Login',
+                style: TextStyle(
+                  fontFamily: FontFamily.fontsPoppinsSemiBold,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   // Validate if required variations are selected
@@ -117,7 +271,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     return '';
   }
 
-  void _handleAddToCart(BuildContext context, ProductDetail product, int quantity) {
+  void _handleAddToCart(BuildContext context, ProductDetail product, int quantity) async {
+    // Check if user is authenticated
+    final isAuthenticated = await _isUserAuthenticated();
+    if (!isAuthenticated) {
+      _showLoginRequiredDialog(context);
+      return;
+    }
+
     // Check if variations are required and selected
     if (!_areVariationsValid(product)) {
       _showVariationRequiredDialog(context, product);
@@ -391,6 +552,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           parentName: '',
           parentOptionName: '',
           parentPrice: 0,
+          parentOriginalPrice: 0,
+          parentDiscountPercentage: 0,
           children: [],
         );
         
@@ -478,7 +641,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 ),
                               ),
                               const SizedBox(width: 10),
-                              if (product.productDiscountPercentage > 0)
+                              if (getCurrentDiscountPercentage(product) > 0)
                                 Container(
                                   padding: EdgeInsets.symmetric(
                                     horizontal: 10,
@@ -492,7 +655,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     ),
                                   ),
                                   child: Text(
-                                    '${product.productDiscountPercentage}% off',
+                                    '${getCurrentDiscountPercentage(product).toStringAsFixed(0)}% off',
                                     style: TextStyle(
                                       fontFamily:
                                           FontFamily.fontsPoppinsSemiBold,
@@ -512,7 +675,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               Row(
                                 children: [
                                   Text(
-                                    "${CurrencyIcon.currencyIcon}${product.price.toStringAsFixed(2)}",
+                                    "${CurrencyIcon.currencyIcon}${getCurrentPrice(product).toStringAsFixed(2)}",
                                     style: TextStyle(
                                       fontFamily:
                                           FontFamily.fontsPoppinsSemiBold,
@@ -522,10 +685,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     ),
                                   ),
                                   SizedBox(width: context.widthPct(.02)),
-                                  if (product.originalPrice !=
-                                      product.price)
+                                  if (getCurrentOriginalPrice(product) !=
+                                      getCurrentPrice(product))
                                     Text(
-                                      "${CurrencyIcon.currencyIcon}${product.originalPrice.toStringAsFixed(2)}",
+                                      "${CurrencyIcon.currencyIcon}${getCurrentOriginalPrice(product).toStringAsFixed(2)}",
                                       style: TextStyle(
                                         fontFamily:
                                             FontFamily.fontsPoppinsLight,

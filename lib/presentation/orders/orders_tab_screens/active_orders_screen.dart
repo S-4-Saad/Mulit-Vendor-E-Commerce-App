@@ -1,80 +1,159 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:speezu/presentation/order_details/order_details_screen.dart';
 import '../../../widgets/dialog_boxes/orders_dialog_boxes.dart';
 import '../../../widgets/order_card.dart';
 import '../../qr_scanner/qr_scanner_screen.dart';
+import '../bloc/orders_bloc.dart';
+import '../bloc/orders_event.dart';
+import '../bloc/order_state.dart';
 
-class ActiveOrdersScreen extends StatelessWidget {
+class ActiveOrdersScreen extends StatefulWidget {
   const ActiveOrdersScreen({super.key});
+
+  @override
+  State<ActiveOrdersScreen> createState() => _ActiveOrdersScreenState();
+}
+
+class _ActiveOrdersScreenState extends State<ActiveOrdersScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Load orders when screen initializes
+    context.read<OrdersBloc>().add(LoadOrdersEvent());
+  }
+
+  String _formatDateTime(String dateTime) {
+    try {
+      final parsedDate = DateTime.parse(dateTime);
+      return DateFormat('dd MMM, yyyy | hh:mm a').format(parsedDate);
+    } catch (e) {
+      return dateTime; // Return original if parsing fails
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          children: [
-            OrderCard(
-              status: "Active",
-              orderId: "32",
-              customerName: "John Doe",
-              paymentMethod: "Cash on Delivery",
-              amount: "437.00",
-              dateTime: "25th Dec, 2023 | 02:30 PM",
-              onVerify: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const QrScannerScreen()),
+      body: BlocBuilder<OrdersBloc, OrderState>(
+        builder: (context, state) {
+          if (state.status == OrderStatus.loading) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          if (state.status == OrderStatus.error) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: Colors.red[300],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Error loading orders',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    state.errorMessage ?? 'Unknown error',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.read<OrdersBloc>().add(RefreshOrdersEvent());
+                    },
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          if (state.activeOrders.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.shopping_bag_outlined,
+                    size: 64,
+                    color: Colors.grey[400],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No Active Orders',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'You don\'t have any active orders at the moment.',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return RefreshIndicator(
+            onRefresh: () async {
+              context.read<OrdersBloc>().add(RefreshOrdersEvent());
+            },
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: state.activeOrders.length,
+              itemBuilder: (context, index) {
+                final order = state.activeOrders[index];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: OrderCard(
+                    status: order.status,
+                    orderId: order.orderId,
+                    customerName: order.customerName,
+                    paymentMethod: order.paymentMethod,
+                    amount: order.amount,
+                    dateTime: _formatDateTime(order.dateTime),
+                    onVerify: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const QrScannerScreen()),
+                      );
+
+                      if (result != null) {
+                        print("✅ QR Scanned: $result");
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Scanned: $result")),
+                        );
+                      }
+                    },
+                    onViewDetails: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OrderDetailsScreen(),
+                        ),
+                      );
+                    },
+                    onCancel: () {
+                      OrdersDialogBoxes.showDeleteDialog(
+                        int.tryParse(order.orderId) ?? 0,
+                        context,
+                      );
+                    },
+                  ),
                 );
-
-                if (result != null) {
-                  print("✅ QR Scanned: $result");
-                  // Show it in a Snackbar instead of black screen
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Scanned: $result")),
-                  );
-                }
-              },
-              onViewDetails: () {
-                Navigator.push(context, MaterialPageRoute(builder:  (context) => OrderDetailsScreen(),));
-                // Navigate to details
-              },
-              onCancel: () {
-                OrdersDialogBoxes.showDeleteDialog(23, context);
-                // Cancel logic
               },
             ),
-            OrderCard(
-              status: "Active",
-              orderId: "32",
-              customerName: "John Doe",
-              paymentMethod: "Cash on Delivery",
-              amount: "437.00",
-              dateTime: "25th Dec, 2023 | 02:30 PM",
-              onViewDetails: () {
-                // Navigate to details
-              },
-              onCancel: () {
-                OrdersDialogBoxes.showDeleteDialog(23, context);
-                // Cancel logic
-              },
-            ),
-            OrderCard(
-              status: "Active",
-              orderId: "32",
-              customerName: "John Doe",
-              paymentMethod: "Cash on Delivery",
-              amount: "437.00",
-              dateTime: "25th Dec, 2023 | 02:30 PM",
-              onViewDetails: () {
-
-                // Navigate to details
-              },
-              onCancel: () {
-                // Cancel logic
-              },
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

@@ -240,9 +240,8 @@ class AuthBloc extends Bloc<AuthEvents, AuthState> {
   void _logOutUser(LogOutUserEvent event, Emitter<AuthState> emit) async {
     emit(state.copyWith(logoutStatus: LogoutStatus.loading));
     try {
-      await LocalStorage.removeData(key: AppKeys.userData);
       await LocalStorage.removeData(key: AppKeys.authToken);
-      await UserRepository().clearUser();
+      await UserRepository().clearUser(); // This will clear both user and cart data
 
       emit(
         state.copyWith(

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'package:speezu/models/user_model.dart';
+import 'package:speezu/models/cart_model.dart';
 import '../core/services/localStorage/my-local-controller.dart';
 import '../core/utils/constants.dart';
 import '../core/services/urls.dart';
@@ -21,24 +22,41 @@ class UserRepository {
   }
 
   UserModel? _currentUser;
+  Cart? _currentCart;
   final StreamController<UserModel?> _userController = StreamController<UserModel?>.broadcast();
+  final StreamController<Cart?> _cartController = StreamController<Cart?>.broadcast();
 
   UserModel? get currentUser => _currentUser;
+  Cart? get currentCart => _currentCart;
   
   Stream<UserModel?> get userStream => _userController.stream;
+  Stream<Cart?> get cartStream => _cartController.stream;
 
   Future<UserModel?> loadInitialData() async {
     try {
+      // Load user data
       final savedUserData = await LocalStorage.getData(key: AppKeys.userData);
-
       if (savedUserData != null) {
         _currentUser = UserModel.fromJson(jsonDecode(savedUserData));
         log("UserModel successfully decoded: ${_currentUser!.toJson()}");
-        return _currentUser;
+        _userController.add(_currentUser); // Notify listeners
       } else {
         log("No user data found, returning null.");
-        return null;
       }
+
+      // Load cart data
+      final savedCartData = await LocalStorage.getData(key: AppKeys.cartData);
+      if (savedCartData != null) {
+        _currentCart = Cart.fromJson(jsonDecode(savedCartData));
+        log("Cart successfully decoded: ${_currentCart!.toJson()}");
+        _cartController.add(_currentCart); // Notify listeners
+      } else {
+        log("No cart data found, using empty cart.");
+        _currentCart = const Cart(); // Initialize with empty cart
+        _cartController.add(_currentCart); // Notify listeners
+      }
+
+      return _currentUser;
     } catch (e) {
       log("Error loading data: $e");
       return null;
@@ -56,12 +74,32 @@ class UserRepository {
 
   Future<void> clearUser() async {
     _currentUser = null;
+    _currentCart = null;
     await LocalStorage.removeData(key: AppKeys.userData);
+    await LocalStorage.removeData(key: AppKeys.cartData);
     _userController.add(null); // Notify listeners
+    _cartController.add(null); // Notify listeners
+  }
+
+  // Cart management methods
+  Future<void> setCart(Cart cart) async {
+    _currentCart = cart;
+    await LocalStorage.saveData(
+      key: AppKeys.cartData,
+      value: jsonEncode(cart.toJson()),
+    );
+    _cartController.add(_currentCart); // Notify listeners
+  }
+
+  Future<void> clearCart() async {
+    _currentCart = const Cart(); // Reset to empty cart
+    await LocalStorage.removeData(key: AppKeys.cartData);
+    _cartController.add(_currentCart); // Notify listeners
   }
 
   void dispose() {
     _userController.close();
+    _cartController.close();
   }
 
   // User Details Management Methods

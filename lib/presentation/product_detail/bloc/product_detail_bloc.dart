@@ -111,6 +111,8 @@ class ProductDetailBloc extends Bloc<ProductDetailEvent, ProductDetailState> {
               name: child['name']?.toString() ?? '',
               childOptionName: child['childOptionName']?.toString() ?? '',
               price: double.tryParse(child['discountedPrice']?.toString() ?? '0') ?? 0.0,
+              originalPrice: double.tryParse(child['price']?.toString() ?? '0') ?? 0.0,
+              discountPercentage: double.tryParse(child['discountPercentage']?.toString() ?? '0') ?? 0.0,
               stock: 10, // Default stock since not provided in API
               stockTotal: 20, // Default stock total since not provided in API
             );
@@ -122,6 +124,8 @@ class ProductDetailBloc extends Bloc<ProductDetailEvent, ProductDetailState> {
           parentName: variation['parentName']?.toString() ?? '',
           parentOptionName: variation['parentOptionName']?.toString() ?? '',
           parentPrice: double.tryParse(variation['parentPrice']?.toString() ?? '0') ?? 0.0,
+          parentOriginalPrice: double.tryParse(variation['parentOriginalPrice']?.toString() ?? '0') ?? 0.0,
+          parentDiscountPercentage: double.tryParse(variation['parentDiscountPercentage']?.toString() ?? '0') ?? 0.0,
           children: children,
         );
       }).toList();

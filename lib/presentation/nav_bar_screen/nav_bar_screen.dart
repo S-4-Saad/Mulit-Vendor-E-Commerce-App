@@ -13,7 +13,8 @@ import '../../repositories/user_repository.dart';
 import '../../routes/route_names.dart';
 import '../../widgets/search_animated_container.dart';
 import '../drawers/drawer.dart';
-import '../home/home_screen.dart';
+import '../cart/bloc/cart_bloc.dart';
+import '../cart/bloc/cart_state.dart';
 import 'bloc/nav_bar_bloc.dart';
 import 'bloc/nav_bar_event.dart';
 import 'bloc/nav_bar_state.dart';
@@ -27,26 +28,130 @@ class NavBarScreen extends StatefulWidget {
   State<NavBarScreen> createState() => _NavBarScreenState();
 }
 
-class _NavBarScreenState extends State<NavBarScreen> {
+class _NavBarScreenState extends State<NavBarScreen> with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _navBarScaffoldKey =
       GlobalKey<ScaffoldState>();
 
   final ScrollController _scrollController = ScrollController();
   bool _showTitle = true;
-
+  bool _showIcons = true;
+  bool _isScrollingDown = false;
+  double _lastOffset = 0.0;
+  
+  late AnimationController _titleAnimationController;
+  late AnimationController _iconsAnimationController;
+  late Animation<double> _titleAnimation;
+  late Animation<double> _iconsAnimation;
 
   @override
   void initState() {
-    // TODO: implement initState
-    _scrollController.addListener(() {
-      // Hide when scrolling down, show when scrolling up
-      if (_scrollController.position.userScrollDirection == ScrollDirection.reverse) {
-        if (_showTitle) setState(() => _showTitle = false);
-      } else if (_scrollController.position.userScrollDirection == ScrollDirection.forward) {
-        if (!_showTitle) setState(() => _showTitle = true);
-      }
-    });
     super.initState();
+    
+    // Initialize animation controllers with optimized durations
+    _titleAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 250),
+      vsync: this,
+    );
+    _iconsAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 180),
+      vsync: this,
+    );
+    
+    // Initialize animations with smoother curves
+    _titleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _titleAnimationController, curve: Curves.easeOutCubic),
+    );
+    _iconsAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _iconsAnimationController, curve: Curves.easeOutCubic),
+    );
+    
+    // Start with visible elements
+    _titleAnimationController.forward();
+    _iconsAnimationController.forward();
+    
+    _scrollController.addListener(_handleScroll);
+  }
+
+  void _handleScroll() {
+    if (!_scrollController.hasClients) return;
+    
+    final offset = _scrollController.offset;
+    
+    // Calculate scroll delta to determine actual movement
+    final double delta = offset - _lastOffset;
+    _lastOffset = offset;
+    
+    // Track scroll direction with more robust detection
+    if (delta > 0) {
+      // Scrolling down
+      _isScrollingDown = true;
+    } else if (delta < 0) {
+      // Scrolling up
+      _isScrollingDown = false;
+    }
+    
+    // Thresholds for hiding/showing
+    const double scrollThreshold = 1.0;
+    const double hideThreshold = 15.0;
+    const double titleHideThreshold = 5.0;
+    const double showThreshold = 2.0;
+    
+    final bool isAtTop = offset <= scrollThreshold;
+    final bool isNearTop = offset <= showThreshold;
+    
+    // Only hide if we're actually scrolling down and have moved enough
+    final bool shouldHideTitle = _isScrollingDown && offset > titleHideThreshold;
+    final bool shouldHideIcons = _isScrollingDown && offset > hideThreshold;
+    
+    // Only show if we're at the very top OR actively scrolling up and very close to top
+    final bool shouldShowTitle = isAtTop || (delta < 0 && isNearTop && !_isScrollingDown);
+    final bool shouldShowIcons = isAtTop || (delta < 0 && isNearTop && !_isScrollingDown);
+    
+    // Apply transitions with strict state checking
+    if (shouldHideTitle && _showTitle) {
+      _showTitle = false;
+      _titleAnimationController.reverse();
+    } else if (shouldShowTitle && !_showTitle) {
+      _showTitle = true;
+      _titleAnimationController.forward();
+    }
+    
+    if (shouldHideIcons && _showIcons) {
+      _showIcons = false;
+      _iconsAnimationController.reverse();
+    } else if (shouldShowIcons && !_showIcons) {
+      _showIcons = true;
+      _iconsAnimationController.forward();
+    }
+  }
+
+  void _resetAnimationStates() {
+    // Reset scroll position to top
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        0.0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+    
+    // Reset animation states
+    _showTitle = true;
+    _showIcons = true;
+    _isScrollingDown = false;
+    _lastOffset = 0.0;
+    
+    // Animate to visible state
+    _titleAnimationController.forward();
+    _iconsAnimationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_handleScroll);
+    _titleAnimationController.dispose();
+    _iconsAnimationController.dispose();
+    super.dispose();
   }
 
  // ← added
@@ -64,9 +169,14 @@ class _NavBarScreenState extends State<NavBarScreen> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => NavBarBloc()..add(InitPage(widget.currentTab)),
-      child: BlocBuilder<NavBarBloc, NavBarState>(
-        builder: (context, state) {
-          final bloc = context.read<NavBarBloc>();
+      child: BlocListener<NavBarBloc, NavBarState>(
+        listener: (context, state) {
+          // Reset animation states when tab changes
+          _resetAnimationStates();
+        },
+        child: BlocBuilder<NavBarBloc, NavBarState>(
+          builder: (context, state) {
+            final bloc = context.read<NavBarBloc>();
 
           return Scaffold(
             key: _navBarScaffoldKey,
@@ -76,14 +186,48 @@ class _NavBarScreenState extends State<NavBarScreen> {
               centerTitle: true,
               backgroundColor: Theme.of(context).colorScheme.onPrimary,
               actions: [
-                IconButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, RouteNames.cartScreen);
+                BlocBuilder<CartBloc, CartState>(
+                  builder: (context, cartState) {
+                    final cartCount = cartState.totalItems;
+                    return Stack(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, RouteNames.cartScreen);
+                          },
+                          icon: Icon(
+                            Icons.shopping_cart,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        if (cartCount > 0)
+                          Positioned(
+                            right: 2,
+                            top: 2,
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 20,
+                                minHeight: 20,
+                              ),
+                              child: Text(
+                                cartCount.toString(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
                   },
-                  icon: Icon(
-                    Icons.shopping_cart,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
                 ),
               ],
               leading: IconButton(
@@ -142,14 +286,6 @@ class _NavBarScreenState extends State<NavBarScreen> {
                   ? NestedScrollView(
                 controller: _scrollController,
                 headerSliverBuilder: (context, innerBoxIsScrolled) {
-                  double getShrinkFactor() {
-                    final maxHeight = 120.0;
-                    final minHeight = kToolbarHeight;
-                    final offset = _scrollController.hasClients ? _scrollController.offset : 0.0;
-                    final shrink = (offset / (maxHeight - minHeight)).clamp(0.0, 1.0);
-                    return shrink;
-                  }
-
                   return [
                     SliverAppBar(
                       pinned: true,
@@ -157,28 +293,83 @@ class _NavBarScreenState extends State<NavBarScreen> {
                       snap: true,
                       centerTitle: true,
                       backgroundColor: Theme.of(context).colorScheme.onPrimary,
-                      leading: IconButton(
-                        icon: const Icon(Icons.menu),
-                        color: Theme.of(context).colorScheme.primary,
-                        onPressed: () => _navBarScaffoldKey.currentState?.openDrawer(),
+                      leading: AnimatedBuilder(
+                        animation: _iconsAnimation,
+                        builder: (context, child) {
+                          return Opacity(
+                            opacity: _iconsAnimation.value,
+                            child: IconButton(
+                              icon: const Icon(Icons.menu),
+                              color: Theme.of(context).colorScheme.primary,
+                              onPressed: () => _navBarScaffoldKey.currentState?.openDrawer(),
+                            ),
+                          );
+                        },
                       ),
                       actions: [
-                        IconButton(
-                          icon: Icon(Icons.shopping_cart, color: Theme.of(context).colorScheme.primary),
-                          onPressed: () => Navigator.pushNamed(context, RouteNames.cartScreen),
+                        AnimatedBuilder(
+                          animation: _iconsAnimation,
+                          builder: (context, child) {
+                            return Opacity(
+                              opacity: _iconsAnimation.value,
+                              child: BlocBuilder<CartBloc, CartState>(
+                                builder: (context, cartState) {
+                                  final cartCount = cartState.totalItems;
+                                  return Stack(
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(Icons.shopping_cart, color: Theme.of(context).colorScheme.primary),
+                                        onPressed: () => Navigator.pushNamed(context, RouteNames.cartScreen),
+                                      ),
+                                      if (cartCount > 0)
+                                        Positioned(
+                                          right: 2,
+                                          top: 2,
+                                          child: Container(
+                                            padding: const EdgeInsets.all(2),
+                                            decoration: BoxDecoration(
+                                              color: Colors.red,
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                            constraints: const BoxConstraints(
+                                              minWidth: 20,
+                                              minHeight: 20,
+                                            ),
+                                            child: Text(
+                                              cartCount.toString(),
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            );
+                          },
                         ),
                       ],
                       expandedHeight: 120,
-                      title: Visibility(
-                        visible: _showTitle,
-                        child: Text(
-                          screenTitles[state.currentTab],
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSecondary.withOpacity(0.9),
-                            fontFamily: FontFamily.fontsPoppinsSemiBold,
-                            fontSize: context.scaledFont(19),
-                          ),
-                        ),
+                      title: AnimatedBuilder(
+                        animation: _titleAnimation,
+                        builder: (context, child) {
+                          return Opacity(
+                            opacity: _titleAnimation.value,
+                            child: Text(
+                              screenTitles[state.currentTab],
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSecondary.withOpacity(0.9),
+                                fontFamily: FontFamily.fontsPoppinsSemiBold,
+                                fontSize: context.scaledFont(19),
+                              ),
+                            ),
+                          );
+                        },
                       ),
 
                       flexibleSpace: LayoutBuilder(
@@ -191,16 +382,26 @@ class _NavBarScreenState extends State<NavBarScreen> {
                           final shrinkFactor = (maxHeight - currentHeight) / (maxHeight - minHeight);
 
                           final fullWidth = MediaQuery.of(context).size.width - 32; // full width minus padding
-                          final collapsedWidth = fullWidth * 0.5; // width when collapsed (adjust as needed)
+                          final collapsedWidth = fullWidth * 0.6; // width when collapsed (slightly larger for better UX)
+                          
+                          // Smooth interpolation for width and opacity
+                          final animatedWidth = lerpDouble(fullWidth, collapsedWidth, shrinkFactor.clamp(0.0, 1.0)) ?? fullWidth;
+                          final searchOpacity = lerpDouble(1.0, 0.8, shrinkFactor.clamp(0.0, 1.0)) ?? 1.0;
 
                           return Padding(
                             padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
                             child: Align(
                               alignment: Alignment.bottomCenter,
                               child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 100),
-                                width: lerpDouble(fullWidth, collapsedWidth, shrinkFactor),
-                                child: SearchContainer(onSearchTap: () {}),
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.easeOutCubic,
+                                width: animatedWidth,
+                                child: AnimatedOpacity(
+                                  duration: const Duration(milliseconds: 180),
+                                  curve: Curves.easeOutCubic,
+                                  opacity: searchOpacity,
+                                  child: SearchContainer(onSearchTap: () {}),
+                                ),
                               ),
                             ),
                           );
@@ -292,6 +493,7 @@ class _NavBarScreenState extends State<NavBarScreen> {
             ),
           );
         },
+        ),
       ),
     );
   }

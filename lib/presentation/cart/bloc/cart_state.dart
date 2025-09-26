@@ -1,5 +1,9 @@
 import 'package:equatable/equatable.dart';
 import '../../../models/cart_model.dart';
+import '../../../models/address_model.dart';
+import '../../../models/card_details_model.dart';
+import '../../../models/payment_model.dart';
+import 'cart_event.dart';
 
 enum CartStatus { initial, loading, success, error }
 
@@ -7,22 +11,52 @@ class CartState extends Equatable {
   final CartStatus status;
   final Cart cart;
   final String? errorMessage;
+  
+  // Checkout related fields
+  final CheckoutMethod? selectedMethod;
+  final AddressModel? selectedAddress;
+  final String? deliveryInstructions;
+  final CardDetailsModel? selectedCard;
+  final PaymentResult? paymentResult;
+  final List<AddressModel> addresses;
+  final bool orderPlacedSuccessfully;
 
   const CartState({
     this.status = CartStatus.initial,
     this.cart = const Cart(),
     this.errorMessage,
+    this.selectedMethod,
+    this.selectedAddress,
+    this.deliveryInstructions,
+    this.selectedCard,
+    this.paymentResult,
+    this.addresses = const [],
+    this.orderPlacedSuccessfully = false,
   });
 
   CartState copyWith({
     CartStatus? status,
     Cart? cart,
     String? errorMessage,
+    CheckoutMethod? selectedMethod,
+    AddressModel? selectedAddress,
+    String? deliveryInstructions,
+    CardDetailsModel? selectedCard,
+    PaymentResult? paymentResult,
+    List<AddressModel>? addresses,
+    bool? orderPlacedSuccessfully,
   }) {
     return CartState(
       status: status ?? this.status,
       cart: cart ?? this.cart,
       errorMessage: errorMessage ?? this.errorMessage,
+      selectedMethod: selectedMethod ?? this.selectedMethod,
+      selectedAddress: selectedAddress ?? this.selectedAddress,
+      deliveryInstructions: deliveryInstructions ?? this.deliveryInstructions,
+      selectedCard: selectedCard ?? this.selectedCard,
+      paymentResult: paymentResult ?? this.paymentResult,
+      addresses: addresses ?? this.addresses,
+      orderPlacedSuccessfully: orderPlacedSuccessfully ?? this.orderPlacedSuccessfully,
     );
   }
 
@@ -43,5 +77,16 @@ class CartState extends Equatable {
   int getItemCountForStore(String storeId) => cart.getItemCountForStore(storeId);
 
   @override
-  List<Object?> get props => [status, cart, errorMessage];
+  List<Object?> get props => [
+    status, 
+    cart, 
+    errorMessage, 
+    selectedMethod, 
+    selectedAddress, 
+    deliveryInstructions,
+    selectedCard, 
+    paymentResult, 
+    addresses,
+    orderPlacedSuccessfully
+  ];
 }

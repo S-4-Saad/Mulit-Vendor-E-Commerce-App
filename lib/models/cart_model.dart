@@ -85,6 +85,74 @@ class CartItem {
     );
   }
 
+  // Calculate the current price based on selected variations
+  static double _getCurrentPrice(ProductDetail product, {
+    String? variationParentValue,
+    String? variationChildValue,
+  }) {
+    // If no variations, return base price
+    if (product.variations.isEmpty) {
+      return product.price;
+    }
+    
+    // If no parent selected, return base price
+    if (variationParentValue == null) {
+      return product.price;
+    }
+    
+    // Find the selected parent variation
+    final selectedParentVariation = product.variations.firstWhere(
+      (v) => v.parentName == variationParentValue,
+      orElse: () => product.variations.first,
+    );
+    
+    // If parent has children and child is selected, use child price
+    if (selectedParentVariation.children.isNotEmpty && variationChildValue != null) {
+      final selectedChildVariation = selectedParentVariation.children.firstWhere(
+        (child) => child.name == variationChildValue,
+        orElse: () => selectedParentVariation.children.first,
+      );
+      return selectedChildVariation.price;
+    }
+    
+    // If parent has no children or child not selected, use parent price
+    return selectedParentVariation.parentPrice;
+  }
+
+  // Calculate the current original price based on selected variations
+  static double _getCurrentOriginalPrice(ProductDetail product, {
+    String? variationParentValue,
+    String? variationChildValue,
+  }) {
+    // If no variations, return base original price
+    if (product.variations.isEmpty) {
+      return product.originalPrice;
+    }
+    
+    // If no parent selected, return base original price
+    if (variationParentValue == null) {
+      return product.originalPrice;
+    }
+    
+    // Find the selected parent variation
+    final selectedParentVariation = product.variations.firstWhere(
+      (v) => v.parentName == variationParentValue,
+      orElse: () => product.variations.first,
+    );
+    
+    // If parent has children and child is selected, use child original price
+    if (selectedParentVariation.children.isNotEmpty && variationChildValue != null) {
+      final selectedChildVariation = selectedParentVariation.children.firstWhere(
+        (child) => child.name == variationChildValue,
+        orElse: () => selectedParentVariation.children.first,
+      );
+      return selectedChildVariation.originalPrice;
+    }
+    
+    // If parent has no children or child not selected, use parent original price
+    return selectedParentVariation.parentOriginalPrice;
+  }
+
   // Convert from ProductDetail
   factory CartItem.fromProductDetail(
     ProductDetail product,
@@ -100,13 +168,26 @@ class CartItem {
     // Create unique item ID using real server IDs
     final itemId = '${product.id}_${variationParentValue ?? ''}_${variationChildValue ?? ''}';
     
+    // Calculate variation-specific prices
+    final variationPrice = _getCurrentPrice(
+      product,
+      variationParentValue: variationParentValue,
+      variationChildValue: variationChildValue,
+    );
+    
+    final variationOriginalPrice = _getCurrentOriginalPrice(
+      product,
+      variationParentValue: variationParentValue,
+      variationChildValue: variationChildValue,
+    );
+    
     return CartItem(
       id: itemId,
       productId: product.id, // Real server product ID
       name: product.name,
       imageUrl: product.thumbnail,
-      price: product.price,
-      originalPrice: product.originalPrice,
+      price: variationPrice,
+      originalPrice: variationOriginalPrice,
       quantity: quantity,
       variationParentName: variationParentName,
       variationParentValue: variationParentValue,
@@ -133,6 +214,50 @@ class CartItem {
   @override
   int get hashCode {
     return Object.hash(id, productId, variationParentValue, variationChildValue);
+  }
+
+  // Convert to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'productId': productId,
+      'name': name,
+      'imageUrl': imageUrl,
+      'price': price,
+      'originalPrice': originalPrice,
+      'quantity': quantity,
+      'variationParentName': variationParentName,
+      'variationParentValue': variationParentValue,
+      'variationChildName': variationChildName,
+      'variationChildValue': variationChildValue,
+      'variationParentId': variationParentId,
+      'variationChildId': variationChildId,
+      'shopName': shopName,
+      'categoryName': categoryName,
+      'storeId': storeId,
+    };
+  }
+
+  // Create from JSON
+  factory CartItem.fromJson(Map<String, dynamic> json) {
+    return CartItem(
+      id: json['id'] ?? '',
+      productId: json['productId'] ?? '',
+      name: json['name'] ?? '',
+      imageUrl: json['imageUrl'] ?? '',
+      price: (json['price'] ?? 0.0).toDouble(),
+      originalPrice: (json['originalPrice'] ?? 0.0).toDouble(),
+      quantity: json['quantity'] ?? 0,
+      variationParentName: json['variationParentName'],
+      variationParentValue: json['variationParentValue'],
+      variationChildName: json['variationChildName'],
+      variationChildValue: json['variationChildValue'],
+      variationParentId: json['variationParentId'],
+      variationChildId: json['variationChildId'],
+      shopName: json['shopName'] ?? '',
+      categoryName: json['categoryName'] ?? '',
+      storeId: json['storeId'] ?? '',
+    );
   }
 
   @override
@@ -202,6 +327,26 @@ class Cart {
       items: items ?? this.items,
       deliveryFee: deliveryFee ?? this.deliveryFee,
       taxRate: taxRate ?? this.taxRate,
+    );
+  }
+
+  // Convert to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'items': items.map((item) => item.toJson()).toList(),
+      'deliveryFee': deliveryFee,
+      'taxRate': taxRate,
+    };
+  }
+
+  // Create from JSON
+  factory Cart.fromJson(Map<String, dynamic> json) {
+    return Cart(
+      items: (json['items'] as List<dynamic>?)
+          ?.map((item) => CartItem.fromJson(item as Map<String, dynamic>))
+          .toList() ?? [],
+      deliveryFee: (json['deliveryFee'] ?? 0.0).toDouble(),
+      taxRate: (json['taxRate'] ?? 0.0).toDouble(),
     );
   }
 
