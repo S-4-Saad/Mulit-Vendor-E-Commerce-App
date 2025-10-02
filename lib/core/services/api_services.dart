@@ -175,7 +175,7 @@ class ApiService {
   // New Multipart POST Method
   static Future<void> postMultipartMethod({
     required String apiUrl,
-    required Map<String, String> formData,
+    required Map<String, dynamic> formData,
     File? file,
     String fileKey = 'file',
     required Function(bool success, dynamic data) executionMethod,

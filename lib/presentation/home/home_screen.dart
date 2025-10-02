@@ -51,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ProductCategory(name: "Food", imageUrl: AppImages.foodStoreIcon),
     ProductCategory(name: "Supermarket", imageUrl: AppImages.superMarketIcon),
     ProductCategory(
-      name: "Retail Stores",
+      name: "Retail Store",
       imageUrl: AppImages.utilityStoreIcon,
     ),
     ProductCategory(name: "Pharmacy", imageUrl: AppImages.pharmacyIcon),
@@ -190,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           child: Center(
                             child: Text(
-                              "No food products available",
+                              Labels.noFoodProducts,
                               style: TextStyle(
                                 color: Colors.grey[600],
                                 fontSize: 16,
@@ -251,7 +251,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           child: Center(
                             child: Text(
-                              "No supermarket products available",
+                              Labels.noSupermarketProducts,
                               style: TextStyle(
                                 color: Colors.grey[600],
                                 fontSize: 16,
@@ -290,7 +290,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                     SizedBox(height: context.heightPct(.02)),
                     HomeHeaderTile(
-                      title: Labels.topTrendingProducts,
+                      title: Labels.topRetailProducts,
                       onViewAllTap:
                           getApiRetailProducts(state).isNotEmpty
                               ? () {
@@ -312,7 +312,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           child: Center(
                             child: Text(
-                              "No retail products available",
+                              Labels.noRetailProducts,
                               style: TextStyle(
                                 color: Colors.grey[600],
                                 fontSize: 16,
@@ -371,7 +371,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           child: Center(
                             child: Text(
-                              "No pharmacy products available",
+                              Labels.noPharmacyProducts,
                               style: TextStyle(
                                 color: Colors.grey[600],
                                 fontSize: 16,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:speezu/core/assets/font_family.dart';
 import 'package:speezu/core/utils/labels.dart';
+import 'package:speezu/core/utils/snackbar_helper.dart';
 import 'package:speezu/presentation/settings/add_address_screen.dart';
 import 'package:speezu/presentation/settings/edit_address_screen.dart';
 import 'package:speezu/widgets/custom_app_bar.dart';
@@ -47,19 +48,11 @@ class _AddressBookScreenState extends State<AddressBookScreen> {
     if (success) {
       // Reload addresses to get updated order with new default at top
       _loadAddresses();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Default address updated successfully!'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      SnackBarHelper.showSuccess(context, Labels.defaultAddressUpdatedSuccessfully);
+
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to update default address. Please try again.'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      SnackBarHelper.showError(context, Labels.failedToUpdateDefaultAddress);
+
     }
   }
 
@@ -67,19 +60,11 @@ class _AddressBookScreenState extends State<AddressBookScreen> {
     final success = await _userRepository.removeAddress(addressId);
     if (success) {
       _loadAddresses();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Address deleted successfully!'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      SnackBarHelper.showSuccess(context, Labels.addressDeletedSuccessfully);
+
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to delete address. Please try again.'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      SnackBarHelper.showError(context, Labels.failedToDeleteAddress);
+
     }
   }
 
@@ -112,7 +97,7 @@ class _AddressBookScreenState extends State<AddressBookScreen> {
                   ),
                   SizedBox(height: 16),
                   Text(
-                    'No addresses saved',
+                    Labels.noAddressesSaved,
                     style: TextStyle(
                       fontSize: 18,
                       fontFamily: FontFamily.fontsPoppinsSemiBold,
@@ -121,7 +106,7 @@ class _AddressBookScreenState extends State<AddressBookScreen> {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'Add your first address to get started',
+                    Labels.addYourFirstAddress,
                     style: TextStyle(
                       fontSize: 14,
                       fontFamily: FontFamily.fontsPoppinsRegular,
@@ -139,12 +124,8 @@ class _AddressBookScreenState extends State<AddressBookScreen> {
                   onSelectPressed: () {
                     // Don't show dialog if address is already default
                     if (address.isDefault == true) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('This address is already set as default'),
-                          backgroundColor: Colors.blue,
-                        ),
-                      );
+                      SnackBarHelper.showSuccess(context, Labels.alreadyDefault);
+
                       return;
                     }
                     

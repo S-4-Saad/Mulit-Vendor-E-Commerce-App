@@ -11,7 +11,9 @@ import 'package:speezu/routes/route_names.dart';
 import 'package:speezu/core/services/localStorage/my-local-controller.dart';
 import 'package:speezu/core/utils/constants.dart';
 import 'package:speezu/models/user_model.dart';
+import 'package:speezu/widgets/app_cache_image.dart';
 
+import '../../core/services/urls.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/theme_bloc/theme_event.dart';
 import '../auth/bloc/auth_bloc.dart';
@@ -153,6 +155,9 @@ class DrawerWidget extends StatelessWidget {
                 () =>
                     Navigator.pushNamed(context, RouteNames.languagesScreen),
           ),
+          IconButton(onPressed: (){
+            print('$imageBaseUrl${UserRepository().currentUser?.userData?.profileImage}');
+          }, icon: Icon(Icons.add)),
           //
           // // ✅ Theme Switch
           _buildListTile(
@@ -240,7 +245,8 @@ class DrawerWidget extends StatelessWidget {
           
           return UserAccountsDrawerHeader(
             currentAccountPicture: CircleAvatar(
-              child: const Icon(Icons.person, size: 32),
+              backgroundColor: Theme.of(context).colorScheme.onPrimary,
+              child:AppCacheImage(imageUrl: '$imageBaseUrl${UserRepository().currentUser?.userData?.profileImage}'??"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTkk0W0Xd-NcLqTzNj58LHYs-vG4v0J-Qtj2w&s")
             ),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),

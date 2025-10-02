@@ -205,4 +205,110 @@ class Labels {
   static String get shareYourThoughts => 'shareYourThoughts'.tr();
   static String get yourVoiceMatters => 'yourVoiceMatters'.tr();
   static String get verify => 'verify'.tr();
+  static String get camera => 'camera'.tr();
+  static String get gallery => 'gallery'.tr();
+  static String get noChanges => 'noChanges'.tr();
+  static String get profileUpdateSuccessfully =>
+      'profileUpdateSuccessfully'.tr();
+  static String get profileUpdateFailed => 'profileUpdateFailed'.tr();
+  static String get error => 'error'.tr();
+  static String get imageCaptured => 'imageCaptured'.tr();
+  static String get imagePicked => 'imagePicked'.tr();
+  static String get editCard => 'editCard'.tr();
+  static String get cardNumberHint => 'cardNumberHint'.tr();
+  static String get expiryHint => 'expiryHint'.tr();
+  static String get cvvHint => 'cvvHint'.tr();
+  static String get updateCard => 'updateCard'.tr();
+  static String get deleteCard => 'deleteCard'.tr();
+  static String get cardUpdatedSuccess => 'cardUpdatedSuccess'.tr();
+  static String get cardAddedSuccess => 'cardAddedSuccess'.tr();
+  static String get cardUpdateFailed => 'cardUpdateFailed'.tr();
+  static String get cardAddFailed => 'cardAddFailed'.tr();
+  static String get cardDeletedSuccess => 'cardDeletedSuccess'.tr();
+  static String get cardDeleteFailed => 'cardDeleteFailed'.tr();
+  static String get errorOccurred => 'errorOccurred'.tr();
+  static String get deleteConfirmation => 'deleteConfirmation'.tr();
+  static String get failedTo => 'failedTo'.tr();
+  static String get pleaseTryAgain => 'pleaseTryAgain'.tr();
+  static String get addCard => 'addCard'.tr();
+  static String get failedToDeleteCard => 'failedToDeleteCard'.tr();
+  static String get addressDeletedSuccessfully =>
+      'addressDeletedSuccessfully'.tr();
+  static String get failedToDeleteAddress => 'failedToDeleteAddress'.tr();
+  static String get failedToUpdateDefaultAddress =>
+      'failedToUpdateDefaultAddress'.tr();
+  static String get defaultAddressUpdatedSuccessfully =>
+      'defaultAddressUpdatedSuccessfully'.tr();
+  static String get noAddressesSaved => 'noAddressesSaved'.tr();
+  static String get addYourFirstAddress => 'addYourFirstAddress'.tr();
+  static String get alreadyDefault => 'alreadyDefault'.tr();
+  static String get addressSavedSuccessfully => 'addressSavedSuccessfully'.tr();
+  static String get failedToSaveAddress => 'failedToSaveAddress'.tr();
+  static String get editAddress => 'editAddress'.tr();
+  static String get homeAddress => 'homeAddress'.tr();
+  static String get officeAddress => 'officeAddress'.tr();
+  static String get temporaryAddress => 'temporaryAddress'.tr();
+  static String get currentAddress => 'currentAddress'.tr();
+  static String get otherAddress => 'otherAddress'.tr();
+  static String get updateAddress => 'updateAddress'.tr();
+  static String get addressUpdatedSuccessfully => 'addressUpdatedSuccessfully'.tr();
+  static String get failedToUpdateAddress => 'failedToUpdateAddress'.tr();
+  static String get errorMessagePrefix => 'errorMessagePrefix'.tr();
+  static String get currentPassword => 'currentPassword'.tr();
+  static String get newPassword => 'newPassword'.tr();
+  static String get confirmNewPassword => 'confirmNewPassword'.tr();
+  static String get passwordsDoNotMatch => 'passwordsDoNotMatch'.tr();
+  static String get enterCurrentPassword => 'enterCurrentPassword'.tr();
+  static String get enterNewPassword => 'enterNewPassword'.tr();
+  static String get enterConfirmPassword => 'enterConfirmPassword'.tr();
+  static String get faqHowToOrder => 'faqHowToOrder'.tr();
+  static String get faqHowToOrderAnswer => 'faqHowToOrderAnswer'.tr();
+
+  static String get faqTrackOrder => 'faqTrackOrder'.tr();
+  static String get faqTrackOrderAnswer => 'faqTrackOrderAnswer'.tr();
+
+  static String get faqDeliveryTime => 'faqDeliveryTime'.tr();
+  static String get faqDeliveryTimeAnswer => 'faqDeliveryTimeAnswer'.tr();
+
+  static String get faqPaymentMethods => 'faqPaymentMethods'.tr();
+  static String get faqPaymentMethodsAnswer => 'faqPaymentMethodsAnswer'.tr();
+
+  static String get faqCancelOrder => 'faqCancelOrder'.tr();
+  static String get faqCancelOrderAnswer => 'faqCancelOrderAnswer'.tr();
+
+  static String get faqWrongOrDamaged => 'faqWrongOrDamaged'.tr();
+  static String get faqWrongOrDamagedAnswer => 'faqWrongOrDamagedAnswer'.tr();
+
+  static String get faqDeliveryCharges => 'faqDeliveryCharges'.tr();
+  static String get faqDeliveryChargesAnswer => 'faqDeliveryChargesAnswer'.tr();
+
+  static String get faqUpdateAddress => 'faqUpdateAddress'.tr();
+  static String get faqUpdateAddressAnswer => 'faqUpdateAddressAnswer'.tr();
+
+  static String get faqSecurePayments => 'faqSecurePayments'.tr();
+  static String get faqSecurePaymentsAnswer => 'faqSecurePaymentsAnswer'.tr();
+
+  static String get faqDeliverToMyArea => 'faqDeliverToMyArea'.tr();
+  static String get faqDeliverToMyAreaAnswer => 'faqDeliverToMyAreaAnswer'.tr();
+
+  static String get faqCustomerSupport => 'faqCustomerSupport'.tr();
+  static String get faqCustomerSupportAnswer => 'faqCustomerSupportAnswer'.tr();
+  static String get errorWithMessage => 'errorWithMessage'.tr();
+  static String get noFoodProducts => 'noFoodProducts'.tr();
+  static String get noSupermarketProducts => 'noSupermarketProducts'.tr();
+  static String get noRetailProducts => 'noRetailProducts'.tr();
+  static String get noPharmacyProducts => 'noPharmacyProducts'.tr();
+
+  static String get categoryFood => 'categoryFood'.tr();
+  static String get categorySupermarket => 'categorySupermarket'.tr();
+  static String get categoryRetailStores => 'categoryRetailStores'.tr();
+  static String get categoryPharmacy => 'categoryPharmacy'.tr();
+
+  static String get fallbackFastFood => 'fallbackFastFood'.tr();
+  static String get fallbackGrocery => 'fallbackGrocery'.tr();
+  static String get fallbackClothing => 'fallbackClothing'.tr();
+  static String get fallbackMedicine => 'fallbackMedicine'.tr();
+  static String get topRetailProducts => 'topRetailProducts'.tr();
+
+
 }
