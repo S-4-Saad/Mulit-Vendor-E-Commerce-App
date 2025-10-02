@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:speezu/core/utils/snackbar_helper.dart';
 
 import '../../core/assets/font_family.dart';
 import '../../core/utils/app_validators.dart';
@@ -20,15 +21,24 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
   final TextEditingController addressController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController primaryPhoneNumber = TextEditingController();
+  final TextEditingController selectedAddressType = TextEditingController();
   final TextEditingController secondaryPhoneNumber = TextEditingController();
   final FocusNode nameFocusNode = FocusNode();
   final FocusNode primaryPhoneFocusNode = FocusNode();
   final FocusNode secondaryPhoneFocusNode = FocusNode();
   final FocusNode addressFocusNode = FocusNode();
-  
+  final FocusNode selectedAddressTypeFocusNode = FocusNode();
+
   // Address type dropdown
-  String? selectedAddressType;
-  final List<String> addressTypes = ['Home Address', 'Office Address'];
+  // String? selectedAddressType;
+  final List<String> addressTypes = [
+    'Home Address',
+    'Office Address',
+    'Temporary Address',
+    'Current Address',
+    'Other',
+  ];
+
 
   @override
   void dispose() {
@@ -63,62 +73,72 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
               children: [
                 Text(Labels.addressTitle, style: textStyle),
                 const SizedBox(height: 5),
-                DropdownButtonFormField<String>(
-                  value: selectedAddressType,
-                  decoration: InputDecoration(
-                    hintText: 'Select Address Type',
-                    hintStyle: TextStyle(
-                      fontFamily: FontFamily.fontsPoppinsRegular,
-                      color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.6),
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.primary,
-                        width: 2,
-                      ),
-                    ),
-                    filled: true,
-                    fillColor: Theme.of(context).colorScheme.onPrimary,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  ),
-                  dropdownColor: Theme.of(context).colorScheme.onPrimary,
-                  items: addressTypes.map((String type) {
-                    return DropdownMenuItem<String>(
-                      value: type,
-                      child: Text(
-                        type,
-                        style: TextStyle(
-                          fontFamily: FontFamily.fontsPoppinsRegular,
-                          color: Theme.of(context).colorScheme.onSecondary,
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      selectedAddressType = newValue;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please select address type';
-                    }
-                    return null;
-                  },
+                CustomTextFormField(
+                  focusNode: selectedAddressTypeFocusNode,
+                  nextFocusNode: nameFocusNode,
+
+                  validator: AppValidators.validateRequired,
+                  textEditingController: selectedAddressType,
+                  hint: Labels.addressTitle,
+                  haveDropdownMenu: true,
+                  dropdownMenuItems: addressTypes,
                 ),
+                // DropdownButtonFormField<String>(
+                //   value: selectedAddressType,
+                //   decoration: InputDecoration(
+                //     hintText: 'Select Address Type',
+                //     hintStyle: TextStyle(
+                //       fontFamily: FontFamily.fontsPoppinsRegular,
+                //       color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.6),
+                //     ),
+                //     border: OutlineInputBorder(
+                //       borderRadius: BorderRadius.circular(8),
+                //       borderSide: BorderSide(
+                //         color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                //       ),
+                //     ),
+                //     enabledBorder: OutlineInputBorder(
+                //       borderRadius: BorderRadius.circular(8),
+                //       borderSide: BorderSide(
+                //         color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                //       ),
+                //     ),
+                //     focusedBorder: OutlineInputBorder(
+                //       borderRadius: BorderRadius.circular(8),
+                //       borderSide: BorderSide(
+                //         color: Theme.of(context).colorScheme.primary,
+                //         width: 2,
+                //       ),
+                //     ),
+                //     filled: true,
+                //     fillColor: Theme.of(context).colorScheme.onPrimary,
+                //     contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                //   ),
+                //   dropdownColor: Theme.of(context).colorScheme.onPrimary,
+                //   items: addressTypes.map((String type) {
+                //     return DropdownMenuItem<String>(
+                //       value: type,
+                //       child: Text(
+                //         type,
+                //         style: TextStyle(
+                //           fontFamily: FontFamily.fontsPoppinsRegular,
+                //           color: Theme.of(context).colorScheme.onSecondary,
+                //         ),
+                //       ),
+                //     );
+                //   }).toList(),
+                //   onChanged: (String? newValue) {
+                //     setState(() {
+                //       selectedAddressType = newValue;
+                //     });
+                //   },
+                //   validator: (value) {
+                //     if (value == null || value.isEmpty) {
+                //       return 'Please select address type';
+                //     }
+                //     return null;
+                //   },
+                // ),
                 const SizedBox(height: 10),
                 Text(Labels.customerName, style: textStyle),
                 const SizedBox(height: 5),
@@ -174,69 +194,72 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                     if (_addAddressKey.currentState!.validate()) {
                       // Create address model
                       final address = AddressModel(
-                        title: selectedAddressType!,
+                        title: selectedAddressType.text.trim(),
                         customerName: nameController.text.trim(),
                         primaryPhoneNumber: primaryPhoneNumber.text.trim(),
                         secondaryPhoneNumber: secondaryPhoneNumber.text.trim(),
                         address: addressController.text.trim(),
-                        isDefault: false, // Will be set to true if it's the first address
+                        isDefault:
+                            false, // Will be set to true if it's the first address
                       );
 
                       // Show loading dialog
                       showDialog(
                         context: context,
                         barrierDismissible: false,
-                        builder: (context) => Center(
-                          child: CircularProgressIndicator(),
-                        ),
+                        builder:
+                            (context) =>
+                                Center(child: CircularProgressIndicator()),
                       );
 
                       try {
                         // Add address to user details and sync with server
                         final userRepo = UserRepository();
-                        final success = await userRepo.addAddressAndSync(address);
-                        
+                        final success = await userRepo.addAddressAndSync(
+                          address,
+                        );
+
                         // Close loading dialog
                         Navigator.pop(context);
-                        
+
                         if (success) {
-                          // Show success message and go back
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Address saved successfully!'),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
+                          SnackBarHelper.showSuccess(context, Labels.addressSavedSuccessfully);
                           Navigator.pop(context);
                         } else {
+                          SnackBarHelper.showError(context, Labels.failedToSaveAddress);
                           // Show error message
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Failed to save address. Please try again.'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
+                          // ScaffoldMessenger.of(context).showSnackBar(
+                          //   SnackBar(
+                          //     content: Text(
+                          //       'Failed to save address. Please try again.',
+                          //     ),
+                          //     backgroundColor: Colors.red,
+                          //   ),
+                          // );
                         }
                       } catch (e) {
                         // Close loading dialog
                         Navigator.pop(context);
-                        
+                        SnackBarHelper.showError(context, '${Labels.error}: ${e.toString()}');
+
                         // Show error message
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Error: ${e.toString()}'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
+                        // ScaffoldMessenger.of(context).showSnackBar(
+                        //   SnackBar(
+                        //     content: Text('Error: ${e.toString()}'),
+                        //     backgroundColor: Colors.red,
+                        //   ),
+                        // );
                       }
                     }
                   },
-                  child:  Text(Labels.saveAddress,style: TextStyle(
-                    fontFamily: FontFamily.fontsPoppinsSemiBold,
-                    fontSize: 16,
-                    color: Colors.white,
-
-                  ),),
+                  child: Text(
+                    Labels.saveAddress,
+                    style: TextStyle(
+                      fontFamily: FontFamily.fontsPoppinsSemiBold,
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ],
             ),

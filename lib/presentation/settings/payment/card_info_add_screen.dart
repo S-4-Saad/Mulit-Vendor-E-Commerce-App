@@ -5,6 +5,7 @@ import 'package:speezu/core/assets/app_images.dart';
 import 'package:speezu/core/assets/font_family.dart';
 import 'package:speezu/core/theme/theme_bloc/theme_bloc.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
+import 'package:speezu/core/utils/snackbar_helper.dart';
 import 'package:speezu/widgets/custom_app_bar.dart';
 import 'package:speezu/models/card_details_model.dart';
 import 'package:speezu/repositories/user_repository.dart';
@@ -29,7 +30,7 @@ class CardInfoAddScreenState extends State<CardInfoAddScreen> {
 
   bool useFloatingAnimation = true;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  
+
   bool _hasExistingCard = false;
   CardDetailsModel? _existingCard;
   final UserRepository _userRepository = UserRepository();
@@ -55,7 +56,7 @@ class CardInfoAddScreenState extends State<CardInfoAddScreen> {
     cardNumber = card.cardNumber ?? '';
     cardHolderName = card.cardHolderName ?? '';
     cvvCode = card.cvv ?? '';
-    
+
     // Format expiry date from month/year
     if (card.expiryMonth != null && card.expiryYear != null) {
       expiryDate = '${card.expiryMonth}/${card.expiryYear}';
@@ -65,7 +66,9 @@ class CardInfoAddScreenState extends State<CardInfoAddScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: _hasExistingCard ? 'Edit Card' : Labels.addNewCard),
+      appBar: CustomAppBar(
+        title: _hasExistingCard ? Labels.editCard : Labels.addNewCard,
+      ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       // resizeToAvoidBottomInset: false,
       body: Builder(
@@ -80,7 +83,6 @@ class CardInfoAddScreenState extends State<CardInfoAddScreen> {
                           AppThemeMode.light
                       ? AppImages.cardBgLight
                       : AppImages.cardBgDark,
-
                 ),
                 fit: BoxFit.fill,
               ),
@@ -386,7 +388,9 @@ class CardInfoAddScreenState extends State<CardInfoAddScreen> {
                                 ),
                                 onPressed: _onValidate,
                                 child: Text(
-                                  _hasExistingCard ? 'Update Card' : Labels.save,
+                                  _hasExistingCard
+                                      ? Labels.updateCard
+                                      : Labels.save,
                                   style: TextStyle(
                                     color:
                                         Theme.of(context).colorScheme.onPrimary,
@@ -396,7 +400,7 @@ class CardInfoAddScreenState extends State<CardInfoAddScreen> {
                                 ),
                               ),
                             ),
-                            
+
                             // Delete Card Button (only if card exists)
                             if (_hasExistingCard) ...[
                               SizedBox(height: context.heightPct(0.02)),
@@ -424,7 +428,7 @@ class CardInfoAddScreenState extends State<CardInfoAddScreen> {
                                     );
                                   },
                                   child: Text(
-                                    'Delete Card',
+                                    Labels.deleteCard,
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: context.scaledFont(13),
@@ -454,9 +458,7 @@ class CardInfoAddScreenState extends State<CardInfoAddScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => Center(
-          child: CircularProgressIndicator(),
-        ),
+        builder: (context) => Center(child: CircularProgressIndicator()),
       );
 
       try {
@@ -499,35 +501,28 @@ class CardInfoAddScreenState extends State<CardInfoAddScreen> {
 
         if (success) {
           // Show success message and go back
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(_hasExistingCard 
-                  ? 'Card updated successfully!' 
-                  : 'Card added successfully!'),
-              backgroundColor: Colors.green,
-            ),
+          SnackBarHelper.showSuccess(
+            context,
+            _hasExistingCard
+                ? Labels.cardUpdatedSuccess
+                : Labels.cardAddedSuccess,
           );
+
           Navigator.pop(context);
         } else {
           // Show error message
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Failed to ${_hasExistingCard ? 'update' : 'add'} card. Please try again.'),
-              backgroundColor: Colors.red,
-            ),
+          SnackBarHelper.showError(
+            context,
+            '${Labels.failedTo} ${_hasExistingCard ? Labels.updateCard : Labels.addCard}.${Labels.pleaseTryAgain}.',
           );
         }
       } catch (e) {
         // Close loading dialog
         Navigator.pop(context);
+        SnackBarHelper.showError(context, '${Labels.error}: ${e.toString()}');
 
         // Show error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+
       }
     } else {
       print('invalid!');
@@ -564,30 +559,17 @@ class CardInfoAddScreenState extends State<CardInfoAddScreen> {
   Future<void> _deleteCard() async {
     try {
       final success = await _userRepository.removeCard();
-      
+
       if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Card deleted successfully!'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        SnackBarHelper.showSuccess(context, Labels.cardDeletedSuccess);
+
         Navigator.pop(context); // Go back to settings
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to delete card. Please try again.'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        SnackBarHelper.showError(context, Labels.failedToDeleteCard);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: ${e.toString()}'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      SnackBarHelper.showError(context, '${Labels.error}: ${e.toString()}');
+
     }
   }
 }
@@ -615,7 +597,7 @@ class CardDialogs {
               children: [
                 // Title
                 Text(
-                  'Delete Card',
+                  Labels.deleteCard,
                   style: TextStyle(
                     fontSize: 15,
                     fontFamily: FontFamily.fontsPoppinsSemiBold,
@@ -625,7 +607,7 @@ class CardDialogs {
                 SizedBox(height: 10),
                 // Message
                 Text(
-                  'Are you sure you want to delete this card? This action cannot be undone.',
+                  Labels.deleteConfirmation,
                   style: TextStyle(
                     fontSize: 12,
                     fontFamily: FontFamily.fontsPoppinsRegular,
@@ -670,7 +652,7 @@ class CardDialogs {
                         onDelete();
                       },
                       child: Text(
-                        'Delete',
+                        Labels.deleteCard,
                         style: TextStyle(
                           fontSize: 12,
                           fontFamily: FontFamily.fontsPoppinsSemiBold,

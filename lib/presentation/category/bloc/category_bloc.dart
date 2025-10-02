@@ -25,8 +25,10 @@ class CategoryBloc extends Bloc<CategoryEvent,CategoryState> {
     ));
 
     try {
+      print('Loading shops for category: ${event.category}');
       final categoryId = CategoryMapper.getCategoryId(event.category);
       final apiUrl = '$shopsUrl$categoryId';
+      
 
       await ApiService.getMethod(
         apiUrl: apiUrl,

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:speezu/core/assets/font_family.dart';
+import 'package:speezu/core/services/urls.dart';
 import 'package:speezu/core/utils/app_validators.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
+import 'package:speezu/core/utils/snackbar_helper.dart';
 import 'package:speezu/repositories/user_repository.dart';
 import 'package:speezu/widgets/app_cache_image.dart';
 import 'package:speezu/widgets/custom_app_bar.dart';
@@ -18,6 +20,7 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final currentUser = UserRepository().currentUser;
+  UserRepository userRepository = UserRepository();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
@@ -27,7 +30,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _editProfileFormKey = GlobalKey<FormState>();
   final UserRepository _userRepository = UserRepository();
   bool _isLoading = false;
-  
+
   String _originalName = '';
   String _originalPhoneNo = '';
 
@@ -50,7 +53,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void _initializeControllers() {
     _originalName = currentUser?.userData?.name ?? '';
     _originalPhoneNo = currentUser?.userData?.phoneNo ?? '';
-    
+
     nameController.text = _originalName;
     emailController.text = currentUser?.userData?.email ?? '';
     phoneController.text = _originalPhoneNo;
@@ -89,7 +92,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   GestureDetector(
-                    onTap: _showImagePickerDialog,
+                    onTap: () => _showImagePickerBottomSheet(context),
                     child: Stack(
                       children: [
                         // Profile Image
@@ -98,19 +101,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           height: context.heightPct(.13),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.white,
-                              width: 3,
-                            ),
+                            border: Border.all(color: Colors.white, width: 3),
                           ),
                           child: ClipOval(
-                            child: AppCacheImage(
-                              imageUrl: currentUser?.userData?.profileImage ?? 
-                                  'https://tse1.mm.bing.net/th/id/OET.7252da000e8341b2ba1fb61c275c1f30?w=594&h=594&c=7&rs=1&r=0&o=5&pid=1.9&ucfimg=1',
-                              width: context.heightPct(.13),
-                              height: context.heightPct(.13),
-                              round: 500,
-                            ),
+                            child:
+                                _userRepository.selectedImage != null
+                                    ? Image.file(
+                                      _userRepository.selectedImage!,
+                                      width: context.heightPct(.13),
+                                      height: context.heightPct(.13),
+                                      fit: BoxFit.cover,
+                                    )
+                                    : AppCacheImage(
+                                      imageUrl:
+                                         "$imageBaseUrl${currentUser?.userData?.profileImage }"??
+                                          'https://tse1.mm.bing.net/th/id/OET.7252da000e8341b2ba1fb61c275c1f30?w=594&h=594&c=7&rs=1&r=0&o=5&pid=1.9&ucfimg=1',
+                                      width: context.heightPct(.13),
+                                      height: context.heightPct(.13),
+                                      round: 500,
+                                    ),
                           ),
                         ),
                         // Edit Icon
@@ -123,10 +132,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             decoration: BoxDecoration(
                               color: Theme.of(context).colorScheme.primary,
                               shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.white,
-                                width: 2,
-                              ),
+                              border: Border.all(color: Colors.white, width: 2),
                             ),
                             child: Icon(
                               Icons.camera_alt,
@@ -150,121 +156,127 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.person,
-                        color: Theme.of(context).colorScheme.onSecondary,
-                      ),
-                      SizedBox(width: context.widthPct(.05)),
-                      Text(
-                        Labels.name,
-                        style: TextStyle(
-                          fontSize: context.scaledFont(14),
-                          fontFamily: FontFamily.fontsPoppinsSemiBold,
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.person,
                           color: Theme.of(context).colorScheme.onSecondary,
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 5),
-                  CustomTextFormField(
-                    validator: AppValidators.validateRequired,
-                    textEditingController: nameController,
-                    hint: currentUser?.userData?.name ?? Labels.name,
-                    focusNode: nameFocusNode,
-                    nextFocusNode: emailFocusNode,
-                  ),
-                  SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.email_outlined,
-                        color: Theme.of(context).colorScheme.onSecondary,
-                      ),
-                      SizedBox(width: context.widthPct(.05)),
-                      Text(
-                        Labels.emailAddress,
-                        style: TextStyle(
-                          fontSize: context.scaledFont(14),
-                          fontFamily: FontFamily.fontsPoppinsSemiBold,
-                          color: Theme.of(context).colorScheme.onSecondary,
+                        SizedBox(width: context.widthPct(.05)),
+                        Text(
+                          Labels.name,
+                          style: TextStyle(
+                            fontSize: context.scaledFont(14),
+                            fontFamily: FontFamily.fontsPoppinsSemiBold,
+                            color: Theme.of(context).colorScheme.onSecondary,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 5),
-                  CustomTextFormField(
-                    isEnabled: false,
-                    validator: AppValidators.validateEmail,
-                    textEditingController: emailController,
-                    hint: currentUser?.userData?.email ?? Labels.email,
-                    focusNode: emailFocusNode,
-                    nextFocusNode: phoneFocusNode,
-                  ),
-                  SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.phone_android,
-                        color: Theme.of(context).colorScheme.onSecondary,
-                      ),
-                      SizedBox(width: context.widthPct(.05)),
-                      Text(
-                        Labels.phoneNumber,
-                        style: TextStyle(
-                          fontSize: context.scaledFont(14),
-                          fontFamily: FontFamily.fontsPoppinsSemiBold,
-                          color: Theme.of(context).colorScheme.onSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 5),
-                  CustomTextFormField(
-                    validator: AppValidators.validatePhone,
-                    textEditingController: phoneController,
-                    hint: currentUser?.userData?.phoneNo ?? Labels.phone,
-                    focusNode: phoneFocusNode,
-                    nextFocusNode: null,
-                  ),
-                  SizedBox(height: 30),
-                  
-                  // Save Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _hasChanges() 
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.primary.withValues(alpha: 0.6),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      onPressed: _isLoading ? null : _saveProfile,
-                      child: _isLoading
-                          ? SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                              ),
-                            )
-                          : Text(
-                              Labels.save,
-                              style: TextStyle(
-                                fontFamily: FontFamily.fontsPoppinsSemiBold,
-                                fontSize: 16,
-                                color: Colors.white,
-                              ),
-                            ),
+                      ],
                     ),
-                  ),
-                  SizedBox(height: 20),
-                ],
+                    SizedBox(height: 5),
+                    CustomTextFormField(
+                      validator: AppValidators.validateRequired,
+                      textEditingController: nameController,
+                      hint: currentUser?.userData?.name ?? Labels.name,
+                      focusNode: nameFocusNode,
+                      nextFocusNode: emailFocusNode,
+                    ),
+                    SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.email_outlined,
+                          color: Theme.of(context).colorScheme.onSecondary,
+                        ),
+                        SizedBox(width: context.widthPct(.05)),
+                        Text(
+                          Labels.emailAddress,
+                          style: TextStyle(
+                            fontSize: context.scaledFont(14),
+                            fontFamily: FontFamily.fontsPoppinsSemiBold,
+                            color: Theme.of(context).colorScheme.onSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 5),
+                    CustomTextFormField(
+                      isEnabled: false,
+                      validator: AppValidators.validateEmail,
+                      textEditingController: emailController,
+                      hint: currentUser?.userData?.email ?? Labels.email,
+                      focusNode: emailFocusNode,
+                      nextFocusNode: phoneFocusNode,
+                    ),
+                    SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.phone_android,
+                          color: Theme.of(context).colorScheme.onSecondary,
+                        ),
+                        SizedBox(width: context.widthPct(.05)),
+                        Text(
+                          Labels.phoneNumber,
+                          style: TextStyle(
+                            fontSize: context.scaledFont(14),
+                            fontFamily: FontFamily.fontsPoppinsSemiBold,
+                            color: Theme.of(context).colorScheme.onSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 5),
+                    CustomTextFormField(
+                      validator: AppValidators.validatePhone,
+                      textEditingController: phoneController,
+                      hint: currentUser?.userData?.phoneNo ?? Labels.phone,
+                      focusNode: phoneFocusNode,
+                      nextFocusNode: null,
+                    ),
+                    SizedBox(height: 30),
+
+                    // Save Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              _hasChanges()
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withValues(alpha: 0.6),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: _isLoading ? null : _saveProfile,
+                        child:
+                            _isLoading
+                                ? SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                )
+                                : Text(
+                                  Labels.save,
+                                  style: TextStyle(
+                                    fontFamily: FontFamily.fontsPoppinsSemiBold,
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                  ],
                 ),
               ),
             ),
@@ -277,21 +289,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   bool _hasChanges() {
     final currentName = nameController.text.trim();
     final currentPhone = phoneController.text.trim();
-    
-    return currentName != _originalName || 
-           currentPhone != _originalPhoneNo;
+    final originalImage = _userRepository.selectedImage;
+
+    return currentName != _originalName ||
+        currentPhone != _originalPhoneNo ||
+        originalImage != null;
   }
 
   Future<void> _saveProfile() async {
     if (_editProfileFormKey.currentState!.validate()) {
       // Check if there are any changes
       if (!_hasChanges()) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('No changes detected. Profile is already up to date.'),
-            backgroundColor: Colors.blue,
-          ),
+        SnackBarHelper.showError(
+          context,
+         Labels.noChanges,
         );
+
         return;
       }
 
@@ -303,6 +316,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         final success = await _userRepository.updateBasicProfile(
           name: nameController.text.trim(),
           phoneNo: phoneController.text.trim(),
+          profilePicture: _userRepository.selectedImage,
         );
 
         setState(() {
@@ -313,86 +327,97 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           // Update original values after successful save
           _originalName = nameController.text.trim();
           _originalPhoneNo = phoneController.text.trim();
-          
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Profile updated successfully!'),
-              backgroundColor: Colors.green,
-            ),
-          );
+          SnackBarHelper.showSuccess(context, Labels.profileUpdateSuccessfully);
+
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(
+          //     content: Text('Profile updated successfully!'),
+          //     backgroundColor: Colors.green,
+          //   ),
+          // );
           Navigator.pop(context);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Failed to update profile. Please try again.'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          SnackBarHelper.showError(context, Labels.profileUpdateFailed);
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(
+          //     content: Text('Failed to update profile. Please try again.'),
+          //     backgroundColor: Colors.red,
+          //   ),
+          // );
         }
       } catch (e) {
         setState(() {
           _isLoading = false;
         });
+SnackBarHelper.showError(context, 'Error: ${e.toString()}');
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
       }
     }
   }
 
-  void _showImagePickerDialog() {
-    showDialog(
+  void _showImagePickerBottomSheet(BuildContext context) {
+    final userRepo = UserRepository();
+
+    showModalBottomSheet(
       context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Select Profile Photo',
-            style: TextStyle(
-              fontFamily: FontFamily.fontsPoppinsSemiBold,
-              fontSize: 16,
-            ),
-          ),
-          content: Column(
+        return SafeArea(
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: Icon(Icons.camera_alt),
-                title: Text('Camera'),
-                onTap: () {
+                leading: Icon(
+                  Icons.camera_alt,
+                  color: Theme.of(context).colorScheme.onSecondary,
+                ),
+                title: Text(
+                  Labels.camera,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSecondary,
+                    fontFamily: FontFamily.fontsPoppinsRegular,
+                  ),
+                ),
+                onTap: () async {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Camera functionality will be added soon'),
-                      backgroundColor: Colors.blue,
-                    ),
-                  );
+                  await userRepo.pickImageFromCamera();
+                  setState(() {});
+                  if (userRepo.selectedImage != null) {
+                    SnackBarHelper.showSuccess(context, Labels.imageCaptured);
+                    // ScaffoldMessenger.of(context).showSnackBar(
+                    //   const SnackBar(
+                    //     content: Text('Image captured successfully'),
+                    //   ),
+                    // );
+                  }
                 },
               ),
               ListTile(
-                leading: Icon(Icons.photo_library),
-                title: Text('Gallery'),
-                onTap: () {
+                leading: Icon(
+                  Icons.photo_library,
+                  color: Theme.of(context).colorScheme.onSecondary,
+                ),
+                title: Text(
+                  Labels.gallery,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSecondary,
+                    fontFamily: FontFamily.fontsPoppinsRegular,
+                  ),
+                ),
+                onTap: () async {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Gallery functionality will be added soon'),
-                      backgroundColor: Colors.blue,
-                    ),
-                  );
+                  await userRepo.pickImageFromGallery();
+                  setState(() {});
+                  if (userRepo.selectedImage != null) {
+                    SnackBarHelper.showSuccess(context, Labels.imagePicked);
+
+                  }
                 },
               ),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('Cancel'),
-            ),
-          ],
         );
       },
     );

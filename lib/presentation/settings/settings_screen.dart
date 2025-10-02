@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:speezu/core/assets/font_family.dart';
+import 'package:speezu/core/services/urls.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
+import 'package:speezu/presentation/auth/change_password_screen.dart';
 import 'package:speezu/repositories/user_repository.dart';
 import 'package:speezu/routes/route_names.dart';
 import 'package:speezu/widgets/app_cache_image.dart';
@@ -53,7 +55,7 @@ class SettingsScreen extends StatelessWidget {
                     boxFit: BoxFit.fill,
                     round: 500,
                     imageUrl:
-                        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTSLU5_eUUGBfxfxRd4IquPiEwLbt4E_6RYMw&s",
+                      '$imageBaseUrl${userData?.profileImage}',
                   ),
                 ),
               ),
@@ -319,8 +321,7 @@ class SettingsScreen extends StatelessWidget {
                     SizedBox(height: context.heightPct(.01)),
                     ListTile(
                       onTap: () {
-                        // Navigator.pushNamed(context, RouteNames.languagesScreen);
-                      },
+Navigator.push(context, MaterialPageRoute(builder: (context) => ChangePasswordScreen(),));                      },
                       leading: Icon(
                         Icons.password_outlined,
                         color: Theme.of(context).colorScheme.onSecondary,

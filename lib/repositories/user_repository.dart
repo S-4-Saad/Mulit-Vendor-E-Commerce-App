@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import 'package:speezu/models/user_model.dart';
 import 'package:speezu/models/cart_model.dart';
 import '../core/services/localStorage/my-local-controller.dart';
@@ -16,6 +18,31 @@ class UserRepository {
   factory UserRepository() => _instance;
 
   UserRepository._internal();
+   File? selectedImage; // variable to store the image
+  final ImagePicker _picker = ImagePicker();
+
+  // Pick from gallery
+  Future<void> pickImageFromGallery() async {
+    final XFile? pickedFile = await _picker.pickImage(
+      source: ImageSource.gallery,
+    );
+
+    if (pickedFile != null) {
+      selectedImage = File(pickedFile.path);
+    }
+  }
+
+  // Capture from camera
+  Future<void> pickImageFromCamera() async {
+    final XFile? pickedFile = await _picker.pickImage(
+      source: ImageSource.camera,
+    );
+
+    if (pickedFile != null) {
+      selectedImage = File(pickedFile.path);
+    }
+  }
+
 
   Future<void> init() async {
     await loadInitialData();
@@ -102,48 +129,101 @@ class UserRepository {
     _cartController.close();
   }
 
-  // User Details Management Methods
+  // // User Details Management Methods
+  // Future<bool> updateBasicProfile({
+  //   String? name,
+  //   String? phoneNo,
+  //   File? profilePicture,
+  // }) async {
+  //   if (_currentUser?.userData == null) return false;
+  //
+  //   // Prepare the request data
+  //   Map<String, dynamic> requestData = {
+  //     'user_id': _currentUser!.userData!.id,
+  //   };
+  //
+  //   // Add fields only if they are provided
+  //   if (name != null) requestData['name'] = name;
+  //   if (phoneNo != null) requestData['phone_no'] = phoneNo;
+  //   if (profilePicture != null) requestData['profile_picture'] = profilePicture;
+  //
+  //   // Always include user_details JSON (even if empty)
+  //   requestData['user_details'] = _currentUser!.userData!.userDetails?.toJson() ?? {};
+  //
+  //   // Use Completer to wait for the callback
+  //   final completer = Completer<bool>();
+  //
+  //   await ApiService.postMultipartMethod(
+  //     file: profilePicture,
+  //     apiUrl: updateUserDetailsUrl,
+  //     formData: requestData,
+  //     authHeader: true,
+  //     executionMethod: (success, responseData) async {
+  //       if (success && responseData['success'] == true) {
+  //         log("Basic profile update API success: ${responseData['message']}");
+  //
+  //         // Parse the updated user data from response
+  //         final updatedUser = UserModel.fromJson(responseData);
+  //
+  //         // Update the current user with the response data
+  //         _currentUser = updatedUser;
+  //
+  //         // Save the updated user data locally
+  //         await setUser(_currentUser!);
+  //
+  //         log("Basic profile updated successfully on server and locally");
+  //         completer.complete(true);
+  //       } else {
+  //         log("API returned success: false - ${responseData['message']}");
+  //         completer.complete(false);
+  //       }
+  //     },
+  //   );
+  //
+  //   return await completer.future;
+  // }
+// User Details Management Methods
   Future<bool> updateBasicProfile({
     String? name,
     String? phoneNo,
-    String? profilePicture,
+    File? profilePicture,
   }) async {
     if (_currentUser?.userData == null) return false;
-    
-    // Prepare the request data
+
+    // Prepare only text/JSON fields (no File objects here)
     Map<String, dynamic> requestData = {
-      'user_id': _currentUser!.userData!.id,
+      'user_id': _currentUser!.userData!.id.toString(),
     };
-    
-    // Add fields only if they are provided
+
     if (name != null) requestData['name'] = name;
     if (phoneNo != null) requestData['phone_no'] = phoneNo;
-    if (profilePicture != null) requestData['profile_picture'] = profilePicture;
-    
-    // Always include user_details JSON (even if empty)
-    requestData['user_details'] = _currentUser!.userData!.userDetails?.toJson() ?? {};
-    
-    // Use Completer to wait for the callback
+
+    // Always include user_details JSON (stringify for form-data)
+    requestData['user_details'] =
+        jsonEncode(_currentUser!.userData!.userDetails?.toJson() ?? {});
+
+    // Use Completer to wait for callback
     final completer = Completer<bool>();
-    
-    await ApiService.postMethod(
+
+    await ApiService.postMultipartMethod(
       apiUrl: updateUserDetailsUrl,
-      postData: requestData,
+      formData: requestData,              // only text + JSON
+      file: profilePicture,               // actual file goes here
+      fileKey: 'profile_picture',         // backend field name
       authHeader: true,
       executionMethod: (success, responseData) async {
         if (success && responseData['success'] == true) {
           log("Basic profile update API success: ${responseData['message']}");
-          
-          // Parse the updated user data from response
+
+          // Parse updated user data
           final updatedUser = UserModel.fromJson(responseData);
-          
-          // Update the current user with the response data
+
+          // Update current user in memory + local storage
           _currentUser = updatedUser;
-          
-          // Save the updated user data locally
           await setUser(_currentUser!);
-          
+
           log("Basic profile updated successfully on server and locally");
+          selectedImage = null; // Clear selected image after successful upload
           completer.complete(true);
         } else {
           log("API returned success: false - ${responseData['message']}");
@@ -151,8 +231,8 @@ class UserRepository {
         }
       },
     );
-    
-    return await completer.future;
+
+    return completer.future;
   }
 
   Future<bool> updateUserDetailsOnServer() async {

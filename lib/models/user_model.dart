@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'dart:developer';
 import 'user_details_model.dart';
@@ -50,7 +49,7 @@ class UserData {
     name = json['name'];
     email = json['email'];
     phoneNo = json['phone_no'];
-    
+
     // Parse user_details - it can be a Map, String (JSON), or UserDetailsModel
     if (json['user_details'] != null) {
       if (json['user_details'] is Map<String, dynamic>) {
@@ -62,11 +61,14 @@ class UserData {
           userDetails = UserDetailsModel();
         } else {
           try {
-            final Map<String, dynamic> parsedJson = jsonDecode(userDetailsString);
+            final Map<String, dynamic> parsedJson = jsonDecode(
+              userDetailsString,
+            );
             userDetails = UserDetailsModel.fromJson(parsedJson);
           } catch (e) {
             log("Error parsing user_details JSON string: $e");
-            userDetails = UserDetailsModel(); // Fallback to empty UserDetailsModel
+            userDetails =
+                UserDetailsModel(); // Fallback to empty UserDetailsModel
           }
         }
       } else {
@@ -76,7 +78,7 @@ class UserData {
     } else {
       userDetails = UserDetailsModel();
     }
-    
+
     profileImage = json['profile_picture'];
   }
 
@@ -94,9 +96,9 @@ class UserData {
   // Helper methods for easier access to user details
   List<AddressModel>? get deliveryAddresses => userDetails?.deliveryAddresses;
   CardDetailsModel? get cardDetails => userDetails?.cardDetails;
-  
+
   void addAddress(AddressModel address) => userDetails?.addAddress(address);
   void setCard(CardDetailsModel card) => userDetails?.setCard(card);
-  void setDefaultAddress(String addressId) => userDetails?.setDefaultAddress(addressId);
+  void setDefaultAddress(String addressId) =>
+      userDetails?.setDefaultAddress(addressId);
 }
-
