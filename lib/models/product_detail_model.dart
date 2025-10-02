@@ -59,30 +59,42 @@ class ShopBoxModel {
 }
 
 class ProductVariation {
-  final String parentName;          // e.g. "Fajita", "Malai Boti"
-  final String parentOptionName;    // e.g. "Flavor"
+  final String id;
+  final String parentName;
+  final String parentOptionName;
   final double parentPrice;
+  final double parentOriginalPrice;
+  final double parentDiscountPercentage;
   final List<ProductSubVariation> children;
 
   ProductVariation({
+    required this.id,
     required this.parentName,
     required this.parentOptionName,
     required this.parentPrice,
+    required this.parentOriginalPrice,
+    required this.parentDiscountPercentage,
     required this.children,
   });
 }
 
 class ProductSubVariation {
-  final String name;                // e.g. "Large", "Medium", "Small"
-  final String childOptionName;     // e.g. "Size"
+  final String id;
+  final String name;
+  final String childOptionName;
   final double price;
+  final double originalPrice;
+  final double discountPercentage;
   final int stock;
   final int stockTotal;
 
   ProductSubVariation({
+    required this.id,
     required this.name,
     required this.childOptionName,
     required this.price,
+    required this.originalPrice,
+    required this.discountPercentage,
     required this.stock,
     required this.stockTotal,
   });

@@ -19,3 +19,5 @@ const String resCategoriesUrl = "$baseUrl/category/";
 const String resProductsUrl = "$baseUrl/product/";
 const String addProductUrl = "$baseUrl/all-products/";
 const String productDetailUrl = "$baseUrl/product-detail/";
+const String placeOrderUrl = "$baseUrl/create-order";
+const String orderHistoryUrl = "$baseUrl/order-history";

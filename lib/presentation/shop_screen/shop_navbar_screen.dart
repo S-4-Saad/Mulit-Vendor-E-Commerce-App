@@ -3,16 +3,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/assets/font_family.dart';
 import 'package:speezu/core/utils/labels.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
+import 'package:speezu/routes/route_names.dart';
 import '../nav_bar_screen/bloc/nav_bar_bloc.dart';
 import '../nav_bar_screen/bloc/nav_bar_event.dart';
 import '../nav_bar_screen/bloc/nav_bar_state.dart';
+import '../cart/bloc/cart_bloc.dart';
+import '../cart/bloc/cart_state.dart';
 
 class ShopNavbarScreen extends StatelessWidget {
   final dynamic shopCurrentTab;
   final int? storeId;
 
   ShopNavbarScreen({super.key, this.shopCurrentTab, this.storeId});
-  List<String> screenTitles = [
+  final List<String> screenTitles = [
     Labels.shop,
     Labels.mapExplorer,
     Labels.shopProducts,
@@ -32,12 +35,48 @@ class ShopNavbarScreen extends StatelessWidget {
               centerTitle: true,
               backgroundColor: Theme.of(context).colorScheme.onPrimary,
               actions: [
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(
-                    Icons.shopping_cart,
-                    color: Theme.of(context).colorScheme.secondary,
-                  ),
+                BlocBuilder<CartBloc, CartState>(
+                  builder: (context, cartState) {
+                    final cartCount = cartState.totalItems;
+                    return Stack(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, RouteNames.cartScreen);
+                          },
+                          icon: Icon(
+                            Icons.shopping_cart,
+                            color: Theme.of(context).colorScheme.secondary,
+                          ),
+                        ),
+                        if (cartCount > 0)
+                          Positioned(
+                            right: 2,
+                            top: 2,
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 20,
+                                minHeight: 20,
+                              ),
+                              child: Text(
+                                cartCount.toString(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
                 ),
               ],
               leading: IconButton(

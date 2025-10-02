@@ -1,5 +1,11 @@
 import 'package:equatable/equatable.dart';
 import '../../../models/product_detail_model.dart';
+import '../../../models/cart_model.dart';
+import '../../../models/address_model.dart';
+import '../../../models/card_details_model.dart';
+import '../../../models/payment_model.dart';
+
+enum CheckoutMethod { pickup, delivery }
 
 abstract class CartEvent extends Equatable {
   @override
@@ -13,6 +19,8 @@ class AddToCart extends CartEvent {
   final String? variationParentValue;
   final String? variationChildName;
   final String? variationChildValue;
+  final String? variationParentId;
+  final String? variationChildId;
 
   AddToCart({
     required this.product,
@@ -21,6 +29,8 @@ class AddToCart extends CartEvent {
     this.variationParentValue,
     this.variationChildName,
     this.variationChildValue,
+    this.variationParentId,
+    this.variationChildId,
   });
 
   @override
@@ -31,6 +41,8 @@ class AddToCart extends CartEvent {
         variationParentValue,
         variationChildName,
         variationChildValue,
+        variationParentId,
+        variationChildId,
       ];
 }
 
@@ -102,3 +114,112 @@ class ClearCartForNewStore extends CartEvent {
   @override
   List<Object?> get props => [newStoreId];
 }
+
+class AuthenticationRequired extends CartEvent {
+  final String message;
+
+  AuthenticationRequired({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class LoadCartFromStorage extends CartEvent {}
+
+class SaveCartToStorage extends CartEvent {
+  final Cart cart;
+
+  SaveCartToStorage({required this.cart});
+
+  @override
+  List<Object?> get props => [cart];
+}
+
+class ClearCartOnLogout extends CartEvent {}
+
+// Checkout related events
+class SetCheckoutMethod extends CartEvent {
+  final CheckoutMethod method;
+
+  SetCheckoutMethod({required this.method});
+
+  @override
+  List<Object?> get props => [method];
+}
+
+class SetSelectedAddress extends CartEvent {
+  final AddressModel? address;
+
+  SetSelectedAddress({this.address});
+
+  @override
+  List<Object?> get props => [address];
+}
+
+class SetDeliveryInstructions extends CartEvent {
+  final String? instructions;
+
+  SetDeliveryInstructions({this.instructions});
+
+  @override
+  List<Object?> get props => [instructions];
+}
+
+class SetAddresses extends CartEvent {
+  final List<AddressModel> addresses;
+
+  SetAddresses({required this.addresses});
+
+  @override
+  List<Object?> get props => [addresses];
+}
+
+class SetSelectedCard extends CartEvent {
+  final CardDetailsModel? card;
+
+  SetSelectedCard({this.card});
+
+  @override
+  List<Object?> get props => [card];
+}
+
+class SetPaymentResult extends CartEvent {
+  final PaymentResult? paymentResult;
+
+  SetPaymentResult({this.paymentResult});
+
+  @override
+  List<Object?> get props => [paymentResult];
+}
+
+class ProcessOrder extends CartEvent {
+  final String paymentMethod;
+  final PaymentResult? paymentResult;
+  final CardDetailsModel? selectedCard;
+
+  ProcessOrder({
+    required this.paymentMethod,
+    this.paymentResult,
+    this.selectedCard,
+  });
+
+  @override
+  List<Object?> get props => [paymentMethod, paymentResult, selectedCard];
+}
+
+class PostOrder extends CartEvent {
+  final String paymentMethod;
+  final PaymentResult? paymentResult;
+  final CardDetailsModel? selectedCard;
+
+  PostOrder({
+    required this.paymentMethod,
+    this.paymentResult,
+    this.selectedCard,
+  });
+
+  @override
+  List<Object?> get props => [paymentMethod, paymentResult, selectedCard];
+}
+
+class ResetCheckout extends CartEvent {}

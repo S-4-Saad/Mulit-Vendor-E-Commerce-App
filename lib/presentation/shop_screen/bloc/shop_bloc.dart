@@ -84,6 +84,7 @@ class ShopBloc extends Bloc<ShopEvent, ShopState> {
       currentProducts: [],
       currentCategoryId: null,
       tabCurrentIndex: 0,
+      productsStatus: ProductsStatus.initial, // Explicitly set to initial instead of loading
     ));
 
     try {
@@ -163,25 +164,8 @@ class ShopBloc extends Bloc<ShopEvent, ShopState> {
     ));
 
     try {
-      // For "All Products" category (id "0"), we don't need to fetch from server
-      // We'll combine products from all categories
-      if (event.categoryId == "0") {
-        final allProducts = <DummyProductModel>[];
-        for (final category in state.categories.skip(1)) {
-          // Load products for each category
-          final categoryProducts = await _fetchProductsForCategory(event.storeId, category.id);
-          allProducts.addAll(categoryProducts);
-        }
-        
-        emit(state.copyWith(
-          productsStatus: ProductsStatus.success,
-          currentProducts: allProducts,
-          message: 'All products loaded successfully',
-        ));
-        return;
-      }
-
-      // Fetch products for specific category
+      // Fetch products for category (including "All Products" with id "0")
+      // Backend handles categoryId "0" by returning all products for the store
       final products = await _fetchProductsForCategory(event.storeId, event.categoryId);
       
       emit(state.copyWith(
@@ -232,4 +216,5 @@ class ShopBloc extends Bloc<ShopEvent, ShopState> {
     
     return products;
   }
+
 }

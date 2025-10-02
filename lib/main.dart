@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:speezu/core/theme/theme_bloc/theme_state.dart';
 import 'package:speezu/presentation/auth/bloc/auth_bloc.dart';
 import 'package:speezu/presentation/category/bloc/category_bloc.dart';
@@ -36,6 +37,13 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Load environment variables
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    print('Warning: .env file not found. Using default values.');
+  }
   await EasyLocalization.ensureInitialized();
   // If you want immersive UI without hiding bars completely:
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
