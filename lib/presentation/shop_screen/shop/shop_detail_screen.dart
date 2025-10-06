@@ -2,18 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/assets/font_family.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
+import 'package:speezu/models/store_detail_model.dart';
 import 'package:speezu/widgets/image_gallery_viewer_widget.dart';
+import 'package:speezu/widgets/product_review_box.dart';
 
 import '../../../core/utils/labels.dart';
-import '../../../models/store_model.dart';
 import '../../../widgets/business_hours_widget.dart';
-import '../../../widgets/custom_action_container.dart';
 import '../../../widgets/image_type_extention.dart';
 import '../../../widgets/open_status_container.dart';
-import '../../../widgets/product_review_box.dart';
 import '../../../widgets/rating_display_widget.dart';
 import '../../../widgets/shop_detail_shimmer_widget.dart';
-import '../../review/shop_review_screen.dart';
 import '../bloc/shop_bloc.dart';
 import '../bloc/shop_event.dart';
 import '../bloc/shop_state.dart';
@@ -71,40 +69,63 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
           );
         }
         
-        // Use API data if available, otherwise fallback to dummy data
-        final store = state.shopDetailStatus == ShopDetailStatus.success && state.storeDetail != null
-            ? state.storeDetail!.toStore()
-            : _getDummyStore();
+        // Check if storeDetail is available and status is success
+        if (state.shopDetailStatus == ShopDetailStatus.success && state.storeDetail != null) {
+          return _buildStoreDetail(context, state.storeDetail!);
+        }
         
-        return _buildStoreDetail(context, store);
+        // If we reach here, something went wrong - show error
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, size: 64, color: Colors.red),
+              SizedBox(height: 16),
+              Text(
+                'Store details not available',
+                style: TextStyle(fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  if (widget.storeId != null) {
+                    context.read<ShopBloc>().add(LoadShopDetailEvent(storeId: widget.storeId!));
+                  }
+                },
+                child: Text('Retry'),
+              ),
+            ],
+          ),
+        );
       },
     );
   }
 
-  Store _getDummyStore() {
-    return Store(
-      ratting: 4.5,
-      isDelivering: true,
-      isOpen: true,
-      openingTime: '9 AM',
-      closingTime: "10 PM",
-      id: "1",
-      name: "Sample Store",
-      image: "https://via.placeholder.com/400x300",
-      moreImages: [],
-      latitude: 0.0,
-      longitude: 0.0,
-      description: "Sample store description",
-      information: "Sample store information",
-      whatsappNumber: "",
-      primaryNumber: "",
-      secondaryNumber: "",
-      address: "Sample Address",
-      reviews: [],
-    );
-  }
+  // Store _getDummyStore() {
+  //   return Store(
+  //     ratting: 4.5,
+  //     isDelivering: true,
+  //     isOpen: true,
+  //     openingTime: '9 AM',
+  //     closingTime: "10 PM",
+  //     id: "1",
+  //     name: "Sample Store",
+  //     image: "https://via.placeholder.com/400x300",
+  //     moreImages: [],
+  //     latitude: 0.0,
+  //     longitude: 0.0,
+  //     description: "Sample store description",
+  //     information: "Sample store information",
+  //     whatsappNumber: "",
+  //     primaryNumber: "",
+  //     secondaryNumber: "",
+  //     address: "Sample Address",
+  //     reviews: [],
+  //   );
+  // }
 
-  Widget _buildStoreDetail(BuildContext context, Store store) {
+  Widget _buildStoreDetail(BuildContext context, StoreDetailModel storeModel) {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -133,7 +154,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
               collapseMode: CollapseMode.parallax,
               background: CustomImageView(
                 fit: BoxFit.cover,
-                imagePath: store.image,
+                imagePath: storeModel.store?.image ?? '',
               ),
             ),
           ),
@@ -150,7 +171,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                         children: [
                           Expanded(
                             child: Text(
-                              store.name,
+                           storeModel.store?.name ?? '',
                               style: TextStyle(
                                 fontFamily: FontFamily.fontsPoppinsSemiBold,
                                 color:
@@ -172,7 +193,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                               ),
                               const SizedBox(width: 5),
                               Text(
-                                store.ratting.toStringAsFixed(1),
+                            (storeModel.store?.rating ?? 0).toString(),
                                 style: TextStyle(
                                   fontFamily: FontFamily.fontsPoppinsLight,
                                   color:
@@ -220,7 +241,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       ),
                       SizedBox(height: context.heightPct(.02)),
                       Text(
-                        store.description,
+                    storeModel.store?.description ?? '',
                         style: TextStyle(
                           fontFamily: FontFamily.fontsPoppinsLight,
 
@@ -234,7 +255,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           padding: const EdgeInsets.all(12),
-                          itemCount: store.moreImages.length,
+                          itemCount: (storeModel.store?.moreImages ?? []).length,
                           separatorBuilder:
                               (_, __) => const SizedBox(width: 10),
                           itemBuilder: (context, index) {
@@ -245,7 +266,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                   MaterialPageRoute(
                                     builder:
                                         (context) => ImageGalleryViewer(
-                                          imageUrls: store.moreImages,
+                                          imageUrls: storeModel.store?.moreImages ?? [],
                                           initialIndex: index,
                                         ),
                                   ),
@@ -254,7 +275,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                               },
                               radius: BorderRadius.circular(10),
 
-                              imagePath: store.moreImages[index],
+                              imagePath: (storeModel.store?.moreImages ?? [])[index],
                               width: context.widthPct(.55),
                               fit: BoxFit.cover,
                             );
@@ -263,8 +284,8 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       ),
                       SizedBox(height: context.heightPct(.01)),
                       BusinessHoursWidget(
-                        openingTime: store.openingTime,
-                        closingTime: store.closingTime,
+                        openingTime: storeModel.store?.openingTime ?? '',
+                        closingTime: storeModel.store?.closingTime ?? '',
                       ),
 
                       SizedBox(height: context.heightPct(.01)),
@@ -276,18 +297,18 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       //   onTap: () {},
                       // ),
                       // SizedBox(height: context.heightPct(.01)),
-                      CustomActionContainer(
-                        text: store.address,
-                        icon: Icons.directions,
-                        onTap: () {},
-                      ),
+                      // CustomActionContainer(
+                      //   text: storeModel.store!.??'',
+                      //   icon: Icons.directions,
+                      //   onTap: () {},
+                      // ),
                       SizedBox(height: context.heightPct(.01)),
-                      CustomActionContainer(
-                        text:
-                            '${store.primaryNumber}\n${store.secondaryNumber}',
-                        icon: Icons.phone,
-                        onTap: () {},
-                      ),
+                      // CustomActionContainer(
+                      //   text:
+                      //       '${storeModel.store!.}\n${storeModel.store!.secondaryNumber}',
+                      //   icon: Icons.phone,
+                      //   onTap: () {},
+                      // ),
                       SizedBox(height: context.heightPct(.02)),
                       Row(
                         children: [
@@ -308,7 +329,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                         ],
                       ),
                       Text(
-                        store.information,
+                       storeModel.store?.description ?? '',
                         style: TextStyle(
                           fontFamily: FontFamily.fontsPoppinsLight,
 
@@ -350,7 +371,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                 ),
                                 SizedBox(width: 5),
                                 Text(
-                                  '(${store.reviews.length})',
+                                  '(${(storeModel.store?.reviews ?? []).length})',
                                   style: TextStyle(
                                     fontSize: context.scaledFont(12),
                                     fontFamily: FontFamily.fontsPoppinsRegular,
@@ -364,7 +385,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                 Row(
                                   children: [
                                     Text(
-                                      store.ratting.toStringAsFixed(1),
+                                 (storeModel.store?.rating ?? 0).toString(),
                                       style: TextStyle(
                                         fontSize: context.scaledFont(14),
                                         fontFamily: FontFamily.fontsPoppinsBold,
@@ -375,7 +396,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                       ),
                                     ),
                                     RatingDisplayWidget(
-                                      rating: store.ratting,
+                                      rating: (storeModel.store?.rating ?? 0).toDouble(),
                                       starSize: context.scaledFont(16),
                                     ),
                                     // Icon(Icons.arrow_forward_ios_rounded, size: 15.w),
@@ -383,15 +404,15 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                 ),
                                 IconButton(
                                   onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (context) => ProductReviewsScreen(
-                                              store: store,
-                                            ),
-                                      ),
-                                    );
+                                    // Navigator.push(
+                                    //   context,
+                                    //   MaterialPageRoute(
+                                    //     builder:
+                                    //         (context) => ProductReviewsScreen(
+                                    //           store: store,
+                                    //         ),
+                                    //   ),
+                                    // );
                                   },
                                   icon: Icon(
                                     Icons.arrow_forward_ios_rounded,
@@ -408,7 +429,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                               ).colorScheme.outline.withValues(alpha: 0.3),
                             ),
                             // Display up to 4 reviews
-                            if (store.reviews.isNotEmpty)
+                            if (storeModel.store!.reviews!.isNotEmpty)
                               ListView.separated(
                                 padding: const EdgeInsets.only(top: 0),
                                 separatorBuilder:
@@ -421,40 +442,38 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                 physics: const NeverScrollableScrollPhysics(),
                                 shrinkWrap: true,
                                 itemCount:
-                                    store.reviews.length > 3
+                                    storeModel.store!.reviews!.length > 3
                                         ? 3
-                                        : store.reviews.length, // Limit to 4 reviews
+                                        : storeModel.store!.reviews!.length, // Limit to 4 reviews
                                 itemBuilder: (context, index) {
-                                  final review = store.reviews[index];
+                                  final review = storeModel.store!.reviews![index];
                                   return ProductReviewBox(
-                                    userName: review.username,
+                                    userName: review.userName??'',
                                     review:
-                                        review.reviewText,
-                                    rating: review.rating,
+                                        review.review??'',
+                                    rating: double.parse(review.rating?.toString()??'0'),
                                     imgUrl:
-                                        review.images.isNotEmpty
-                                            ? review.images.first
-                                            : 'https://via.placeholder.com/55',
+                                         'https://via.placeholder.com/55',
                                   );
                                 },
                               ),
                             // Show "See All Reviews" if there are more than 4 reviews
-                            if (store.reviews.length > 4)
+                            // if (storeModel.store!.lastReviews!.length > 4)
                               Center(
                                 child: TextButton(
                                   onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (context) => ProductReviewsScreen(
-                                              store: store,
-                                            ),
-                                      ),
-                                    );
+                                    // Navigator.push(
+                                    //   context,
+                                    //   MaterialPageRoute(
+                                    //     builder:
+                                    //         (context) => ProductReviewsScreen(
+                                    //           store: store,
+                                    //         ),
+                                    //   ),
+                                    // );
                                   },
                                   child: Text(
-                                    '${Labels.seeAllReviews} (${store.reviews.length})',
+                                    '${Labels.seeAllReviews} (${storeModel.store!.reviews!.length})',
                                     style: TextStyle(
                                       fontSize: context.scaledFont(12),
                                       fontFamily:

@@ -40,10 +40,11 @@ class ShopBloc extends Bloc<ShopEvent, ShopState> {
           if (success) {
             try {
               StoreDetailModel storeDetailModel = StoreDetailModel.fromJson(responseData);
-              if (storeDetailModel.stores != null && storeDetailModel.stores!.isNotEmpty) {
+              if (storeDetailModel.store != null) {
+print(storeDetailModel.store?.toJson());
                 emit(state.copyWith(
                   shopDetailStatus: ShopDetailStatus.success,
-                  storeDetail: storeDetailModel.stores!.first,
+                  storeDetail: storeDetailModel,
                   message: storeDetailModel.message,
                 ));
               } else {

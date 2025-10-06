@@ -11,7 +11,7 @@ class ShopState extends Equatable {
   final String message;
   final int tabCurrentIndex;
   final ShopDetailStatus shopDetailStatus;
-  final StoreDetail? storeDetail;
+  final StoreDetailModel? storeDetail;
   final CategoriesStatus categoriesStatus;
   final List<Category> categories;
   final ProductsStatus productsStatus;
@@ -34,7 +34,7 @@ class ShopState extends Equatable {
     String? message, 
     int? tabCurrentIndex,
     ShopDetailStatus? shopDetailStatus,
-    StoreDetail? storeDetail,
+    StoreDetailModel? storeDetail,
     CategoriesStatus? categoriesStatus,
     List<Category>? categories,
     ProductsStatus? productsStatus,
