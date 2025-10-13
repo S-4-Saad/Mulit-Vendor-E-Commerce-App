@@ -20,10 +20,10 @@ class ReviewGraphWidget extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(10),
+      padding: EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.onSecondary
-            .withValues(alpha: 0.1), // Light gray background
+            .withValues(alpha: 0.06), // Light gray background
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(

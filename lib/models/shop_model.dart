@@ -10,6 +10,7 @@ class ShopModel {
   final bool isDelivering;
   final double latitude;
   final double longitude;
+   double? distance;
 
   ShopModel({
     required this.id,
@@ -21,6 +22,7 @@ class ShopModel {
     required this.isDelivering,
     required this.latitude,
     required this.longitude,
+    this.distance,
   });
 
   factory ShopModel.fromJson(Map<String, dynamic> json) {
@@ -38,6 +40,9 @@ class ShopModel {
       isDelivering: (json['is_delivery'] ?? 0) == 1,
       latitude: double.tryParse(json['latitude']?.toString() ?? '0.0') ?? 0.0,
       longitude: double.tryParse(json['longitude']?.toString() ?? '0.0') ?? 0.0,
+      distance: json.containsKey('distance')
+          ? double.tryParse(json['distance']?.toString() ?? '0.0') ?? 0.0
+          : null,
     );
   }
 
@@ -52,6 +57,7 @@ class ShopModel {
       'latitude': latitude.toString(),
       'longitude': longitude.toString(),
       'rating': shopRating.toString(),
+      if (distance != null) 'distance': distance.toString(),
     };
   }
 }

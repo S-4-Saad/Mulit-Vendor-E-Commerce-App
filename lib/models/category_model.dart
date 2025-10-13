@@ -45,7 +45,7 @@ class CategoryData {
   }
 
   // Convert to Category for UI compatibility
-  Category toCategory({List<DummyProductModel> products = const []}) {
+  Category toCategory({List<ProductModel> products = const []}) {
     // Construct full image URL if the image path is relative
     String fullImageUrl = image;
     if (!image.startsWith('http')) {

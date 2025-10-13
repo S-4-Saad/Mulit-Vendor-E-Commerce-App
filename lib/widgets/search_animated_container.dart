@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/assets/font_family.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
+import 'package:speezu/presentation/search_products/search_prompt_screen.dart';
 import '../core/utils/labels.dart';
 
 class SearchContainer extends StatelessWidget {
-  SearchContainer({super.key, required this.onSearchTap});
-  final VoidCallback onSearchTap;
+  SearchContainer({super.key,});
+  // final VoidCallback onSearchTap;
 
   final List<Map<String, dynamic>> _searchItems = [
     {
@@ -39,7 +40,9 @@ class SearchContainer extends StatelessWidget {
         final item = _searchItems[index];
 
         return GestureDetector(
-          onTap: onSearchTap,
+          onTap: (){
+            Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPromptScreen(),));
+          },
           child: AnimatedContainer(
 
             duration: const Duration(milliseconds: 400),

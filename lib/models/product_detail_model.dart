@@ -40,6 +40,52 @@ class ProductDetail {
     required this.isAvailable,
     required this.productDiscountPercentage,
   });
+  ProductDetail copyWith({
+    String? id,
+    double? productDiscountPercentage,
+    bool? isAvailable,
+    bool? isDeliveryAvailable,
+    double? price,
+    double? originalPrice,
+    double? rating,
+    bool? isFavourite,
+    String? name,
+    String? thumbnail,
+    List<String>? images,
+    String? categoryName,
+    String? subCategoryName,
+    String? categoryId,
+    String? shopName,
+    String? description,
+    ShopBoxModel? shop,
+    List<ProductVariation>? variations,
+    List<RelatedProduct>? relatedProducts,
+  }) {
+    return ProductDetail(
+      id: id ?? this.id,
+      productDiscountPercentage:
+      productDiscountPercentage ?? this.productDiscountPercentage,
+      isAvailable: isAvailable ?? this.isAvailable,
+      isDeliveryAvailable: isDeliveryAvailable ?? this.isDeliveryAvailable,
+      price: price ?? this.price,
+      originalPrice: originalPrice ?? this.originalPrice,
+      rating: rating ?? this.rating,
+      isFavourite: isFavourite ?? this.isFavourite,
+      name: name ?? this.name,
+      thumbnail: thumbnail ?? this.thumbnail,
+      images: images ?? List<String>.from(this.images),
+      categoryName: categoryName ?? this.categoryName,
+      subCategoryName: subCategoryName ?? this.subCategoryName,
+      categoryId: categoryId ?? this.categoryId,
+      shopName: shopName ?? this.shopName,
+      description: description ?? this.description,
+      shop: shop ?? this.shop,
+      variations: variations ?? List<ProductVariation>.from(this.variations),
+      relatedProducts:
+      relatedProducts ?? List<RelatedProduct>.from(this.relatedProducts),
+    );
+  }
+
 }
 
 class ShopBoxModel {
@@ -109,6 +155,7 @@ class RelatedProduct {
   final String imageUrl;
   final String categoryId;
   final String categoryName;
+  final bool isProductFavourite;
 
   RelatedProduct({
     required this.id,
@@ -119,5 +166,6 @@ class RelatedProduct {
     required this.imageUrl,
     required this.categoryId,
     required this.categoryName,
+    required this.isProductFavourite
   });
 }

@@ -21,3 +21,12 @@ class LoadProductDetail extends ProductDetailEvent {
 class IncrementQuantity extends ProductDetailEvent {}
 
 class DecrementQuantity extends ProductDetailEvent {}
+class UpdateFavouriteStatusEvent extends ProductDetailEvent {
+  final String productId;
+  final bool isFavourite;
+
+  UpdateFavouriteStatusEvent({
+    required this.productId,
+    required this.isFavourite,
+  });
+}

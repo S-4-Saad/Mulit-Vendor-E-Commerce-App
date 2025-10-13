@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+
 import '../../../models/product_detail_model.dart';
 import '../../../models/cart_model.dart';
 import '../../../models/address_model.dart';
@@ -223,3 +224,4 @@ class PostOrder extends CartEvent {
 }
 
 class ResetCheckout extends CartEvent {}
+class ResetCartStatus extends CartEvent {}

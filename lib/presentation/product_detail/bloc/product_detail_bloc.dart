@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/presentation/product_detail/bloc/product_detail_event.dart';
 import 'package:speezu/presentation/product_detail/bloc/product_detail_state.dart';
+import 'package:speezu/repositories/user_repository.dart';
 import 'dart:convert';
 
 import '../../../core/services/api_services.dart';
@@ -10,6 +11,7 @@ import '../../../models/product_detail_model.dart';
 
 class ProductDetailBloc extends Bloc<ProductDetailEvent, ProductDetailState> {
   ProductDetailBloc() : super(const ProductDetailState()) {
+
     on<ShowBottomBar>((event, emit) {
       emit(state.copyWith(isBottomSheetVisible: true));
     });
@@ -27,13 +29,24 @@ class ProductDetailBloc extends Bloc<ProductDetailEvent, ProductDetailState> {
         emit(state.copyWith(quantity: state.quantity - 1));
       }
     });
+    on<UpdateFavouriteStatusEvent>((event, emit) {
+      if (state.productDetail != null &&
+          state.productDetail!.id == event.productId) {
+        final updatedProduct = state.productDetail!.copyWith(
+          isFavourite: event.isFavourite,
+        );
+
+        emit(state.copyWith(productDetail: updatedProduct));
+      }
+    });
 
     on<LoadProductDetail>((event, emit) async {
       emit(state.copyWith(status: ProductDetailStatus.loading, quantity: 1));
 
       try {
         await ApiService.getMethod(
-          apiUrl: '$productDetailUrl${event.productId}',
+          apiUrl: '$productDetailUrl${event.productId}?user_id=${UserRepository().currentUser?.userData?.id??''}',
+          authHeader: true,
           executionMethod: (bool success, dynamic responseData) async {
             if (success && responseData != null) {
               try {
@@ -140,6 +153,7 @@ class ProductDetailBloc extends Bloc<ProductDetailEvent, ProductDetailState> {
         final discountPercentage = originalPrice > 0 ? ((originalPrice - discountedPrice) / originalPrice) * 100 : 0.0;
 
         return RelatedProduct(
+          isProductFavourite: relatedProduct.containsKey('is_favourite') ? relatedProduct['is_favourite'] == 1 : false,
           id: relatedProduct['id']?.toString() ?? '',
           name: relatedProduct['product_name']?.toString() ?? '',
           price: discountedPrice,
@@ -159,7 +173,7 @@ class ProductDetailBloc extends Bloc<ProductDetailEvent, ProductDetailState> {
       categoryName: categoryName,
       name: data['store']?['name']?.toString() ?? '',
       imageUrl: data['store']?['image'] != null 
-          ? '$imageBaseUrl${data['store']['image']}' 
+          ? '$imageBaseUrl${data['store']['image']}'
           : '',
       rating: double.tryParse(data['store']?['rating']?.toString() ?? '0') ?? 0.0,
       id: data['store']?['id'] ?? 0,
@@ -173,7 +187,7 @@ class ProductDetailBloc extends Bloc<ProductDetailEvent, ProductDetailState> {
       price: discountedPrice,
       originalPrice: originalPrice,
       rating: double.tryParse(data['product_rating']?.toString() ?? '0') ?? 0.0,
-      isFavourite: false, // Not provided in API
+      isFavourite: data['is_favorite'] == true || data['is_favorite'] == 1,
       name: data['product_name']?.toString() ?? '',
       thumbnail: data['product_image'] != null ? '$imageBaseUrl${data['product_image']}' : '',
       images: productImages,

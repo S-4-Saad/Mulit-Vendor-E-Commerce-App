@@ -29,22 +29,34 @@ class ProductsTabBarScreen extends StatelessWidget {
                 Container(
                   margin: const EdgeInsets.symmetric(
                     horizontal: 16,
-                    vertical: 8,
+                    vertical: 12,
                   ),
-                  padding: const EdgeInsets.all(6),
+                  padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.onPrimary,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 8,
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+                        blurRadius: 20,
                         offset: const Offset(0, 4),
+                        spreadRadius: 0,
+                      ),
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.03),
+                        blurRadius: 12,
+                        offset: const Offset(0, 2),
                       ),
                     ],
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.1),
+                      width: 1,
+                    ),
                   ),
                   child: TabBar(
-                    physics: const BouncingScrollPhysics(),
+                    physics: BouncingScrollPhysics(),
+
+                    splashBorderRadius: BorderRadius.circular(10),
                     dividerColor: Colors.transparent,
                     isScrollable: true,
                     indicatorSize: TabBarIndicatorSize.tab,
@@ -52,46 +64,112 @@ class ProductsTabBarScreen extends StatelessWidget {
                       context.read<ProductsBloc>().add(ChangeTabEvent(index));
                     },
                     indicator: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: Theme.of(context).colorScheme.primary,
+                      borderRadius: BorderRadius.circular(10),
+                      gradient: LinearGradient(
+                        colors: [
+                          Theme.of(context).colorScheme.primary,
+                          Theme.of(context).colorScheme.primary.withValues(alpha: 0.85),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.35),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                          spreadRadius: -2,
+                        ),
+                      ],
                     ),
                     labelColor: Colors.white,
-                    unselectedLabelColor:
-                        Theme.of(context).colorScheme.onSecondary,
+                    unselectedLabelColor: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.6),
                     labelStyle: const TextStyle(
                       fontFamily: FontFamily.fontsPoppinsSemiBold,
                       fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.3,
+                    ),
+                    unselectedLabelStyle: const TextStyle(
+                      fontFamily: FontFamily.fontsPoppinsSemiBold,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.2,
                     ),
                     tabs: [
-                      Tab(
-                        icon: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                          child: Text(Labels.food),
-                        ),
-                      ),
-                      Tab(
-                        icon: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                          child: Text(Labels.superMarket),
-                        ),
-                      ),
-                      Tab(
-                        icon: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                          child: Text(Labels.retailStore),
-                        ),
-                      ),
-                      Tab(
-                        icon: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                          child: Text(Labels.pharmacy),
-                        ),
-                      ),
+                      _buildTab(Labels.food, Icons.restaurant_menu_rounded),
+                      _buildTab(Labels.superMarket, Icons.shopping_cart_rounded),
+                      _buildTab(Labels.retailStore, Icons.store_rounded),
+                      _buildTab(Labels.pharmacy, Icons.medical_services_rounded),
                     ],
                   ),
-                ),
+                )
+                // Container(
+                //   margin: const EdgeInsets.symmetric(
+                //     horizontal: 16,
+                //     vertical: 8,
+                //   ),
+                //   padding: const EdgeInsets.all(6),
+                //   decoration: BoxDecoration(
+                //     color: Theme.of(context).colorScheme.onPrimary,
+                //     borderRadius: BorderRadius.circular(16),
+                //     boxShadow: [
+                //       BoxShadow(
+                //         color: Colors.black.withValues(alpha: 0.05),
+                //         blurRadius: 8,
+                //         offset: const Offset(0, 4),
+                //       ),
+                //     ],
+                //   ),
+                //   child: TabBar(
+                //     physics: const BouncingScrollPhysics(),
+                //     dividerColor: Colors.transparent,
+                //     isScrollable: true,
+                //     indicatorSize: TabBarIndicatorSize.tab,
+                //     onTap: (index) {
+                //       context.read<ProductsBloc>().add(ChangeTabEvent(index));
+                //     },
+                //     indicator: BoxDecoration(
+                //       borderRadius: BorderRadius.circular(12),
+                //       color: Theme.of(context).colorScheme.primary,
+                //     ),
+                //     labelColor: Colors.white,
+                //     unselectedLabelColor:
+                //         Theme.of(context).colorScheme.onSecondary,
+                //     labelStyle: const TextStyle(
+                //       fontFamily: FontFamily.fontsPoppinsSemiBold,
+                //       fontSize: 14,
+                //     ),
+                //     tabs: [
+                //       Tab(
+                //         icon: Padding(
+                //           padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                //           child: Text(Labels.food),
+                //         ),
+                //       ),
+                //       Tab(
+                //         icon: Padding(
+                //           padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                //           child: Text(Labels.superMarket),
+                //         ),
+                //       ),
+                //       Tab(
+                //         icon: Padding(
+                //           padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                //           child: Text(Labels.retailStore),
+                //         ),
+                //       ),
+                //       Tab(
+                //         icon: Padding(
+                //           padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                //           child: Text(Labels.pharmacy),
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
 
-                const SizedBox(height: 10),
+                , SizedBox(height: 10),
                 Expanded(
                   child: TabBarView(
                     physics: const NeverScrollableScrollPhysics(), // 🚫 disables swipe
@@ -135,5 +213,20 @@ class ProductsTabBarScreen extends StatelessWidget {
     );
   }
 
-
+  Widget _buildTab(String label, IconData icon) {
+    return Tab(
+      height: 48,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 18),
+            const SizedBox(width: 8),
+            Text(label),
+          ],
+        ),
+      ),
+    );
+  }
 }

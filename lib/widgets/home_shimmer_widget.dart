@@ -17,21 +17,20 @@ class HomeShimmerWidget extends StatelessWidget {
             SizedBox(height: context.heightPct(.01)),
             
             // Search bar shimmer
-            Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
-              child: Container(
-                height: 50,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(5),
-                ),
-              ),
-            ),
+            // Shimmer.fromColors(
+            //   baseColor: Colors.grey[300]!,
+            //   highlightColor: Colors.grey[100]!,
+            //   child: Container(
+            //     height: 50,
+            //     width: double.infinity,
+            //     decoration: BoxDecoration(
+            //       color: Colors.white,
+            //       borderRadius: BorderRadius.circular(5),
+            //     ),
+            //   ),
+            // ),
             
-            SizedBox(height: context.heightPct(.009)),
-            
+
             // Banner shimmer
             Shimmer.fromColors(
               baseColor: Colors.grey[300]!,

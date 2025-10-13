@@ -11,13 +11,13 @@ class ProductReviewBox extends StatelessWidget {
     required this.userName,
     required this.review,
     required this.rating,
-    required this.imgUrl,
+    // required this.imgUrl,
   });
 
   final String userName;
   final String review;
   final double rating;
-  final String imgUrl;
+  // final String imgUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -35,13 +35,13 @@ class ProductReviewBox extends StatelessWidget {
                   children: [
                     RatingDisplayWidget(
                       rating: rating,
-                      starSize: context.scaledFont(14),
+                      starSize: context.scaledFont(16),
                     ),
-                    SizedBox(width: 5),
+                    SizedBox(width: 8),
                     Text(
                       userName,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 15,
                         fontFamily: FontFamily.fontsPoppinsMedium,
                         color: Theme.of(context).colorScheme.outline,
                       ),
@@ -49,30 +49,25 @@ class ProductReviewBox extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 5),
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.63,
-                  ),
-                  child: Text(
-                    review,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: context.scaledFont(12),
-                      fontFamily: FontFamily.fontsPoppinsRegular,
-                      color: Theme.of(context).colorScheme.onSecondary,
-                    ),
+                Text(
+                  review,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: context.scaledFont(13),
+                    fontFamily: FontFamily.fontsPoppinsRegular,
+                    color: Theme.of(context).colorScheme.onSecondary,
                   ),
                 ),
               ],
             ),
 
-            AppCacheImage(
-              imageUrl: imgUrl,
-              height: context.heightPct(.07),
-              width: context.heightPct(.07),
-              round: 5,
-            ),
+            // AppCacheImage(
+            //   imageUrl: imgUrl,
+            //   height: context.heightPct(.07),
+            //   width: context.heightPct(.07),
+            //   round: 5,
+            // ),
           ],
         ),
       ],

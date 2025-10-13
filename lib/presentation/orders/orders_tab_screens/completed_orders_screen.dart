@@ -37,9 +37,7 @@ class _CompletedOrdersScreenState extends State<CompletedOrdersScreen> {
       body: BlocBuilder<OrdersBloc, OrderState>(
         builder: (context, state) {
           if (state.status == OrderStatus.loading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (state.status == OrderStatus.error) {
@@ -47,11 +45,7 @@ class _CompletedOrdersScreenState extends State<CompletedOrdersScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 64,
-                    color: Colors.red[300],
-                  ),
+                  Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
                   const SizedBox(height: 16),
                   Text(
                     'Error loading orders',
@@ -123,7 +117,9 @@ class _CompletedOrdersScreenState extends State<CompletedOrdersScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => OrderDetailsScreen(),
+                          builder:
+                              (context) =>
+                                  OrderDetailsScreen(orderId: order.orderId),
                         ),
                       );
                     },

@@ -7,6 +7,7 @@ import 'package:speezu/widgets/image_type_extention.dart';
 import '../../core/utils/currency_icon.dart';
 import '../../core/utils/labels.dart';
 import '../../routes/route_names.dart';
+import '../../widgets/dialog_boxes/order_success_dialog.dart';
 import '../settings/add_address_screen.dart';
 import 'bloc/cart_bloc.dart';
 import 'bloc/cart_state.dart';
@@ -37,6 +38,8 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
     _initializePaystack();
     // Load addresses using CartBloc
     context.read<CartBloc>().loadAddresses();
+    context.read<CartBloc>().add(ResetCartStatus());
+
   }
 
   @override
@@ -82,36 +85,26 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
     ));
   }
 
-  void _showOrderSuccessDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: Text('Order Successful'),
-        content: Text('Your order has been placed successfully!'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text('OK'),
-          ),
-        ],
-      ),
-    );
+  void _showOrderSuccessDialog(BuildContext dialogContext) {
+    OrderSuccessDialog.show(
+      dialogContext,
+  onContinue: () {
+    Navigator.of(dialogContext).pop();
+    // Navigate back to home
+  },
+);
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<CartBloc, CartState>(
       listener: (context, state) {
-        
         if (state.status == CartStatus.success && state.orderPlacedSuccessfully) {
-            Navigator.of(context).pushNamedAndRemoveUntil(
-                RouteNames.navBarScreen,
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            RouteNames.navBarScreen,
                 (Route<dynamic> route) => false,
-              );
-          _showOrderSuccessDialog();
+          );
+          _showOrderSuccessDialog(context);
         }
       },
       builder: (context, state) {
@@ -1004,135 +997,137 @@ class _PaymentMethodBottomSheetState extends State<PaymentMethodBottomSheet> {
   Widget build(BuildContext context) {
     return BlocBuilder<CartBloc, CartState>(
       builder: (context, state) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                Labels.selectPaymentMethod,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              ...List.generate(paymentMethods.length, (index) {
-                final method = paymentMethods[index];
-                final isSelected = selectedIndex == index;
-
-                return GestureDetector(
-                  key: ValueKey('payment_method_${method['title']}_$index'),
-                  onTap: () {
-                    setState(() {
-                      selectedIndex = index;
-                    });
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color:
-                          isSelected
-                              ? Theme.of(
-                                context,
-                              ).colorScheme.primary.withOpacity(0.1)
-                              : Theme.of(context).colorScheme.surface,
-                      border: Border.all(
+        return SafeArea(
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  Labels.selectPaymentMethod,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+                ...List.generate(paymentMethods.length, (index) {
+                  final method = paymentMethods[index];
+                  final isSelected = selectedIndex == index;
+          
+                  return GestureDetector(
+                    key: ValueKey('payment_method_${method['title']}_$index'),
+                    onTap: () {
+                      setState(() {
+                        selectedIndex = index;
+                      });
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
                         color:
                             isSelected
-                                ? Theme.of(context).colorScheme.primary
-                                : Colors.grey.shade300,
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      children: [
-                        Text(method["icon"]!, style: const TextStyle(fontSize: 24)),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                method["title"]!,
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                method["subtitle"]!,
-                                style: Theme.of(
+                                ? Theme.of(
                                   context,
-                                ).textTheme.bodySmall?.copyWith(color: Colors.grey),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Icon(
-                          isSelected
-                              ? Icons.radio_button_checked
-                              : Icons.radio_button_off,
+                                ).colorScheme.primary.withOpacity(0.1)
+                                : Theme.of(context).colorScheme.surface,
+                        border: Border.all(
                           color:
                               isSelected
                                   ? Theme.of(context).colorScheme.primary
-                                  : Colors.grey,
+                                  : Colors.grey.shade300,
                         ),
-                      ],
-                    ),
-                  ),
-                );
-              }),
-              
-              // Card Selection Widget (only show when online payment is selected)
-              if (selectedIndex == 1) ...[
-                const SizedBox(height: 16),
-                SavedCardSelectionWidget(
-                  onCardSelected: (card) {
-                    context.read<CartBloc>().add(SetSelectedCard(card: card));
-                  },
-                  selectedCard: state.selectedCard,
-                ),
-              ],
-              
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _isProcessingPayment || selectedIndex == -1 || 
-                    (selectedIndex == 1 && state.selectedCard == null)
-                    ? null
-                    : () async {
-                        final selectedMethod = paymentMethods[selectedIndex]["title"]!;
-                        
-                        if (selectedMethod == Labels.onlinePayment) {
-                          // Handle Paystack payment
-                          await _handlePaystackPayment();
-                    } else {
-                      // Handle COD payment
-                      widget.onOrderConfirmed(selectedMethod, null, null);
-                      Navigator.pop(context);
-                    }
-                      },
-                child: _isProcessingPayment
-                    ? Row(
-                        mainAxisSize: MainAxisSize.min,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
                         children: [
-                          SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          Text(method["icon"]!, style: const TextStyle(fontSize: 24)),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  method["title"]!,
+                                  style: Theme.of(context).textTheme.titleMedium,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  method["subtitle"]!,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.bodySmall?.copyWith(color: Colors.grey),
+                                ),
+                              ],
                             ),
                           ),
-                          SizedBox(width: 10),
-                          Text('Processing...'),
+                          Icon(
+                            isSelected
+                                ? Icons.radio_button_checked
+                                : Icons.radio_button_off,
+                            color:
+                                isSelected
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Colors.grey,
+                          ),
                         ],
-                      )
-                    : Text(Labels.confirmOrder),
-              ),
-            ],
+                      ),
+                    ),
+                  );
+                }),
+                
+                // Card Selection Widget (only show when online payment is selected)
+                if (selectedIndex == 1) ...[
+                  const SizedBox(height: 16),
+                  SavedCardSelectionWidget(
+                    onCardSelected: (card) {
+                      context.read<CartBloc>().add(SetSelectedCard(card: card));
+                    },
+                    selectedCard: state.selectedCard,
+                  ),
+                ],
+                
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _isProcessingPayment || selectedIndex == -1 || 
+                      (selectedIndex == 1 && state.selectedCard == null)
+                      ? null
+                      : () async {
+                          final selectedMethod = paymentMethods[selectedIndex]["title"]!;
+                          
+                          if (selectedMethod == Labels.onlinePayment) {
+                            // Handle Paystack payment
+                            await _handlePaystackPayment();
+                      } else {
+                        // Handle COD payment
+                        widget.onOrderConfirmed(selectedMethod, null, null);
+                        Navigator.pop(context);
+                      }
+                        },
+                  child: _isProcessingPayment
+                      ? Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Text('Processing...'),
+                          ],
+                        )
+                      : Text(Labels.confirmOrder),
+                ),
+              ],
+            ),
           ),
         );
       },

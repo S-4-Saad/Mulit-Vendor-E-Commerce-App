@@ -56,7 +56,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              SearchContainer(onSearchTap: () {}),
+              SearchContainer(),
               SizedBox(height: context.heightPct(0.01)),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),

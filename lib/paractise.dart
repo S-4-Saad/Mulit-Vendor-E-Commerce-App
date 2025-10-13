@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:speezu/core/assets/app_images.dart';
-import 'package:speezu/core/assets/font_family.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
-import 'package:speezu/widgets/app_cache_image.dart';
 import 'package:speezu/widgets/carousel_slider_widget.dart';
 import 'package:speezu/widgets/category_box_widget.dart';
 import 'package:speezu/widgets/image_type_extention.dart';
-import 'package:speezu/widgets/product_box_widget.dart';
 import 'package:speezu/widgets/rating_display_widget.dart';
+import 'package:speezu/widgets/search_result_shimmar.dart';
 import 'package:speezu/widgets/shop_box_widget.dart';
 
 class NotificationScreen extends StatelessWidget {
@@ -25,34 +23,17 @@ class NotificationScreen extends StatelessWidget {
     );
   }
 }
-class OrderScreen extends StatelessWidget {
-  const OrderScreen({super.key});
-  
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
-  }
 
-}
 
-class FavouriteScreen extends StatelessWidget {
-  const FavouriteScreen({super.key});
+class PractiseScreen extends StatefulWidget {
+
+  PractiseScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text(
-          'MapScreen Screen',
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-      ),
-    );
-  }
+  State<PractiseScreen> createState() => _PractiseScreenState();
 }
 
-class PractiseScreen extends StatelessWidget {
+class _PractiseScreenState extends State<PractiseScreen> {
   final List<ShopModel> dummyShops = [
     ShopModel(
       imageUrl:
@@ -63,29 +44,15 @@ class PractiseScreen extends StatelessWidget {
       isOpen: true,
       isDelivering: true,
     ),
-    ShopModel(
-      imageUrl: "https://picsum.photos/270/130?random=2",
-      shopName: "Pizza Palace",
-      shopDescription: "Italian & Fast Food",
-      shopRating: 4.2,
-      isOpen: false,
-      isDelivering: false,
-    ),
-    ShopModel(
-      imageUrl: "https://picsum.photos/270/130?random=3",
-      shopName: "Cafe Aroma",
-      shopDescription: "Coffee & Snacks",
-      shopRating: 4.8,
-      isOpen: true,
-      isDelivering: false,
-    ),
+
   ];
+
   List<String> imageUrl = [
     'https://t3.ftcdn.net/jpg/04/65/46/52/360_F_465465254_1pN9MGrA831idD6zIBL7q8r`1zxc nZZpUCQTy.jpg',
     "https://static.vecteezy.com/system/resources/thumbnails/002/006/774/small/paper-art-shopping-online-on-smartphone-and-new-buy-sale-promotion-backgroud-for-banner-market-ecommerce-free-vector.jpg",
     "https://static.vecteezy.com/system/resources/thumbnails/004/299/835/small/online-shopping-on-phone-buy-sell-business-digital-web-banner-application-money-advertising-payment-ecommerce-illustration-search-free-vector.jpg",
   ];
-  PractiseScreen({super.key});
+
   final List<ProductCategory> dummyCategories = [
     ProductCategory(name: "Food", imageUrl: AppImages.foodStoreIcon),
     ProductCategory(name: "Supermarket", imageUrl: AppImages.superMarketIcon),
@@ -125,6 +92,7 @@ class PractiseScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: context.heightPct(.02)),
+                SearchResultShimmar(),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(

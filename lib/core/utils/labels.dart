@@ -309,6 +309,42 @@ class Labels {
   static String get fallbackClothing => 'fallbackClothing'.tr();
   static String get fallbackMedicine => 'fallbackMedicine'.tr();
   static String get topRetailProducts => 'topRetailProducts'.tr();
+  static String get search => 'search'.tr();
+  static String get searchProducts => 'searchProducts'.tr();
+  static String get recentSearches => 'recentSearches'.tr();
+  static String get clearAll => 'clearAll'.tr();
+  static String get noRecentSearches => 'noRecentSearches'.tr();
+  static String get browseCategories => 'browseCategories'.tr();
+  static String get browseTags => 'browseTags'.tr();
+  static String get noResultsFound => 'noResultsFound'.tr();
+  static String get resultStores => 'resultStores'.tr();
+  static String get resultProducts => 'resultProducts'.tr();
+  static String get retail => 'retail'.tr();
+  static String get market => 'market'.tr();
+  static String get yourOneStopShop => 'yourOneStopShop'.tr();
+  static String get forEveryEveryThingYouNeed => 'forEveryEveryThingYouNeed'.tr();
+  static String get loadingYourExperience => 'loadingYourExperience'.tr();
+  static String get trySearching => 'trySearching'.tr();
+  static String get found => 'found'.tr();
+  static String get store => 'store'.tr();
+  static String get stores => 'stores'.tr();
+  static String get product => 'product'.tr();
+  static String get orderSummary => 'orderSummary'.tr();
+  static String get deliveryAddress => 'deliveryAddress'.tr();
+  static String get orderItems => 'orderItems'.tr();
+  static String get placedOn => 'placedOn'.tr();
+  static String get orderNumber => 'orderNumber'.tr();
+  static String get pleaseLoginToContinueWithTheActionYouWillGetAccessToAllFeatures => 'pleaseLoginToContinueWithTheActionYouWillGetAccessToAllFeatures'.tr();
+  static String get mayBeLater => 'mayBeLater'.tr();
+  static String get loginNow => 'loginNow'.tr();
+  static String get loginRequired => 'loginRequired'.tr();
+  static String get saveYourFavorites => 'saveYourFavorites'.tr();
+  static String get fastAndEasyCheckout => 'fastAndEasyCheckout'.tr();
+  static String get trackYouOrders => 'trackYouOrders'.tr();
+  static String get whatYouWillGet => 'whatYouWillGet'.tr();
+  static String get access => 'access'.tr();
+  static String get pleaseSelectA => 'pleaseSelectA'.tr();
+
 
 
 }

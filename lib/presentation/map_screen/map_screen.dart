@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../models/restaurant_model.dart';
+import '../../models/shop_model.dart';
 import '../../widgets/restaurant_list.dart';
 import '../../core/distance_calculator.dart';
 import 'bloc/map_bloc.dart';
@@ -38,53 +39,53 @@ class _MapViewState extends State<MapView> {
   }
 
   // Sample restaurant data - replace with API response
-  List<RestaurantModel> _getSampleRestaurants([LatLng? currentLocation]) {
-    final restaurants = [
-      RestaurantModel(
+  List<ShopModel> _getSampleShops([LatLng? currentLocation]) {
+    final shops = [
+      ShopModel(
         id: 1,
-        name: "Home Cooking Experience",
-        description: "Letraset sheets containing Lorem Ipsum passages",
-        rating: 5.0,
-        status: "Open",
-        isDeliveryAvailable: true,
-        isPickupAvailable: true,
-        isFavorite: false,
+
+        shopName: "Home Cooking Experience",
+        shopDescription: "Letraset sheets containing Lorem Ipsum passages",
+        shopRating: 5.0,
+        isOpen: true,
+        isDelivering: true,
+        imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9oBl8oMj8unCKsHx9WuzVKgxc34HJnei-Qw&s',
         latitude: 31.4205338, // ~500m north of your location
         longitude: 73.1172914, // slightly west
       ),
-      RestaurantModel(
+      ShopModel(
+
         id: 2,
-        name: "The Local Bistro",
-        description: "Letraset sheets containing Lorem Ipsum passages",
-        rating: 4.5,
-        status: "Open",
-        isDeliveryAvailable: true,
-        isPickupAvailable: true,
-        isFavorite: true,
+        shopName: "The Local Bistro",
+        shopDescription: "Letraset sheets containing Lorem Ipsum passages",
+        shopRating: 4.5,
+        isOpen: true,
+        isDelivering: true,
+        imageUrl:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQOOgoiSob7STY6T9gsLPRZA3omjcpx_KpiVw&s' ,
+
         latitude: 31.4197338, // ~400m south of your location
         longitude: 73.1180914, // slightly east
       ),
-      RestaurantModel(
+      ShopModel(
         id: 3,
-        name: "Garden Fresh Cafe",
-        description: "Fresh ingredients and healthy options",
-        rating: 4.2,
-        status: "Open",
-        isDeliveryAvailable: false,
-        isPickupAvailable: true,
-        isFavorite: false,
+        shopName: "Garden Fresh Cafe",
+
+        shopDescription: "Fresh ingredients and healthy options",
+        shopRating: 4.2,
+        isOpen:false,
+        isDelivering: false,
+        imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNgzW6LUDP_-oVca6nsAECRnKLUCtvp18HVA&s',
         latitude: 31.4210338, // ~900m north of your location
         longitude: 73.1168914, // slightly west
       ),
-      RestaurantModel(
+      ShopModel(
         id: 4,
-        name: "Spice Palace",
-        description: "Authentic Indian cuisine with traditional flavors",
-        rating: 4.8,
-        status: "Open",
-        isDeliveryAvailable: true,
-        isPickupAvailable: true,
-        isFavorite: true,
+        shopName: "Spice Palace",
+        shopDescription: "Authentic Indian cuisine with traditional flavors",
+        shopRating: 4.8,
+        isDelivering: true,
+        isOpen: true,
+        imageUrl: 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1b/1d/50/53/excellent-buffet.jpg?w=900&h=500&s=1',
         latitude: 31.4192338, // ~800m south of your location
         longitude: 73.1184914, // slightly east
       ),
@@ -92,19 +93,19 @@ class _MapViewState extends State<MapView> {
 
     // Calculate distances if current location is available
     if (currentLocation != null) {
-      for (final restaurant in restaurants) {
-        if (restaurant.latitude != null && restaurant.longitude != null) {
-          restaurant.distance = DistanceCalculator.calculateDistance(
+      for (final shop in shops) {
+        if (shop.latitude != null && shop.longitude != null) {
+          shop.distance = DistanceCalculator.calculateDistance(
             currentLocation.latitude,
             currentLocation.longitude,
-            restaurant.latitude!,
-            restaurant.longitude!,
+            shop.latitude!,
+            shop.longitude!,
           );
         }
       }
     }
 
-    return restaurants;
+    return shops;
   }
 
   @override
@@ -232,9 +233,11 @@ class _MapViewState extends State<MapView> {
           bottom: 0,
           left: 0,
           right: 0,
-          child: RestaurantList(
-            restaurants: _getSampleRestaurants(currentLocation),
-            onRestaurantTap: () {
+          child: ShopList(
+            height: 250,
+            shops: _getSampleShops(currentLocation),
+
+            onShopTap: () {
               // Navigate to restaurant details
               print("Restaurant tapped");
             },
@@ -246,11 +249,11 @@ class _MapViewState extends State<MapView> {
               // Handle pickup action
               print("Pickup tapped");
             },
-            onLocationTap: (restaurant) {
+            onLocationTap: (shop) {
               // Draw route to restaurant
               context.read<MapBloc>().add(MapDrawRouteToRestaurant(
-                restaurantLocation: LatLng(restaurant.latitude!, restaurant.longitude!),
-                restaurantName: restaurant.name ?? "Restaurant",
+                restaurantLocation: LatLng(shop.latitude!, shop.longitude!),
+                restaurantName: shop.shopName ?? "Restaurant",
               ));
             },
           ),

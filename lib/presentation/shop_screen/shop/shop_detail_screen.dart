@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/assets/font_family.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
 import 'package:speezu/models/store_detail_model.dart';
+import 'package:speezu/presentation/shop_screen/shop/shop_review_screen.dart';
 import 'package:speezu/widgets/image_gallery_viewer_widget.dart';
 import 'package:speezu/widgets/product_review_box.dart';
 
@@ -452,8 +453,8 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                     review:
                                         review.review??'',
                                     rating: double.parse(review.rating?.toString()??'0'),
-                                    imgUrl:
-                                         'https://via.placeholder.com/55',
+                                    // imgUrl:
+                                    //      'https://via.placeholder.com/55',
                                   );
                                 },
                               ),
@@ -462,15 +463,15 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                               Center(
                                 child: TextButton(
                                   onPressed: () {
-                                    // Navigator.push(
-                                    //   context,
-                                    //   MaterialPageRoute(
-                                    //     builder:
-                                    //         (context) => ProductReviewsScreen(
-                                    //           store: store,
-                                    //         ),
-                                    //   ),
-                                    // );
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) => ProductReviewsScreen(
+                                              storeId: storeModel.store!.id,
+                                            ),
+                                      ),
+                                    );
                                   },
                                   child: Text(
                                     '${Labels.seeAllReviews} (${storeModel.store!.reviews!.length})',

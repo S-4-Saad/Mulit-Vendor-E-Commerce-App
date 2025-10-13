@@ -4,11 +4,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:speezu/core/assets/app_images.dart';
 import 'package:speezu/core/assets/font_family.dart';
 import 'package:speezu/core/utils/labels.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
 import 'package:speezu/presentation/drawers/end_drawer.dart';
+import 'package:speezu/widgets/login_required_bottom%20sheet.dart';
 
+import '../../core/services/localStorage/my-local-controller.dart';
+import '../../core/utils/constants.dart';
 import '../../repositories/user_repository.dart';
 import '../../routes/route_names.dart';
 import '../../widgets/search_animated_container.dart';
@@ -254,7 +258,7 @@ class _NavBarScreenState extends State<NavBarScreen> with TickerProviderStateMix
                       thickness: 1.5,
                     ),
                     state.currentTab == 0 || state.currentTab == 2
-                        ? SearchContainer(onSearchTap: () {})
+                        ? SearchContainer()
                         : SizedBox.shrink(),
                   ],
                 ),
@@ -319,7 +323,15 @@ class _NavBarScreenState extends State<NavBarScreen> with TickerProviderStateMix
                                     children: [
                                       IconButton(
                                         icon: Icon(Icons.shopping_cart, color: Theme.of(context).colorScheme.primary),
-                                        onPressed: () => Navigator.pushNamed(context, RouteNames.cartScreen),
+                                        onPressed: ()async {
+                                          final isUserLoggedIn=await UserRepository().isUserAuthenticated();
+                                          if(isUserLoggedIn){
+                                            Navigator.pushNamed(context, RouteNames.cartScreen);
+
+                                          }else{
+                                            LoginRequiredBottomSheet.show(context);
+                                          }
+                                          },
                                       ),
                                       if (cartCount > 0)
                                         Positioned(
@@ -360,7 +372,8 @@ class _NavBarScreenState extends State<NavBarScreen> with TickerProviderStateMix
                         builder: (context, child) {
                           return Opacity(
                             opacity: _titleAnimation.value,
-                            child: Text(
+                            child: state.currentTab==2?Image.asset(AppImages.speezuLogo,width: 110,):Text(
+
                               screenTitles[state.currentTab],
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.onSecondary.withOpacity(0.9),
@@ -400,7 +413,7 @@ class _NavBarScreenState extends State<NavBarScreen> with TickerProviderStateMix
                                   duration: const Duration(milliseconds: 180),
                                   curve: Curves.easeOutCubic,
                                   opacity: searchOpacity,
-                                  child: SearchContainer(onSearchTap: () {}),
+                                  child: SearchContainer(),
                                 ),
                               ),
                             ),
@@ -497,6 +510,7 @@ class _NavBarScreenState extends State<NavBarScreen> with TickerProviderStateMix
       ),
     );
   }
+
 }
 mixin ScrollableScreen {
   Widget withScrollController(ScrollController controller);

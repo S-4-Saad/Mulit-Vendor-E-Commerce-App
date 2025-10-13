@@ -8,12 +8,14 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:speezu/core/theme/theme_bloc/theme_state.dart';
 import 'package:speezu/presentation/auth/bloc/auth_bloc.dart';
 import 'package:speezu/presentation/category/bloc/category_bloc.dart';
+import 'package:speezu/presentation/favourites/bloc/favourite_bloc.dart';
 import 'package:speezu/presentation/home/bloc/home_bloc.dart';
 import 'package:speezu/presentation/languages/bloc/languages_bloc.dart';
 import 'package:speezu/presentation/order_details/bloc/order_details_bloc.dart';
 import 'package:speezu/presentation/orders/bloc/orders_bloc.dart';
 import 'package:speezu/presentation/product_detail/bloc/product_detail_bloc.dart';
 import 'package:speezu/presentation/products/bloc/products_bloc.dart';
+import 'package:speezu/presentation/search_products/bloc/search_products_bloc.dart';
 import 'package:speezu/presentation/shop_screen/bloc/shop_bloc.dart';
 import 'package:speezu/presentation/cart/bloc/cart_bloc.dart';
 import 'package:speezu/repositories/user_repository.dart';
@@ -53,6 +55,7 @@ void main() async {
   final UserRepository userRepository = UserRepository();
   userRepository.init();
 
+
   // Initialize notification service
   final notificationService = NotificationService();
   await notificationService.initializeLocalNotifications();
@@ -84,6 +87,8 @@ void main() async {
           BlocProvider<CartBloc>(create: (_) => CartBloc()),
           BlocProvider<OrdersBloc>(create: (_) => OrdersBloc()),
           BlocProvider<OrderDetailsBloc>(create: (_) => OrderDetailsBloc()),
+          BlocProvider<FavouriteBloc>(create: (_) => FavouriteBloc()),
+          BlocProvider<SearchProductsBloc>(create: (_) => SearchProductsBloc()),
         ],
         child: MyApp(),
       ),

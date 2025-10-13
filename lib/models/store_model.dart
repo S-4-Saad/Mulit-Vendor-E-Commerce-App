@@ -73,7 +73,7 @@ class Category {
   final String id;
   final String name;
   final String imageUrl;
-  final List<DummyProductModel> products;
+  final List<ProductModel> products;
 
   Category({
     required this.id,

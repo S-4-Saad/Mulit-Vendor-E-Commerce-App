@@ -1,4 +1,4 @@
-class DummyProductModel {
+class ProductModel {
   final String id;
   final String productTitle;
   final double productPrice; // discounted price or final price
@@ -8,7 +8,7 @@ class DummyProductModel {
   final String? productCategory;
   final bool isProductFavourite;
 
-  DummyProductModel({
+  ProductModel({
     required this.id,
     required this.productTitle,
     required this.productPrice,
