@@ -168,8 +168,9 @@ class ShopProductsScreen extends StatelessWidget {
                                             productOriginalPrice: product.productOriginalPrice,
                                             productCategory: product.productCategory,
                                             productRating: product.productRating,
-                                            isProductFavourite: product.isProductFavourite,
-                                            onFavouriteTap: () {},
+                                            // isProductFavourite: product.isProductFavourite,
+                                            productId: product.id,
+                                            // onFavouriteTap: () {},
                                             onProductTap: () {
                                               Navigator.pushNamed(
                                                 context,

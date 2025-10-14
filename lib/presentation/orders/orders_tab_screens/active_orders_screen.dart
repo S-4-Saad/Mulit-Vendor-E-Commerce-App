@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:speezu/presentation/order_details/order_details_screen.dart';
+import '../../../widgets/active_orders_shimmer.dart';
 import '../../../widgets/dialog_boxes/orders_dialog_boxes.dart';
 import '../../../widgets/order_card.dart';
 import '../../qr_scanner/qr_scanner_screen.dart';
@@ -39,9 +40,7 @@ class _ActiveOrdersScreenState extends State<ActiveOrdersScreen> {
       body: BlocBuilder<OrdersBloc, OrderState>(
         builder: (context, state) {
           if (state.status == OrderStatus.loading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const ActiveOrdersShimmer();
           }
 
           if (state.status == OrderStatus.error) {
@@ -138,7 +137,8 @@ class _ActiveOrdersScreenState extends State<ActiveOrdersScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => OrderDetailsScreen(),
+                          builder: (context) => OrderDetailsScreen(orderId: order.orderId,
+                          ),
                         ),
                       );
                     },

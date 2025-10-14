@@ -1,126 +1,185 @@
 class OrderDetailModel {
-  final int id;
-  final String placedOn;
-  final double totalAmount;
-  final List<OrderDetailProduct> products;
-  final OrderDetailAddress shippingAddress;
-  final OrderDetailSummary summary;
-  final int currentStep;
+  bool? success;
+  String? message;
+  Order? order;
 
-  OrderDetailModel({
-    required this.id,
-    required this.placedOn,
-    required this.totalAmount,
-    required this.products,
-    required this.shippingAddress,
-    required this.summary,
-    required this.currentStep,
-  });
+  OrderDetailModel({this.success, this.message, this.order});
 
-  factory OrderDetailModel.fromJson(Map<String, dynamic> json) {
-    return OrderDetailModel(
-      id: json['id'],
-      placedOn: json['placedOn'],
-      totalAmount: (json['totalAmount'] as num).toDouble(),
-      products: (json['products'] as List)
-          .map((p) => OrderDetailProduct.fromJson(p))
-          .toList(),
-      shippingAddress: OrderDetailAddress.fromJson(json['shippingAddress']),
-      summary: OrderDetailSummary.fromJson(json['summary']),
-      currentStep: json['currentStep'],
-    );
+  OrderDetailModel.fromJson(Map<String, dynamic> json) {
+    success = json['success'];
+    message = json['message'];
+    order = json['order'] != null ? new Order.fromJson(json['order']) : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['success'] = this.success;
+    data['message'] = this.message;
+    if (this.order != null) {
+      data['order'] = this.order!.toJson();
+    }
+    return data;
   }
 }
 
-class OrderDetailProduct {
-  final String shopName;
-  final String imageUrl;
-  final String productName;
-  final String variationParentName;
-  final String variationParentValue;
-  final String variationChildName;
-  final String variationChildValue;
-  final String price;
-  final String originalPrice;
-  final bool isReviewTaken;
+class Order {
+  int? id;
+  String? placedOn;
+  int? totalAmount;
+  int? currentStep;
+  List<Products>? products;
+  ShippingAddress? shippingAddress;
+  Summary? summary;
 
-  OrderDetailProduct({
-    required this.shopName,
-    required this.imageUrl,
-    required this.productName,
-    required this.variationParentName,
-    required this.variationParentValue,
-    required this.variationChildName,
-    required this.variationChildValue,
-    required this.price,
-    required this.originalPrice,
-    required this.isReviewTaken,
-  });
+  Order(
+      {this.id,
+        this.placedOn,
+        this.totalAmount,
+        this.currentStep,
+        this.products,
+        this.shippingAddress,
+        this.summary});
 
-  factory OrderDetailProduct.fromJson(Map<String, dynamic> json) {
-    return OrderDetailProduct(
-      shopName: json['shopName'],
-      imageUrl: json['imageUrl'],
-      productName: json['productName'],
-      variationParentName: json['variationParentName'],
-      variationParentValue: json['variationParentValue'],
-      variationChildName: json['variationChildName'],
-      variationChildValue: json['variationChildValue'],
-      price: json['price'],
-      originalPrice: json['originalPrice'],
-      isReviewTaken: json['isReviewTaken'] ?? false,
-    );
+  Order.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    placedOn = json['placedOn'];
+    totalAmount = json['totalAmount'];
+    currentStep = json['currentStep'];
+    if (json['products'] != null) {
+      products = <Products>[];
+      json['products'].forEach((v) {
+        products!.add(new Products.fromJson(v));
+      });
+    }
+    shippingAddress = json['shippingAddress'] != null
+        ? new ShippingAddress.fromJson(json['shippingAddress'])
+        : null;
+    summary =
+    json['summary'] != null ? new Summary.fromJson(json['summary']) : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['placedOn'] = this.placedOn;
+    data['totalAmount'] = this.totalAmount;
+    data['currentStep'] = this.currentStep;
+    if (this.products != null) {
+      data['products'] = this.products!.map((v) => v.toJson()).toList();
+    }
+    if (this.shippingAddress != null) {
+      data['shippingAddress'] = this.shippingAddress!.toJson();
+    }
+    if (this.summary != null) {
+      data['summary'] = this.summary!.toJson();
+    }
+    return data;
   }
 }
 
-class OrderDetailAddress {
-  final String title;
-  final String customerName;
-  final String primaryPhone;
-  final String secondaryPhone;
-  final String fullAddress;
+class Products {
+  bool? isReviewTaken;
+  String? shopName;
+  String? imageUrl;
+  String? productName;
+  String? variationParentName;
+  String? variationChildName;
+  String? price;
+  String? originalPrice;
 
-  OrderDetailAddress({
-    required this.title,
-    required this.customerName,
-    required this.primaryPhone,
-    required this.secondaryPhone,
-    required this.fullAddress,
-  });
+  Products(
+      {this.isReviewTaken,
+        this.shopName,
+        this.imageUrl,
+        this.productName,
+        this.variationParentName,
+        this.variationChildName,
+        this.price,
+        this.originalPrice});
 
-  factory OrderDetailAddress.fromJson(Map<String, dynamic> json) {
-    return OrderDetailAddress(
-      title: json['title'],
-      customerName: json['customerName'],
-      primaryPhone: json['primaryPhone'],
-      secondaryPhone: json['secondaryPhone'],
-      fullAddress: json['fullAddress'],
-    );
+  Products.fromJson(Map<String, dynamic> json) {
+    isReviewTaken = json['isReviewTaken'];
+    shopName = json['shopName'];
+    imageUrl = json['imageUrl'];
+    productName = json['productName'];
+    variationParentName = json['variationParentName'];
+    variationChildName = json['variationChildName'];
+    price = json['price'];
+    originalPrice = json['originalPrice'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['isReviewTaken'] = this.isReviewTaken;
+    data['shopName'] = this.shopName;
+    data['imageUrl'] = this.imageUrl;
+    data['productName'] = this.productName;
+    data['variationParentName'] = this.variationParentName;
+    data['variationChildName'] = this.variationChildName;
+    data['price'] = this.price;
+    data['originalPrice'] = this.originalPrice;
+    return data;
   }
 }
 
-class OrderDetailSummary {
-  final String itemTotal;
-  final String deliveryFee;
-  final String tax;
-  final String total;
-  final String itemQty;
+class ShippingAddress {
+  String? title;
+  String? customerName;
+  String? primaryPhone;
+  String? secondaryPhone;
+  String? fullAddress;
 
-  OrderDetailSummary({
-    required this.itemTotal,
-    required this.deliveryFee,
-    required this.tax,
-    required this.total,
-    required this.itemQty,
-  });
+  ShippingAddress(
+      {this.title,
+        this.customerName,
+        this.primaryPhone,
+        this.secondaryPhone,
+        this.fullAddress});
 
-  factory OrderDetailSummary.fromJson(Map<String, dynamic> json) {
-    return OrderDetailSummary(
-      itemTotal: json['itemTotal'],
-      deliveryFee: json['deliveryFee'],
-      tax: json['tax'],
-      total: json['total'],
-      itemQty: json['itemQty'],
-    );
+  ShippingAddress.fromJson(Map<String, dynamic> json) {
+    title = json['title'];
+    customerName = json['customerName'];
+    primaryPhone = json['primaryPhone'];
+    secondaryPhone = json['secondaryPhone'];
+    fullAddress = json['fullAddress'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['title'] = this.title;
+    data['customerName'] = this.customerName;
+    data['primaryPhone'] = this.primaryPhone;
+    data['secondaryPhone'] = this.secondaryPhone;
+    data['fullAddress'] = this.fullAddress;
+    return data;
+  }
+}
+
+class Summary {
+  String? itemTotal;
+  String? deliveryFee;
+  String? tax;
+  String? total;
+  String? itemQty;
+
+  Summary(
+      {this.itemTotal, this.deliveryFee, this.tax, this.total, this.itemQty});
+
+  Summary.fromJson(Map<String, dynamic> json) {
+    itemTotal = json['itemTotal'];
+    deliveryFee = json['deliveryFee'];
+    tax = json['tax'];
+    total = json['total'];
+    itemQty = json['itemQty'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['itemTotal'] = this.itemTotal;
+    data['deliveryFee'] = this.deliveryFee;
+    data['tax'] = this.tax;
+    data['total'] = this.total;
+    data['itemQty'] = this.itemQty;
+    return data;
   }
 }

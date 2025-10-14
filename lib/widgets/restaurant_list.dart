@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
-import '../models/restaurant_model.dart';
-import 'restaurant_card.dart';
-
-class RestaurantList extends StatelessWidget {
-  final List<RestaurantModel> restaurants;
-  final VoidCallback? onRestaurantTap;
+import 'package:speezu/models/shop_model.dart';
+import 'package:speezu/widgets/shop_box_widget.dart';
+class ShopList extends StatelessWidget {
+  final List<ShopModel> shops;
+  final VoidCallback? onShopTap;
   final VoidCallback? onOpenTap;
   final VoidCallback? onPickupTap;
-  final Function(RestaurantModel)? onLocationTap;
+  final Function(ShopModel)? onLocationTap;
   final double? height;
   final EdgeInsetsGeometry? padding;
 
-  const RestaurantList({
+  const ShopList({
     super.key,
-    required this.restaurants,
-    this.onRestaurantTap,
+    required this.shops,
+    this.onShopTap,
     this.onOpenTap,
     this.onPickupTap,
     this.onLocationTap,
@@ -24,7 +23,7 @@ class RestaurantList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (restaurants.isEmpty) {
+    if (shops.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -33,17 +32,29 @@ class RestaurantList extends StatelessWidget {
       padding: padding ?? const EdgeInsets.symmetric(vertical: 8),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: restaurants.length,
+        itemCount: shops.length,
         itemBuilder: (context, index) {
-          final restaurant = restaurants[index];
+          final shop = shops[index];
           return Padding(
             padding: const EdgeInsets.all(8.0),
-            child: RestaurantCard(
-              restaurant: restaurant,
-              onTap: onRestaurantTap,
-              onOpenTap: onOpenTap,
-              onPickupTap: onPickupTap,
-              onLocationTap: onLocationTap,
+            child: ShopBox(
+              onShopBoxTap: () => onOpenTap?.call(),
+
+              imageUrl: shop.imageUrl.toString(),
+              isDelivering: true,
+              isOpen: true,
+             onDirectionTap: () => onLocationTap?.call(shop),
+
+              shopName: shop.shopName,
+              shopDescription: shop.shopDescription,
+              shopRating: shop.shopRating,
+
+
+              // restaurant: restaurant,
+              // onShopBoxTap: onRestaurantTap??(){},
+              // onOpenTap: onOpenTap,
+              // onPickupTap: onPickupTap,
+              // onLocationTap: onLocationTap,
             ),
           );
         },

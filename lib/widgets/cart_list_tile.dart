@@ -41,7 +41,7 @@ class CartListTile extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final tileWidth = constraints.maxWidth;
-        final textMaxWidth = tileWidth * 0.4; // adaptive instead of fixed
+        // final textMaxWidth = tileWidth * 0.4; // adaptive instead of fixed
 
         return Stack(
           children: [

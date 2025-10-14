@@ -60,8 +60,8 @@ class _DynamicProductsScreenState extends State<DynamicProductsScreen> {
           // --- Loading ---
           if (status == ProductsStatus.loading ||
               status == ProductsStatus.initial) {
-            return const CircularProgressIndicator();
-            // return const ProductsTabShimmerWidget();
+            // return const CircularProgressIndicator();
+            return  Center(child: ProductsTabShimmerWidget());
           }
 
           // --- Error ---
@@ -138,14 +138,13 @@ class _DynamicProductsScreenState extends State<DynamicProductsScreen> {
                     child: ProductBox(
                       marginPadding: const Padding(padding: EdgeInsets.all(0)),
                       productWidth: 200,
+                      productId: product.id,
                       productPrice: product.productPrice,
                       productOriginalPrice: product.productOriginalPrice,
                       productCategory: product.productCategory,
                       productRating: product.productRating,
-                      isProductFavourite: product.isProductFavourite,
-                      onFavouriteTap: () {
-                        // TODO: Add favourite logic
-                      },
+                      // isProductFavourite: product.isProductFavourite,
+
                       onProductTap: () {
                         Navigator.pushNamed(
                           context,

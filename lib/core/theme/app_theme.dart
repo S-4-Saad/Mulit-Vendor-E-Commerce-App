@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
 import 'package:speezu/core/assets/font_family.dart';
 
 enum AppThemeMode { light, dark }

@@ -44,3 +44,10 @@ class ClearStoreDataEvent extends ShopEvent {
   @override
   List<Object?> get props => [];
 }
+class FetchShopReviewsEvent extends ShopEvent {
+  final int storeId;
+  FetchShopReviewsEvent({required this.storeId, });
+
+  @override
+  List<Object?> get props => [storeId];
+}

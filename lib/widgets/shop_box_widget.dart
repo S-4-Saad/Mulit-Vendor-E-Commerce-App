@@ -6,7 +6,17 @@ import '../core/assets/font_family.dart';
 import 'app_cache_image.dart';
 
 class ShopBox extends StatelessWidget {
-  const ShopBox({super.key, required this.imageUrl, required this.shopName, required this.shopDescription, required this.shopRating, required this.onShopBoxTap, required this.onDirectionTap, required this.isOpen, required this.isDelivering});
+  const ShopBox({
+    super.key,
+    required this.imageUrl,
+    required this.shopName,
+    required this.shopDescription,
+    required this.shopRating,
+    required this.onShopBoxTap,
+    required this.onDirectionTap,
+    required this.isOpen,
+    required this.isDelivering,
+  });
   final String imageUrl;
   final String shopName;
   final String shopDescription;
@@ -16,14 +26,13 @@ class ShopBox extends StatelessWidget {
   final bool isOpen;
   final bool isDelivering;
 
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onShopBoxTap,
       child: Container(
         clipBehavior: Clip.antiAlias,
-        margin: EdgeInsets.only(right: 8, bottom: 5,top: 5),
+        margin: EdgeInsets.only(right: 8, bottom: 5, top: 5),
 
         width: 270,
         decoration: BoxDecoration(
@@ -44,8 +53,7 @@ class ShopBox extends StatelessWidget {
               alignment: Alignment.bottomLeft,
               children: [
                 AppCacheImage(
-                  imageUrl:
-                  imageUrl,
+                  imageUrl: imageUrl,
                   height: 130,
                   round: 0,
                   width: 270,
@@ -63,17 +71,15 @@ class ShopBox extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color:isOpen? Colors.green: Colors.red,
+                          color: isOpen ? Colors.green : Colors.red,
                           borderRadius: BorderRadius.circular(50),
                         ),
                         child: Center(
                           child: Text(
-                            isOpen? Labels.open:Labels.closed,
+                            isOpen ? Labels.open : Labels.closed,
                             style: TextStyle(
-                              color:
-                              Colors.white,
-                              fontFamily:
-                              FontFamily.fontsPoppinsRegular,
+                              color: Colors.white,
+                              fontFamily: FontFamily.fontsPoppinsRegular,
                               fontSize: 12,
                             ),
                           ),
@@ -86,17 +92,15 @@ class ShopBox extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color:isDelivering?Colors.blue: Colors.orange,
+                          color: isDelivering ? Colors.blue : Colors.orange,
                           borderRadius: BorderRadius.circular(50),
                         ),
                         child: Center(
                           child: Text(
-                            isDelivering?Labels.delivery:  Labels.pickUp,
+                            isDelivering ? Labels.delivery : Labels.pickUp,
                             style: TextStyle(
-                              color:
-                              Colors.white,
-                              fontFamily:
-                              FontFamily.fontsPoppinsRegular,
+                              color: Colors.white,
+                              fontFamily: FontFamily.fontsPoppinsRegular,
                               fontSize: 12,
                             ),
                           ),
@@ -123,11 +127,9 @@ class ShopBox extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontFamily:
-                            FontFamily.fontsPoppinsSemiBold,
+                            fontFamily: FontFamily.fontsPoppinsSemiBold,
                             fontSize: 16,
-                            color:
-                            Theme.of(context).colorScheme.primary,
+                            color: Theme.of(context).colorScheme.primary,
                             height: 1,
                           ),
                         ),
@@ -136,26 +138,18 @@ class ShopBox extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontFamily:
-                            FontFamily.fontsPoppinsRegular,
+                            fontFamily: FontFamily.fontsPoppinsRegular,
                             fontSize: 13,
-                            color:
-                            Theme.of(
-                              context,
-                            ).colorScheme.onSecondary,
+                            color: Theme.of(context).colorScheme.onSecondary,
                           ),
                         ),
-                        RatingDisplayWidget(
-                          rating: shopRating,
-                          starSize: 17,
-                        ),
+                        RatingDisplayWidget(rating: shopRating, starSize: 17),
                       ],
                     ),
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                      Theme.of(context).colorScheme.primary,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(5),
                       ),
@@ -164,7 +158,7 @@ class ShopBox extends StatelessWidget {
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       elevation: 0,
                     ),
-                    onPressed:onDirectionTap,
+                    onPressed: onDirectionTap,
                     child: Icon(
                       Icons.directions,
                       color: Colors.white,
@@ -182,7 +176,17 @@ class ShopBox extends StatelessWidget {
 }
 
 class ShopBoxBigWidget extends StatelessWidget {
-  const ShopBoxBigWidget({super.key, required this.imageUrl, required this.shopName, required this.shopDescription, required this.shopRating, required this.onShopBoxTap, required this.onDirectionTap, required this.isOpen, required this.isDelivering});
+  const ShopBoxBigWidget({
+    super.key,
+    required this.imageUrl,
+    required this.shopName,
+    required this.shopDescription,
+    required this.shopRating,
+    required this.onShopBoxTap,
+    required this.onDirectionTap,
+    required this.isOpen,
+    required this.isDelivering,
+  });
   final String imageUrl;
   final String shopName;
   final String shopDescription;
@@ -192,15 +196,13 @@ class ShopBoxBigWidget extends StatelessWidget {
   final bool isOpen;
   final bool isDelivering;
 
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onShopBoxTap,
       child: Container(
         clipBehavior: Clip.antiAlias,
-        margin: EdgeInsets.only(right: 5, bottom: 5,top: 5, left: 5),
-
+        margin: EdgeInsets.only(right: 5, bottom: 5, top: 5, left: 5),
 
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
@@ -220,8 +222,7 @@ class ShopBoxBigWidget extends StatelessWidget {
               alignment: Alignment.bottomLeft,
               children: [
                 AppCacheImage(
-                  imageUrl:
-                  imageUrl,
+                  imageUrl: imageUrl,
                   height: 200,
                   round: 0,
                   width: double.infinity,
@@ -239,17 +240,15 @@ class ShopBoxBigWidget extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color:isOpen? Colors.green: Colors.red,
+                          color: isOpen ? Colors.green : Colors.red,
                           borderRadius: BorderRadius.circular(50),
                         ),
                         child: Center(
                           child: Text(
-                            isOpen? Labels.open:Labels.closed,
+                            isOpen ? Labels.open : Labels.closed,
                             style: TextStyle(
-                              color:
-                              Colors.white,
-                              fontFamily:
-                              FontFamily.fontsPoppinsRegular,
+                              color: Colors.white,
+                              fontFamily: FontFamily.fontsPoppinsRegular,
                               fontSize: 12,
                             ),
                           ),
@@ -262,17 +261,15 @@ class ShopBoxBigWidget extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color:isDelivering?Colors.blue: Colors.orange,
+                          color: isDelivering ? Colors.blue : Colors.orange,
                           borderRadius: BorderRadius.circular(50),
                         ),
                         child: Center(
                           child: Text(
-                            isDelivering?Labels.delivery:  Labels.pickUp,
+                            isDelivering ? Labels.delivery : Labels.pickUp,
                             style: TextStyle(
-                              color:
-                              Colors.white,
-                              fontFamily:
-                              FontFamily.fontsPoppinsRegular,
+                              color: Colors.white,
+                              fontFamily: FontFamily.fontsPoppinsRegular,
                               fontSize: 12,
                             ),
                           ),
@@ -286,10 +283,14 @@ class ShopBoxBigWidget extends StatelessWidget {
 
                   right: 10,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(50),),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
                     child: RatingDisplayWidget(
                       rating: shopRating,
                       starSize: 17,
@@ -301,7 +302,8 @@ class ShopBoxBigWidget extends StatelessWidget {
 
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
@@ -332,12 +334,10 @@ class ShopBoxBigWidget extends StatelessWidget {
                         ),
                       ],
                     ),
-                  )
-,
+                  ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                      Theme.of(context).colorScheme.primary,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(5),
                       ),
@@ -346,7 +346,7 @@ class ShopBoxBigWidget extends StatelessWidget {
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       elevation: 0,
                     ),
-                    onPressed:onDirectionTap,
+                    onPressed: onDirectionTap,
                     child: Icon(
                       Icons.directions,
                       color: Colors.white,

@@ -8,6 +8,7 @@ import 'package:speezu/presentation/orders/orders_tab_screens/completed_orders_s
 import '../../core/utils/labels.dart';
 import 'bloc/orders_event.dart';
 import 'orders_tab_screens/active_orders_screen.dart';
+import 'orders_tab_screens/cancelled_orders_screen.dart';
 
 class OrdersTabBarScreen extends StatelessWidget {
   final int initialIndex;
@@ -21,7 +22,7 @@ class OrdersTabBarScreen extends StatelessWidget {
     return BlocBuilder<OrdersBloc, OrderState>(
       builder: (context, state) {
         return DefaultTabController(
-          length: 2, // Changed from 3 to 2
+          length: 3, // Changed from 3 to 2
           initialIndex: state.selectedTabIndex,
           child: Scaffold(
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -76,12 +77,12 @@ class OrdersTabBarScreen extends StatelessWidget {
                           child: Text(Labels.completedOrders),
                         ),
                       ),
-                      // Tab(
-                      //   icon: Padding(
-                      //     padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                      //     child: Text(Labels.cancelledOrders),
-                      //   ),
-                      // ),
+                      Tab(
+                        icon: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                          child: Text(Labels.cancelledOrders),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -94,7 +95,7 @@ class OrdersTabBarScreen extends StatelessWidget {
                     children: [
                       const ActiveOrdersScreen(),
                       const CompletedOrdersScreen(),
-                      // const CancelledOrdersScreen(), // Commented out
+                      const CancelledOrdersScreen(), // Commented out
                     ],
                   ),
                 ),

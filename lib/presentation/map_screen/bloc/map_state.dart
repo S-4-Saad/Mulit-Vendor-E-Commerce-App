@@ -86,6 +86,10 @@ class MapLocationPermissionDenied extends MapState {
   const MapLocationPermissionDenied();
 }
 
+class MapLocationPermissionDeniedPermanently extends MapState {
+  const MapLocationPermissionDeniedPermanently();
+}
+
 class MapLocationServiceDisabled extends MapState {
   const MapLocationServiceDisabled();
 }

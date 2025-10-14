@@ -5,7 +5,7 @@ import '../../../models/product_model.dart';
 enum ProductsStatus { initial, loading, success, error }
 class ProductsState extends Equatable {
   final int selectedTabIndex;
-  final Map<String, List<DummyProductModel>> productsByCategory;
+  final Map<String, List<ProductModel>> productsByCategory;
   final Map<String, ProductsStatus> statusByCategory;
   final Map<String, String> messageByCategory;
 
@@ -18,7 +18,7 @@ class ProductsState extends Equatable {
 
   ProductsState copyWith({
     int? selectedTabIndex,
-    Map<String, List<DummyProductModel>>? productsByCategory,
+    Map<String, List<ProductModel>>? productsByCategory,
     Map<String, ProductsStatus>? statusByCategory,
     Map<String, String>? messageByCategory,
   }) {

@@ -11,6 +11,8 @@ import 'package:speezu/models/store_model.dart';
 import 'package:speezu/core/assets/app_images.dart';
 import 'package:speezu/core/utils/labels.dart';
 
+import '../../../models/store_reviews_model.dart';
+
 class ShopBloc extends Bloc<ShopEvent, ShopState> {
   ShopBloc() : super(ShopState()) {
     on<ChangeTabEvent>(_changeTab);
@@ -18,6 +20,7 @@ class ShopBloc extends Bloc<ShopEvent, ShopState> {
     on<LoadCategoriesEvent>(_loadCategories);
     on<LoadProductsEvent>(_loadProducts);
     on<ClearStoreDataEvent>(_clearStoreData);
+    on<FetchShopReviewsEvent>(_fetchShopReviews);
   }
   
   void _changeTab(ChangeTabEvent event, Emitter<ShopState> emit) {
@@ -40,10 +43,11 @@ class ShopBloc extends Bloc<ShopEvent, ShopState> {
           if (success) {
             try {
               StoreDetailModel storeDetailModel = StoreDetailModel.fromJson(responseData);
-              if (storeDetailModel.stores != null && storeDetailModel.stores!.isNotEmpty) {
+              if (storeDetailModel.store != null) {
+print(storeDetailModel.store?.toJson());
                 emit(state.copyWith(
                   shopDetailStatus: ShopDetailStatus.success,
-                  storeDetail: storeDetailModel.stores!.first,
+                  storeDetail: storeDetailModel,
                   message: storeDetailModel.message,
                 ));
               } else {
@@ -164,16 +168,12 @@ class ShopBloc extends Bloc<ShopEvent, ShopState> {
     ));
 
     try {
-      // Fetch products for category (including "All Products" with id "0")
-      // Backend handles categoryId "0" by returning all products for the store
       final products = await _fetchProductsForCategory(event.storeId, event.categoryId);
-      
       emit(state.copyWith(
         productsStatus: ProductsStatus.success,
         currentProducts: products,
         message: 'Products loaded successfully',
       ));
-
     } catch (e) {
       print('Exception caught during products loading: $e');
       emit(state.copyWith(
@@ -182,9 +182,8 @@ class ShopBloc extends Bloc<ShopEvent, ShopState> {
       ));
     }
   }
-
-  Future<List<DummyProductModel>> _fetchProductsForCategory(int storeId, String categoryId) async {
-    final List<DummyProductModel> products = [];
+  Future<List<ProductModel>> _fetchProductsForCategory(int storeId, String categoryId) async {
+    final List<ProductModel> products = [];
     
     try {
       final apiUrl = '$resProductsUrl$categoryId?store_id=$storeId';
@@ -216,5 +215,51 @@ class ShopBloc extends Bloc<ShopEvent, ShopState> {
     
     return products;
   }
+  void _fetchShopReviews(FetchShopReviewsEvent event, Emitter<ShopState> emit) async {
+    emit(state.copyWith(shopReviewsStatus: ShopReviewsStatus.loading));
 
+    try {
+      final apiUrl = '$storeReviewsUrl${event.storeId}';
+
+      await ApiService.getMethod(
+        apiUrl: apiUrl,
+        executionMethod: (bool success, dynamic responseData) async {
+          if (success) {
+            try {
+              ShopReviewsModel reviewsModel = ShopReviewsModel.fromJson(responseData);
+              if (success) {
+                emit(state.copyWith(
+                  shopReviewsStatus: ShopReviewsStatus.success,
+                  shopReviewsModel: reviewsModel,
+                  message: reviewsModel.message,
+                ));
+              } else {
+                emit(state.copyWith(
+                  shopReviewsStatus: ShopReviewsStatus.error,
+                  message: 'No reviews found',
+                ));
+              }
+            } catch (e) {
+              print('Error parsing shop reviews data: $e');
+              emit(state.copyWith(
+                shopReviewsStatus: ShopReviewsStatus.error,
+                message: 'Failed to parse reviews',
+              ));
+            }
+          } else {
+            emit(state.copyWith(
+              shopReviewsStatus: ShopReviewsStatus.error,
+              message: responseData['message'] ?? 'Failed to load reviews',
+            ));
+          }
+        },
+      );
+    } catch (e) {
+      print('Exception caught during shop reviews loading: $e');
+      emit(state.copyWith(
+        shopReviewsStatus: ShopReviewsStatus.error,
+        message: 'Failed to load reviews: $e',
+      ));
+    }
+  }
 }

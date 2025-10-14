@@ -61,7 +61,7 @@ class CategoryProductData {
   }
 
   // Convert to DummyProductModel for UI compatibility
-  DummyProductModel toDummyProductModel({String? category}) {
+  ProductModel toDummyProductModel({String? category}) {
     // Construct full image URL if the image path is relative
     String fullImageUrl = productImage;
     if (!productImage.startsWith('http')) {
@@ -71,7 +71,7 @@ class CategoryProductData {
     // Use the real category name from the nested category object
     String categoryName = category ?? this.category?.name ?? 'Product';
     
-    return DummyProductModel(
+    return ProductModel(
       id: id.toString(),
       productTitle: productName,
       productPrice: double.tryParse(productDiscountedPrice) ?? 0.0,

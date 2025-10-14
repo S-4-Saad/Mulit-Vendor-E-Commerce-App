@@ -1,7 +1,5 @@
-import 'package:equatable/equatable.dart';
 
 import 'media.dart';
-import 'media_model.dart';
 
 class SlidesModel {
   bool? success;

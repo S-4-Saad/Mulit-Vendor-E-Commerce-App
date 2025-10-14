@@ -43,41 +43,40 @@ class OrderDetailsProductTile extends StatelessWidget {
       builder: (context, constraints) {
         final tileWidth = constraints.maxWidth;
 
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-          child: Stack(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.outline.withValues(alpha: .3),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withValues(alpha: 0.1),
-                      spreadRadius: 1,
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+        return Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.onPrimary,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.outline.withValues(alpha: .3),
                 ),
-                child: Column(
-                  children: [
-                    SizedBox(height: 5),
-                    Row(
-                      children: [
-                        SizedBox(width: isDiscounted ? 55 : 10),
-                        Icon(
-                          Icons.store_mall_directory_outlined,
-                          color: Theme.of(context).colorScheme.onSecondary,
-                          size: 27,
-                        ),
-                        SizedBox(width: 5),
-                        Text(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withValues(alpha: 0.1),
+                    spreadRadius: 1,
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  SizedBox(height: 5),
+                  Row(
+                    children: [
+                      SizedBox(width: isDiscounted ? 55 : 10),
+                      Icon(
+                        Icons.store_mall_directory_outlined,
+                        color: Theme.of(context).colorScheme.onSecondary,
+                        size: 27,
+                      ),
+                      SizedBox(width: 5),
+                      Flexible(
+                        child: Text(
                           productName,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -87,71 +86,93 @@ class OrderDetailsProductTile extends StatelessWidget {
                             color: Theme.of(context).colorScheme.onSecondary,
                           ),
                         ),
-                        Spacer(),
-                        if(isReviewed)
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            tapTargetSize:
-                            MaterialTapTargetSize
-                                .shrinkWrap, // removes extra margin
-                            visualDensity: VisualDensity.compact,
-                            minimumSize: Size(0, 30),
-                            backgroundColor: Color(0xFFffbf00),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 5,
-                            ),
+                      ),
+                      Spacer(),
+                      IconButton(onPressed: (){
+                        print(isReviewed);
+                      }, icon: Icon(Icons.add)),
+                      if(!isReviewed)
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          tapTargetSize:
+                          MaterialTapTargetSize
+                              .shrinkWrap, // removes extra margin
+                          visualDensity: VisualDensity.compact,
+                          minimumSize: Size(0, 30),
+                          backgroundColor: Color(0xFFffbf00),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5),
                           ),
-                          onPressed: onReviewTap,
-                          child: Text(
-                            Labels.giveReview,
-                            style: TextStyle(
-                              fontFamily: FontFamily.fontsPoppinsRegular,
-                              color: Colors.white,
-                            ),
+
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
                           ),
                         ),
-                        SizedBox(width: 10),
-                      ],
-                    ),
-                    SizedBox(height: 5),
-                    Divider(
-                      height: 0,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.outline.withValues(alpha: .3),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          /// Product Image
-                          AppCacheImage(
-                            imageUrl: imageUrl,
-                            height: 80,
-                            width: 80,
-                            round: 5,
+                        onPressed: onReviewTap,
+                        child: Text(
+                          Labels.giveReview,
+                          style: TextStyle(
+                            fontFamily: FontFamily.fontsPoppinsRegular,
+                            color: Colors.white,
                           ),
-                          const SizedBox(width: 10),
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                    ],
+                  ),
+                  SizedBox(height: 5),
+                  Divider(
+                    height: 0,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.outline.withValues(alpha: .3),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        /// Product Image
+                        AppCacheImage(
+                          imageUrl: imageUrl,
+                          height: 80,
+                          width: 80,
+                          round: 5,
+                        ),
+                        const SizedBox(width: 10),
 
-                          /// Middle Column (Product info)
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                /// Product Name
+                        /// Middle Column (Product info)
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              /// Product Name
+                              Text(
+                                productName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontFamily: FontFamily.fontsPoppinsSemiBold,
+                                  fontSize: 14,
+                                  color:
+                                  Theme.of(
+                                    context,
+                                  ).colorScheme.onSecondary,
+                                ),
+                              ),
+
+                              /// Parent Variation
+                              if (variationParentName != null &&
+                                  variationParentValue != null)
                                 Text(
-                                  productName,
+                                  "$variationParentName: $variationParentValue",
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    fontFamily: FontFamily.fontsPoppinsSemiBold,
-                                    fontSize: 14,
+                                    fontFamily:
+                                    FontFamily.fontsPoppinsRegular,
+                                    fontSize: 13,
                                     color:
                                     Theme.of(
                                       context,
@@ -159,117 +180,98 @@ class OrderDetailsProductTile extends StatelessWidget {
                                   ),
                                 ),
 
-                                /// Parent Variation
-                                if (variationParentName != null &&
-                                    variationParentValue != null)
+                              /// Child Variation
+                              if (variationChildName != null &&
+                                  variationChildValue != null)
+                                Text(
+                                  "$variationChildName: $variationChildValue",
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontFamily:
+                                    FontFamily.fontsPoppinsRegular,
+                                    fontSize: 13,
+                                    color:
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.onSecondary,
+                                  ),
+                                ),
+
+                              /// Price Row
+                              Row(
+                                children: [
                                   Text(
-                                    "$variationParentName: $variationParentValue",
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
+                                    "${CurrencyIcon.currencyIcon}$price",
                                     style: TextStyle(
                                       fontFamily:
-                                      FontFamily.fontsPoppinsRegular,
-                                      fontSize: 13,
+                                      FontFamily.fontsPoppinsSemiBold,
+                                      fontSize: 16,
                                       color:
                                       Theme.of(
                                         context,
-                                      ).colorScheme.onSecondary,
+                                      ).colorScheme.primary,
                                     ),
                                   ),
-
-                                /// Child Variation
-                                if (variationChildName != null &&
-                                    variationChildValue != null)
-                                  Text(
-                                    "$variationChildName: $variationChildValue",
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontFamily:
-                                      FontFamily.fontsPoppinsRegular,
-                                      fontSize: 13,
-                                      color:
-                                      Theme.of(
-                                        context,
-                                      ).colorScheme.onSecondary,
-                                    ),
-                                  ),
-
-                                /// Price Row
-                                Row(
-                                  children: [
-                                    Text(
-                                      "${CurrencyIcon.currencyIcon}$price",
-                                      style: TextStyle(
-                                        fontFamily:
-                                        FontFamily.fontsPoppinsSemiBold,
-                                        fontSize: 16,
-                                        color:
-                                        Theme.of(
-                                          context,
-                                        ).colorScheme.primary,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    if (isDiscounted)
-                                      Flexible(
-                                        child: Text(
-                                          "${CurrencyIcon.currencyIcon}$originalPrice",
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            fontFamily:
-                                            FontFamily.fontsPoppinsRegular,
-                                            fontSize: 12,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSecondary
-                                                .withValues(alpha: .5),
-                                            decoration:
-                                            TextDecoration.lineThrough,
-                                          ),
+                                  const SizedBox(width: 6),
+                                  if (isDiscounted)
+                                    Flexible(
+                                      child: Text(
+                                        "${CurrencyIcon.currencyIcon}$originalPrice",
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontFamily:
+                                          FontFamily.fontsPoppinsRegular,
+                                          fontSize: 12,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSecondary
+                                              .withValues(alpha: .5),
+                                          decoration:
+                                          TextDecoration.lineThrough,
                                         ),
                                       ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                                    ),
+                                ],
+                              ),
+                            ],
                           ),
-                          IconButton(
-                            onPressed: () {},
-                            icon: Icon(Icons.arrow_forward_ios_outlined),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              /// Discount Badge
-              if (isDiscounted)
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 3,
-                    ),
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        bottomRight: Radius.circular(12),
-                      ),
-                    ),
-                    child: Text(
-                      '-${calculatePercentage(originalPrice, price)}%',
-                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                        ),
+                        IconButton(
+                          onPressed: () {},
+                          icon: Icon(Icons.arrow_forward_ios_outlined),
+                        ),
+                      ],
                     ),
                   ),
+                ],
+              ),
+            ),
+
+            /// Discount Badge
+            if (isDiscounted)
+              Positioned(
+                top: 0,
+                left: 0,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 3,
+                  ),
+                  decoration: const BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(12),
+                      bottomRight: Radius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    '-${calculatePercentage(originalPrice, price)}%',
+                    style: const TextStyle(color: Colors.white, fontSize: 13),
+                  ),
                 ),
-            ],
-          ),
+              ),
+          ],
         );
       },
     );

@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import '../../core/services/permission_service.dart';
+import '../../widgets/dialog_boxes/permission_dialog.dart';
 
 class QrScannerScreen extends StatefulWidget {
   const QrScannerScreen({super.key});
@@ -13,6 +15,8 @@ class _QrScannerScreenState extends State<QrScannerScreen>
     with SingleTickerProviderStateMixin {
   final MobileScannerController controller = MobileScannerController();
   bool isScanned = false;
+  bool hasPermission = false;
+  bool isCheckingPermission = true;
   late AnimationController _animController;
 
   @override
@@ -22,6 +26,48 @@ class _QrScannerScreenState extends State<QrScannerScreen>
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
+    _checkCameraPermission();
+  }
+
+  Future<void> _checkCameraPermission() async {
+    final granted = await PermissionService.isCameraPermissionGranted();
+    
+    if (!granted) {
+      // Show permission dialog
+      if (!mounted) return;
+      final shouldRequest = await PermissionDialog.showCameraPermissionDialog(context);
+      
+      if (shouldRequest == true) {
+        final permissionGranted = await PermissionService.requestCameraPermission();
+        
+        if (!mounted) return;
+        setState(() {
+          hasPermission = permissionGranted;
+          isCheckingPermission = false;
+        });
+        
+        if (!permissionGranted) {
+          // Check if permanently denied
+          if (!mounted) return;
+          await PermissionDialog.showCameraPermissionDeniedDialog(
+            context,
+            isPermanentlyDenied: true,
+          );
+          if (!mounted) return;
+          Navigator.pop(context);
+        }
+      } else {
+        // User declined permission
+        if (!mounted) return;
+        Navigator.pop(context);
+      }
+    } else {
+      if (!mounted) return;
+      setState(() {
+        hasPermission = true;
+        isCheckingPermission = false;
+      });
+    }
   }
 
   @override
@@ -34,6 +80,56 @@ class _QrScannerScreenState extends State<QrScannerScreen>
   @override
   Widget build(BuildContext context) {
     const double scanBoxSize = 280;
+
+    // Show loading while checking permission
+    if (isCheckingPermission) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              CircularProgressIndicator(color: Colors.cyanAccent),
+              SizedBox(height: 16),
+              Text(
+                'Checking camera permission...',
+                style: TextStyle(color: Colors.white70),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Show error if no permission
+    if (!hasPermission) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.no_photography,
+                color: Colors.white70,
+                size: 64,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Camera permission is required\nto scan QR codes',
+                style: TextStyle(color: Colors.white70, fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Go Back'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: Colors.black,

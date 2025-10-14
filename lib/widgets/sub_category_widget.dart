@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:speezu/widgets/image_type_extention.dart';
 
 import '../core/assets/font_family.dart';
-import '../core/utils/currency_icon.dart';
-import 'app_cache_image.dart';
 
 class SubCategoryBox extends StatefulWidget {
   final String imageUrl;

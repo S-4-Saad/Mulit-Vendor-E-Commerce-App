@@ -13,13 +13,16 @@ import '../../models/product_model.dart';
 import '../../paractise.dart';
 import '../../widgets/carousel_slider_widget.dart';
 import '../../widgets/category_box_widget.dart';
+import '../../widgets/dialog_boxes/order_success_dialog.dart';
 import '../../widgets/home_header_tile.dart';
+import '../../widgets/login_required_bottom sheet.dart';
 import '../../widgets/search_animated_container.dart';
 import '../../widgets/home_shimmer_widget.dart';
+import '../favourites/bloc/favourite_bloc.dart';
+import '../favourites/bloc/favourite_event.dart';
 import '../products/bloc/products_event.dart';
 import '../shop_screen/shop_navbar_screen.dart';
 import 'home.dart';
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -50,15 +53,12 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<ProductCategory> dummyCategories = [
     ProductCategory(name: "Food", imageUrl: AppImages.foodStoreIcon),
     ProductCategory(name: "Supermarket", imageUrl: AppImages.superMarketIcon),
-    ProductCategory(
-      name: "Retail Store",
-      imageUrl: AppImages.utilityStoreIcon,
-    ),
+    ProductCategory(name: "Retail Store", imageUrl: AppImages.utilityStoreIcon),
     ProductCategory(name: "Pharmacy", imageUrl: AppImages.pharmacyIcon),
   ];
 
   // Helper methods to get API data
-  List<DummyProductModel> getApiFoodProducts(HomeState state) {
+  List<ProductModel> getApiFoodProducts(HomeState state) {
     if (state.dashboardProducts?.data.restaurant != null &&
         state.dashboardProducts!.data.restaurant.isNotEmpty) {
       return state.dashboardProducts!.data.restaurant.map((product) {
@@ -70,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return []; // Return empty list if no API data
   }
 
-  List<DummyProductModel> getApiSupermarketProducts(HomeState state) {
+  List<ProductModel> getApiSupermarketProducts(HomeState state) {
     if (state.dashboardProducts?.data.supermarket != null &&
         state.dashboardProducts!.data.supermarket.isNotEmpty) {
       return state.dashboardProducts!.data.supermarket.map((product) {
@@ -82,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return []; // Return empty list if no API data
   }
 
-  List<DummyProductModel> getApiRetailProducts(HomeState state) {
+  List<ProductModel> getApiRetailProducts(HomeState state) {
     if (state.dashboardProducts?.data.retail != null &&
         state.dashboardProducts!.data.retail.isNotEmpty) {
       return state.dashboardProducts!.data.retail.map((product) {
@@ -94,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return []; // Return empty list if no API data
   }
 
-  List<DummyProductModel> getApiPharmacyProducts(HomeState state) {
+  List<ProductModel> getApiPharmacyProducts(HomeState state) {
     if (state.dashboardProducts?.data.pharmacy != null &&
         state.dashboardProducts!.data.pharmacy.isNotEmpty) {
       return state.dashboardProducts!.data.pharmacy.map((product) {
@@ -120,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SmartRefresher(
         enablePullDown: true,
         onRefresh: _onRefresh,
-        header:  WaterDropMaterialHeader(
+        header: WaterDropMaterialHeader(
           backgroundColor: Theme.of(context).colorScheme.primary,
         ),
         controller: _refreshController,
@@ -140,6 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: context.heightPct(.01)),
+
                     // SearchContainer(onSearchTap: () {}),
                     // SizedBox(height: context.heightPct(.005)),
                     EcommerceBanner(
@@ -147,6 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       height: context.heightPct(.18),
                       // isImageTap: true,
                     ),
+
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
@@ -167,6 +169,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     SizedBox(height: context.heightPct(.02)),
+                    IconButton(
+                      onPressed: () {
+                        OrderSuccessDialog.show(
+                          context,
+                          onContinue: () {
+                            Navigator.of(context).pop();
+                            // Navigate back to home
+                          },
+                        );
+                      },
+                      icon: Icon(Icons.add),
+                    ),
                     HomeHeaderTile(
                       title: Labels.topTrendingFoods,
                       onViewAllTap:
@@ -202,27 +216,26 @@ class _HomeScreenState extends State<HomeScreen> {
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children:
-                                getApiFoodProducts(state).map((category) {
+                                getApiFoodProducts(state).map((product) {
                                   return ProductBox(
-                                    productPrice: category.productPrice,
+                                    productId: product.id,
+                                    productPrice: product.productPrice,
                                     productOriginalPrice:
-                                        category.productOriginalPrice,
-                                    productCategory: category.productCategory,
-                                    productRating: category.productRating,
-                                    isProductFavourite:
-                                        category.isProductFavourite,
-                                    onFavouriteTap: () {
-                                      // TODO: Implement favourite functionality
-                                    },
+                                        product.productOriginalPrice,
+                                    productCategory: product.productCategory,
+                                    productRating: product.productRating,
+
+                                    // isProductFavourite:
+                                    // product.isProductFavourite,
                                     onProductTap: () {
                                       Navigator.pushNamed(
                                         context,
                                         RouteNames.productScreen,
-                                        arguments: category.id,
+                                        arguments: product.id,
                                       );
                                     },
-                                    productImageUrl: category.productImageUrl,
-                                    productTitle: category.productTitle,
+                                    productImageUrl: product.productImageUrl,
+                                    productTitle: product.productTitle,
                                   );
                                 }).toList(),
                           ),
@@ -263,27 +276,26 @@ class _HomeScreenState extends State<HomeScreen> {
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children:
-                                getApiSupermarketProducts(state).map((
-                                  category,
-                                ) {
+                                getApiSupermarketProducts(state).map((product) {
                                   return ProductBox(
-                                    productPrice: category.productPrice,
+                                    productPrice: product.productPrice,
                                     productOriginalPrice:
-                                        category.productOriginalPrice,
-                                    productCategory: category.productCategory,
-                                    productRating: category.productRating,
-                                    isProductFavourite:
-                                        category.isProductFavourite,
-                                    onFavouriteTap: () {},
+                                        product.productOriginalPrice,
+                                    productCategory: product.productCategory,
+                                    productRating: product.productRating,
+                                    // isProductFavourite:
+                                    // product.isProductFavourite,
+                                    productId: product.id,
+
                                     onProductTap: () {
                                       Navigator.pushNamed(
                                         context,
                                         RouteNames.productScreen,
-                                        arguments: category.id,
+                                        arguments: product.id,
                                       );
                                     },
-                                    productImageUrl: category.productImageUrl,
-                                    productTitle: category.productTitle,
+                                    productImageUrl: product.productImageUrl,
+                                    productTitle: product.productTitle,
                                   );
                                 }).toList(),
                           ),
@@ -324,25 +336,25 @@ class _HomeScreenState extends State<HomeScreen> {
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children:
-                                getApiRetailProducts(state).map((category) {
+                                getApiRetailProducts(state).map((product) {
                                   return ProductBox(
-                                    productPrice: category.productPrice,
+                                    productPrice: product.productPrice,
                                     productOriginalPrice:
-                                        category.productOriginalPrice,
-                                    productCategory: category.productCategory,
-                                    productRating: category.productRating,
-                                    isProductFavourite:
-                                        category.isProductFavourite,
-                                    onFavouriteTap: () {},
+                                        product.productOriginalPrice,
+                                    productCategory: product.productCategory,
+                                    productRating: product.productRating,
+                                    // isProductFavourite:
+                                    // product.isProductFavourite,
+                                    productId: product.id,
                                     onProductTap: () {
                                       Navigator.pushNamed(
                                         context,
                                         RouteNames.productScreen,
-                                        arguments: category.id,
+                                        arguments: product.id,
                                       );
                                     },
-                                    productImageUrl: category.productImageUrl,
-                                    productTitle: category.productTitle,
+                                    productImageUrl: product.productImageUrl,
+                                    productTitle: product.productTitle,
                                   );
                                 }).toList(),
                           ),
@@ -383,25 +395,25 @@ class _HomeScreenState extends State<HomeScreen> {
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children:
-                                getApiPharmacyProducts(state).map((category) {
+                                getApiPharmacyProducts(state).map((product) {
                                   return ProductBox(
-                                    productPrice: category.productPrice,
+                                    productPrice: product.productPrice,
                                     productOriginalPrice:
-                                        category.productOriginalPrice,
-                                    productCategory: category.productCategory,
-                                    productRating: category.productRating,
-                                    isProductFavourite:
-                                        category.isProductFavourite,
-                                    onFavouriteTap: () {},
+                                        product.productOriginalPrice,
+                                    productCategory: product.productCategory,
+                                    productRating: product.productRating,
+                                    // isProductFavourite:
+                                    // product.isProductFavourite,
+                                    productId: product.id,
                                     onProductTap: () {
                                       Navigator.pushNamed(
                                         context,
                                         RouteNames.productScreen,
-                                        arguments: category.id,
+                                        arguments: product.id,
                                       );
                                     },
-                                    productImageUrl: category.productImageUrl,
-                                    productTitle: category.productTitle,
+                                    productImageUrl: product.productImageUrl,
+                                    productTitle: product.productTitle,
                                   );
                                 }).toList(),
                           ),

@@ -203,7 +203,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Text(
                           Labels.skip,
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.secondary,
+                            color: Colors.red,
                           ),
                         ),
                       ),
