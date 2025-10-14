@@ -3,7 +3,6 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:permission_handler/permission_handler.dart';
 import '../../../core/directions_service.dart';
 import 'map_event.dart';
 import 'map_state.dart';
@@ -174,15 +173,31 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     Emitter<MapState> emit,
   ) async {
     try {
-      final status = await Permission.location.request();
-      final isEnabled = status.isGranted;
+      // First check if location services are enabled (device-level)
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        emit(const MapLocationServiceDisabled());
+        return;
+      }
 
-      if (isEnabled) {
-        // Automatically request current location when permission is granted
+      // Check current permission status using geolocator (more reliable for location on iOS)
+      LocationPermission geoPermission = await Geolocator.checkPermission();
+      
+      if (geoPermission == LocationPermission.denied) {
+        // Request permission - this will show iOS system dialog
+        geoPermission = await Geolocator.requestPermission();
+      }
+      
+      if (geoPermission == LocationPermission.whileInUse || 
+          geoPermission == LocationPermission.always) {
+        // Permission granted, proceed to get location
         add(const MapLocationRequested());
+      } else if (geoPermission == LocationPermission.deniedForever) {
+        // Permission permanently denied - user needs to go to Settings
+        emit(const MapLocationPermissionDeniedPermanently());
       } else {
-        // If permission denied, show error
-        emit(MapError('Location permission denied. Please enable location access in settings.'));
+        // Permission denied but can potentially ask again
+        emit(const MapLocationPermissionDenied());
       }
     } catch (e) {
       emit(MapError('Failed to request location permission: $e'));

@@ -4,6 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../models/restaurant_model.dart';
 import '../../models/shop_model.dart';
 import '../../widgets/restaurant_list.dart';
+import '../../widgets/dialog_boxes/permission_dialog.dart';
 import '../../core/distance_calculator.dart';
 import 'bloc/map_bloc.dart';
 import 'bloc/map_event.dart';
@@ -129,35 +130,26 @@ class _MapViewState extends State<MapView> {
               ),
             );
           } else if (state is MapLocationPermissionDenied) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Location permission denied'),
-                backgroundColor: Colors.orange,
-                duration: const Duration(seconds: 5),
-                action: SnackBarAction(
-                  label: 'Use Default',
-                  textColor: Colors.white,
-                  onPressed: () {
-                    context.read<MapBloc>().add(const MapUseDefaultLocation());
-                  },
-                ),
-              ),
-            );
+            // Permission denied but can be requested again
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              PermissionDialog.showLocationPermissionDeniedDialog(
+                context,
+                isPermanentlyDenied: false,
+              );
+            });
+          } else if (state is MapLocationPermissionDeniedPermanently) {
+            // Permission permanently denied - need to go to settings
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              PermissionDialog.showLocationPermissionDeniedDialog(
+                context,
+                isPermanentlyDenied: true,
+              );
+            });
           } else if (state is MapLocationServiceDisabled) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Location services are disabled'),
-                backgroundColor: Colors.orange,
-                duration: const Duration(seconds: 5),
-                action: SnackBarAction(
-                  label: 'Use Default',
-                  textColor: Colors.white,
-                  onPressed: () {
-                    context.read<MapBloc>().add(const MapUseDefaultLocation());
-                  },
-                ),
-              ),
-            );
+            // Location services are disabled on device
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              PermissionDialog.showLocationServicesDisabledDialog(context);
+            });
           }
         },
         builder: (context, state) {

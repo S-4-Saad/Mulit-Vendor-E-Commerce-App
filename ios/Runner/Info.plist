@@ -45,5 +45,25 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	
+	<!-- Location Permissions -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Speezu needs your location to show nearby stores, restaurants, and provide accurate delivery tracking and directions.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Speezu needs your location to show nearby stores, restaurants, and provide accurate delivery tracking and directions even when the app is in the background.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Speezu needs your location to track deliveries and provide real-time updates even when the app is in the background.</string>
+	
+	<!-- Camera Permission for QR Scanning -->
+	<key>NSCameraUsageDescription</key>
+	<string>Speezu needs camera access to scan QR codes for order verification and payment processing.</string>
+	
+	<!-- Photo Library Permissions -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Speezu needs access to your photo library to upload images for profile or product reviews.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Speezu needs access to save images to your photo library.</string>
+	
+
 </dict>
 </plist>
