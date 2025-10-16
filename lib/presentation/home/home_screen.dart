@@ -169,18 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     SizedBox(height: context.heightPct(.02)),
-                    IconButton(
-                      onPressed: () {
-                        OrderSuccessDialog.show(
-                          context,
-                          onContinue: () {
-                            Navigator.of(context).pop();
-                            // Navigate back to home
-                          },
-                        );
-                      },
-                      icon: Icon(Icons.add),
-                    ),
+
                     HomeHeaderTile(
                       title: Labels.topTrendingFoods,
                       onViewAllTap:

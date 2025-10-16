@@ -1,50 +1,139 @@
 import 'package:flutter/material.dart';
-import '../../../widgets/dialog_boxes/orders_dialog_boxes.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import 'package:speezu/presentation/order_details/order_details_screen.dart';
+import '../../../core/utils/labels.dart';
+import '../../../widgets/active_orders_shimmer.dart';
 import '../../../widgets/order_card.dart';
+import '../bloc/orders_bloc.dart';
+import '../bloc/orders_event.dart';
+import '../bloc/order_state.dart';
 
-class CancelledOrdersScreen extends StatelessWidget {
+class CancelledOrdersScreen extends StatefulWidget {
   const CancelledOrdersScreen({super.key});
+
+  @override
+  State<CancelledOrdersScreen> createState() => _CancelledOrdersScreenState();
+}
+
+class _CancelledOrdersScreenState extends State<CancelledOrdersScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Load orders when screen initializes
+    context.read<OrdersBloc>().add(LoadOrdersEvent());
+  }
+
+  String _formatDateTime(String dateTime) {
+    try {
+      final parsedDate = DateTime.parse(dateTime);
+      return DateFormat('dd MMM, yyyy | hh:mm a').format(parsedDate);
+    } catch (e) {
+      return dateTime; // Return original if parsing fails
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          children: [
+      body: BlocBuilder<OrdersBloc, OrderState>(
+        builder: (context, state) {
+          if (state.status == OrderStatus.loading) {
+            return const ActiveOrdersShimmer();
+          }
 
-            OrderCard(
-              status: "Canceled",
-              orderId: "32",
-              customerName: "John Doe",
-              paymentMethod: "Cash on Delivery",
-              amount: "437.00",
-              dateTime: "25th Dec, 2023 | 02:30 PM",
-              onViewDetails: () {
-                // Navigate to details
-              },
-              onCancel: () {
-                // Cancel logic
-                OrdersDialogBoxes.showDeleteDialog(23, context);
+          if (state.status == OrderStatus.error) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Error loading orders',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    state.errorMessage ?? 'Unknown error',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.read<OrdersBloc>().add(RefreshOrdersEvent());
+                    },
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          if (state.cancelledOrders.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.check_circle_outline,
+                    size: 64,
+                    color: Colors.grey[400],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    Labels.noCancelledOrders,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                  Labels.youDoNotHaveAnyCancelledOrders,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return RefreshIndicator(
+            onRefresh: () async {
+              context.read<OrdersBloc>().add(RefreshOrdersEvent());
+            },
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: state.cancelledOrders.length,
+              itemBuilder: (context, index) {
+                final order = state.cancelledOrders[index];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: OrderCard(
+                    status: order.status,
+                    orderId: order.orderId,
+                    customerName: order.customerName,
+                    paymentMethod: order.paymentMethod,
+                    amount: order.amount,
+                    dateTime: _formatDateTime(order.dateTime),
+                    onViewDetails: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  OrderDetailsScreen(orderId: order.orderId),
+                        ),
+                      );
+                    },
+                    onCancel: () {
+                      // Completed orders cannot be cancelled
+                    },
+                  ),
+                );
               },
             ),
-            OrderCard(
-              status: "Canceled",
-              orderId: "388",
-              customerName: "Ahmad Ejaz",
-              paymentMethod: "Cash on Delivery",
-              amount: "200.00",
-              dateTime: "29th Dec, 2023 | 02:30 PM",
-              onViewDetails: () {
-                // Navigate to details
-              },
-              onCancel: () {
-                OrdersDialogBoxes.showDeleteDialog(23, context);
-                // Cancel logic
-              },
-            ),
-
-          ],
-        ),
+          );
+        },
       ),
     );
   }

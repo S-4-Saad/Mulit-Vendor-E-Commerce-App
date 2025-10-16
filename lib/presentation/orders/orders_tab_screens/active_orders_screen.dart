@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:speezu/presentation/order_details/order_details_screen.dart';
+import '../../../core/utils/labels.dart';
 import '../../../widgets/active_orders_shimmer.dart';
 import '../../../widgets/dialog_boxes/orders_dialog_boxes.dart';
 import '../../../widgets/order_card.dart';
@@ -88,12 +89,12 @@ class _ActiveOrdersScreenState extends State<ActiveOrdersScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No Active Orders',
+                    Labels.noActiveOrders,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'You don\'t have any active orders at the moment.',
+                    Labels.youDoNotHaveAnyActiveOrders,
                     style: Theme.of(context).textTheme.bodyMedium,
                     textAlign: TextAlign.center,
                   ),

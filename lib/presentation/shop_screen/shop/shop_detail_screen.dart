@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/assets/font_family.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
 import 'package:speezu/models/store_detail_model.dart';
+import 'package:speezu/presentation/nav_bar_screen/bloc/nav_bar_event.dart';
 import 'package:speezu/presentation/shop_screen/shop/shop_review_screen.dart';
 import 'package:speezu/widgets/image_gallery_viewer_widget.dart';
 import 'package:speezu/widgets/product_review_box.dart';
@@ -13,13 +14,14 @@ import '../../../widgets/image_type_extention.dart';
 import '../../../widgets/open_status_container.dart';
 import '../../../widgets/rating_display_widget.dart';
 import '../../../widgets/shop_detail_shimmer_widget.dart';
+import '../../nav_bar_screen/bloc/nav_bar_bloc.dart';
 import '../bloc/shop_bloc.dart';
 import '../bloc/shop_event.dart';
 import '../bloc/shop_state.dart';
 
 class ShopDetailScreen extends StatefulWidget {
   final int? storeId;
-  
+
   const ShopDetailScreen({super.key, this.storeId});
 
   @override
@@ -32,8 +34,15 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
     super.initState();
     // Load shop detail when the screen initializes
     if (widget.storeId != null) {
-      context.read<ShopBloc>().add(LoadShopDetailEvent(storeId: widget.storeId!));
+      context.read<ShopBloc>().add(
+        LoadShopDetailEvent(storeId: widget.storeId!),
+      );
     }
+    Future.delayed(Duration(seconds: 1), () {
+      if (widget.storeId != null) {
+        context.read<ShopBloc>().add(CalculateShopDistanceEvent());
+      }
+    });
   }
 
   @override
@@ -43,7 +52,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
         if (state.shopDetailStatus == ShopDetailStatus.loading) {
           return const ShopDetailShimmerWidget();
         }
-        
+
         if (state.shopDetailStatus == ShopDetailStatus.error) {
           return Center(
             child: Column(
@@ -60,7 +69,9 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                 ElevatedButton(
                   onPressed: () {
                     if (widget.storeId != null) {
-                      context.read<ShopBloc>().add(LoadShopDetailEvent(storeId: widget.storeId!));
+                      context.read<ShopBloc>().add(
+                        LoadShopDetailEvent(storeId: widget.storeId!),
+                      );
                     }
                   },
                   child: Text('Retry'),
@@ -69,12 +80,13 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
             ),
           );
         }
-        
+
         // Check if storeDetail is available and status is success
-        if (state.shopDetailStatus == ShopDetailStatus.success && state.storeDetail != null) {
+        if (state.shopDetailStatus == ShopDetailStatus.success &&
+            state.storeDetail != null) {
           return _buildStoreDetail(context, state.storeDetail!);
         }
-        
+
         // If we reach here, something went wrong - show error
         return Center(
           child: Column(
@@ -91,7 +103,9 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
               ElevatedButton(
                 onPressed: () {
                   if (widget.storeId != null) {
-                    context.read<ShopBloc>().add(LoadShopDetailEvent(storeId: widget.storeId!));
+                    context.read<ShopBloc>().add(
+                      LoadShopDetailEvent(storeId: widget.storeId!),
+                    );
                   }
                 },
                 child: Text('Retry'),
@@ -172,7 +186,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                         children: [
                           Expanded(
                             child: Text(
-                           storeModel.store?.name ?? '',
+                              storeModel.store?.name ?? '',
                               style: TextStyle(
                                 fontFamily: FontFamily.fontsPoppinsSemiBold,
                                 color:
@@ -194,7 +208,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                               ),
                               const SizedBox(width: 5),
                               Text(
-                            (storeModel.store?.rating ?? 0).toString(),
+                                (storeModel.store?.rating ?? 0).toString(),
                                 style: TextStyle(
                                   fontFamily: FontFamily.fontsPoppinsLight,
                                   color:
@@ -210,7 +224,10 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          OpenStatusContainer(isOpened: true,isDelivering: true,),
+                          OpenStatusContainer(
+                            isOpened: storeModel.store?.isOpen??false,
+                            isDelivering: storeModel.store?.isDelivery??false,
+                          ),
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
@@ -229,20 +246,27 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                 ),
                               ],
                             ),
-                            child: Text(
-                              '0,00 KM',
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onPrimary,
-                                fontFamily: FontFamily.fontsPoppinsSemiBold,
-                                fontSize: context.scaledFont(10),
-                              ),
+                            child: BlocBuilder<ShopBloc, ShopState>(
+                              builder:
+                                  (context, state) => Text(
+                                    '${state.shopDistance} KM',
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(
+                                            context,
+                                          ).colorScheme.onPrimary,
+                                      fontFamily:
+                                          FontFamily.fontsPoppinsSemiBold,
+                                      fontSize: context.scaledFont(10),
+                                    ),
+                                  ),
                             ),
                           ),
                         ],
                       ),
                       SizedBox(height: context.heightPct(.02)),
                       Text(
-                    storeModel.store?.description ?? '',
+                        storeModel.store?.description ?? '',
                         style: TextStyle(
                           fontFamily: FontFamily.fontsPoppinsLight,
 
@@ -256,7 +280,8 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           padding: const EdgeInsets.all(12),
-                          itemCount: (storeModel.store?.moreImages ?? []).length,
+                          itemCount:
+                              (storeModel.store?.moreImages ?? []).length,
                           separatorBuilder:
                               (_, __) => const SizedBox(width: 10),
                           itemBuilder: (context, index) {
@@ -267,7 +292,9 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                   MaterialPageRoute(
                                     builder:
                                         (context) => ImageGalleryViewer(
-                                          imageUrls: storeModel.store?.moreImages ?? [],
+                                          imageUrls:
+                                              storeModel.store?.moreImages ??
+                                              [],
                                           initialIndex: index,
                                         ),
                                   ),
@@ -276,7 +303,8 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                               },
                               radius: BorderRadius.circular(10),
 
-                              imagePath: (storeModel.store?.moreImages ?? [])[index],
+                              imagePath:
+                                  (storeModel.store?.moreImages ?? [])[index],
                               width: context.widthPct(.55),
                               fit: BoxFit.cover,
                             );
@@ -330,7 +358,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                         ],
                       ),
                       Text(
-                       storeModel.store?.description ?? '',
+                        storeModel.store?.description ?? '',
                         style: TextStyle(
                           fontFamily: FontFamily.fontsPoppinsLight,
 
@@ -386,7 +414,8 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                 Row(
                                   children: [
                                     Text(
-                                 (storeModel.store?.rating ?? 0).toString(),
+                                      (storeModel.store?.rating ?? 0)
+                                          .toString(),
                                       style: TextStyle(
                                         fontSize: context.scaledFont(14),
                                         fontFamily: FontFamily.fontsPoppinsBold,
@@ -397,7 +426,9 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                       ),
                                     ),
                                     RatingDisplayWidget(
-                                      rating: (storeModel.store?.rating ?? 0).toDouble(),
+                                      rating:
+                                          (storeModel.store?.rating ?? 0)
+                                              .toDouble(),
                                       starSize: context.scaledFont(16),
                                     ),
                                     // Icon(Icons.arrow_forward_ios_rounded, size: 15.w),
@@ -405,15 +436,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                 ),
                                 IconButton(
                                   onPressed: () {
-                                    // Navigator.push(
-                                    //   context,
-                                    //   MaterialPageRoute(
-                                    //     builder:
-                                    //         (context) => ProductReviewsScreen(
-                                    //           store: store,
-                                    //         ),
-                                    //   ),
-                                    // );
+                                    context.read<NavBarBloc>().add(ShopSelectTab(1));
                                   },
                                   icon: Icon(
                                     Icons.arrow_forward_ios_rounded,
@@ -443,16 +466,21 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                 physics: const NeverScrollableScrollPhysics(),
                                 shrinkWrap: true,
                                 itemCount:
-                                    storeModel.store!.reviews!.length > 3
+                                    storeModel.store!.reviews.length > 3
                                         ? 3
-                                        : storeModel.store!.reviews!.length, // Limit to 4 reviews
+                                        : storeModel
+                                            .store!
+                                            .reviews
+                                            .length, // Limit to 4 reviews
                                 itemBuilder: (context, index) {
-                                  final review = storeModel.store!.reviews![index];
+                                  final review =
+                                      storeModel.store!.reviews[index];
                                   return ProductReviewBox(
-                                    userName: review.userName??'',
-                                    review:
-                                        review.review??'',
-                                    rating: double.parse(review.rating?.toString()??'0'),
+                                    userName: review.userName ?? '',
+                                    review: review.review ?? '',
+                                    rating: double.parse(
+                                      review.rating.toString() ?? '0',
+                                    ),
                                     // imgUrl:
                                     //      'https://via.placeholder.com/55',
                                   );
@@ -460,33 +488,24 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                               ),
                             // Show "See All Reviews" if there are more than 4 reviews
                             // if (storeModel.store!.lastReviews!.length > 4)
-                              Center(
-                                child: TextButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (context) => ProductReviewsScreen(
-                                              storeId: storeModel.store!.id,
-                                            ),
-                                      ),
-                                    );
-                                  },
-                                  child: Text(
-                                    '${Labels.seeAllReviews} (${storeModel.store!.reviews!.length})',
-                                    style: TextStyle(
-                                      fontSize: context.scaledFont(12),
-                                      fontFamily:
-                                          FontFamily.fontsPoppinsSemiBold,
-                                      color:
-                                          Theme.of(
-                                            context,
-                                          ).colorScheme.onSecondary,
-                                    ),
+                            Center(
+                              child: TextButton(
+                                onPressed: () {
+                                  context.read<NavBarBloc>().add(ShopSelectTab(1));
+                                },
+                                child: Text(
+                                  '${Labels.seeAllReviews} (${storeModel.store!.reviews!.length})',
+                                  style: TextStyle(
+                                    fontSize: context.scaledFont(12),
+                                    fontFamily: FontFamily.fontsPoppinsSemiBold,
+                                    color:
+                                        Theme.of(
+                                          context,
+                                        ).colorScheme.onSecondary,
                                   ),
                                 ),
                               ),
+                            ),
                           ],
                         ),
                       ),
@@ -501,4 +520,3 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
     );
   }
 }
-

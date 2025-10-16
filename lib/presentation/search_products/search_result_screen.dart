@@ -61,7 +61,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: CustomAppBar(title: Labels.searchProducts),
+      appBar: CustomAppBar(title: Labels.search),
       body: SafeArea(
         child: Column(
           children: [

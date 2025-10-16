@@ -8,6 +8,7 @@ class OrderState extends Equatable {
   final OrderStatus status;
   final List<OrderModel> activeOrders;
   final List<OrderModel> completedOrders;
+  final List<OrderModel> cancelledOrders;
   final String? errorMessage;
 
   const OrderState({
@@ -15,6 +16,7 @@ class OrderState extends Equatable {
     this.status = OrderStatus.initial,
     this.activeOrders = const [],
     this.completedOrders = const [],
+    this.cancelledOrders = const [],
     this.errorMessage,
   });
 
@@ -23,13 +25,16 @@ class OrderState extends Equatable {
     OrderStatus? status,
     List<OrderModel>? activeOrders,
     List<OrderModel>? completedOrders,
+    List<OrderModel>? cancelledOrders,
     String? errorMessage,
   }) {
     return OrderState(
       selectedTabIndex: selectedTabIndex ?? this.selectedTabIndex,
       status: status ?? this.status,
       activeOrders: activeOrders ?? this.activeOrders,
+
       completedOrders: completedOrders ?? this.completedOrders,
+      cancelledOrders: cancelledOrders ?? this.cancelledOrders,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
@@ -40,6 +45,7 @@ class OrderState extends Equatable {
         status,
         activeOrders,
         completedOrders,
+        cancelledOrders,
         errorMessage,
       ];
 }

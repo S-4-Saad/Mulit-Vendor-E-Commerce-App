@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/presentation/home/home_screen.dart';
 import 'package:speezu/presentation/products/products_tab_bar.dart';
 import 'package:speezu/presentation/shop_screen/shop/shop_products_screen.dart';
+import 'package:speezu/presentation/shop_screen/shop/shop_review_screen.dart';
 import 'package:speezu/repositories/user_repository.dart';
 import 'package:speezu/widgets/login_required_screen.dart';
 
@@ -27,7 +28,7 @@ class NavBarBloc extends Bloc<NavBarEvent, NavBarState> {
       shopCurrentTab: 0,
       currentTab: 2,
       currentPage: const HomeScreen(),
-      shopCurrentPage: StoreScreen(),
+      shopCurrentPage: Container(),
       storeId: null,
     ),
   ) {
@@ -105,7 +106,9 @@ class NavBarBloc extends Bloc<NavBarEvent, NavBarState> {
       case 0:
         return ShopDetailScreen(storeId: state.storeId);
       case 1:
-        return const ShopMapScreen();
+        return state.storeId != null
+            ? ProductReviewsScreen(storeId: state.storeId!)
+            : const Center(child: Text('Store ID not available'));
       case 2:
         return state.storeId != null
             ? ShopProductsScreen(storeId: state.storeId!)

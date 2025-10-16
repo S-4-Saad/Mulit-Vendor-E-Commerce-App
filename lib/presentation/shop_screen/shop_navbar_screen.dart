@@ -15,11 +15,349 @@ class ShopNavbarScreen extends StatelessWidget {
   final int? storeId;
 
   ShopNavbarScreen({super.key, this.shopCurrentTab, this.storeId});
+
   final List<String> screenTitles = [
     Labels.shop,
-    Labels.mapExplorer,
+    Labels.reviews,
     Labels.shopProducts,
   ];
+
+  // Premium cart badge widget
+  Widget _buildCartBadge(BuildContext context, int cartCount) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: () {
+              Navigator.pushNamed(context, RouteNames.cartScreen);
+            },
+            child: Container(
+              margin: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  width: 1,
+                ),
+              ),
+              child: Icon(
+                Icons.shopping_cart_outlined,
+                color: Theme.of(context).colorScheme.onSecondary,
+                size: 22,
+              ),
+            ),
+          ),
+        ),
+        if (cartCount > 0)
+          Positioned(
+            right: 4,
+            top: 4,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.red.shade600, Colors.red.shade700],
+                ),
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.red.withValues(alpha: 0.3),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              constraints: const BoxConstraints(
+                minWidth: 18,
+                minHeight: 18,
+              ),
+              child: Text(
+                cartCount > 99 ? '99+' : cartCount.toString(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  // Premium back button
+  Widget _buildBackButton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => Navigator.pop(context),
+          child: Container(
+            margin: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                width: 1,
+              ),
+            ),
+            child: Icon(
+              Icons.arrow_back,
+              color: Theme.of(context).colorScheme.onSecondary,
+              size: 20,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Premium AppBar
+  PreferredSizeWidget _buildPremiumAppBar(BuildContext context, NavBarState state) {
+    return PreferredSize(
+      preferredSize: const Size.fromHeight(kToolbarHeight),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Theme.of(context).colorScheme.onPrimary,
+              Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.95),
+            ],
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.08),
+              offset: const Offset(0, 2),
+              blurRadius: 8,
+            ),
+          ],
+        ),
+        child: AppBar(
+          centerTitle: true,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          leading: _buildBackButton(context),
+          title: ShaderMask(
+            shaderCallback: (bounds) => LinearGradient(
+              colors: [
+                Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.95),
+                Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.85),
+              ],
+            ).createShader(bounds),
+            child: Text(
+              screenTitles[state.shopCurrentTab],
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: FontFamily.fontsPoppinsSemiBold,
+                fontSize: context.scaledFont(19),
+                letterSpacing: 0.3,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 4),
+              child: BlocBuilder<CartBloc, CartState>(
+                builder: (context, cartState) {
+                  return _buildCartBadge(context, cartState.totalItems);
+                },
+              ),
+            ),
+          ],
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1),
+            child: Container(
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.transparent,
+                    Theme.of(context).colorScheme.secondary.withValues(alpha: 0.15),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Premium Bottom Navigation Bar
+  Widget _buildPremiumBottomNav(BuildContext context, NavBarState state, NavBarBloc bloc) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.onPrimary,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            offset: const Offset(0, -4),
+            blurRadius: 12,
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              // Store Tab
+              _buildNavItem(
+                context: context,
+                icon: Icons.store_rounded,
+                label: Labels.shop,
+                isSelected: state.shopCurrentTab == 0,
+                onTap: () => bloc.add(const ShopSelectTab(0)),
+              ),
+
+              // Reviews Tab
+              _buildNavItem(
+                context: context,
+                icon: Icons.star_rounded,
+                label: Labels.reviews,
+                isSelected: state.shopCurrentTab == 1,
+                onTap: () => bloc.add(const ShopSelectTab(1)),
+              ),
+
+              // Products Tab (Premium Pill Style)
+              _buildProductsTab(context, state, bloc),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Navigation Item
+  Widget _buildNavItem({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOutCubic,
+            padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 12),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.12)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              icon,
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.outline,
+              size: 24,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Premium Products Tab (Pill Style)
+  Widget _buildProductsTab(BuildContext context, NavBarState state, NavBarBloc bloc) {
+    final isSelected = state.shopCurrentTab == 2;
+
+    return Expanded(
+      flex: 2,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(10),
+            onTap: () => bloc.add(const ShopSelectTab(2)),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutCubic,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              decoration: BoxDecoration(
+                gradient: isSelected
+                    ? LinearGradient(
+                  colors: [
+                    Theme.of(context).colorScheme.primary,
+                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.85),
+                  ],
+                )
+                    : null,
+                color: isSelected ? null : Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: isSelected
+                    ? [
+                  BoxShadow(
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+                    : [],
+                border: Border.all(
+                  color: isSelected
+                      ? Colors.transparent
+                      : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.category_rounded,
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : Theme.of(context).colorScheme.outline,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      Labels.products,
+                      style: TextStyle(
+                        fontFamily: FontFamily.fontsPoppinsSemiBold,
+                        color: isSelected
+                            ? Theme.of(context).colorScheme.onPrimary
+                            : Theme.of(context).colorScheme.outline,
+                        fontSize: context.scaledFont(13),
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.2,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -29,146 +367,17 @@ class ShopNavbarScreen extends StatelessWidget {
           final bloc = context.read<NavBarBloc>();
 
           return Scaffold(
-
             backgroundColor: Theme.of(context).colorScheme.onPrimary,
-            appBar:state.shopCurrentTab==0?null: AppBar(
-              centerTitle: true,
-              backgroundColor: Theme.of(context).colorScheme.onPrimary,
-              actions: [
-                BlocBuilder<CartBloc, CartState>(
-                  builder: (context, cartState) {
-                    final cartCount = cartState.totalItems;
-                    return Stack(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, RouteNames.cartScreen);
-                          },
-                          icon: Icon(
-                            Icons.shopping_cart,
-                            color: Theme.of(context).colorScheme.secondary,
-                          ),
-                        ),
-                        if (cartCount > 0)
-                          Positioned(
-                            right: 2,
-                            top: 2,
-                            child: Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              constraints: const BoxConstraints(
-                                minWidth: 20,
-                                minHeight: 20,
-                              ),
-                              child: Text(
-                                cartCount.toString(),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                      ],
-                    );
-                  },
-                ),
-              ],
-              leading: IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
 
-                icon: const Icon(Icons.arrow_back),
-                color: Theme.of(context).colorScheme.secondary,
-              ),
-              bottom: PreferredSize(
-                preferredSize: Size(1, 5),
-                child: Divider(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.secondary.withValues(alpha: .5),
-                  height: 1,
-
-                  thickness: 1.5,
-                ),
-              ),
-
-              // elevation: 1,
-              title: Text(
-                screenTitles[state.shopCurrentTab],
-                style: TextStyle(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSecondary.withValues(alpha: .9),
-                  fontFamily: FontFamily.fontsPoppinsSemiBold,
-                  fontSize: context.scaledFont(19),
-                ),
-              ),
-            ),
+            // Show AppBar for all tabs except tab 0
+            appBar: state.shopCurrentTab == 0
+                ? null
+                : _buildPremiumAppBar(context, state),
 
             body: state.shopCurrentPage,
-            bottomNavigationBar: BottomAppBar(
-              elevation: 3,
-              color: Theme.of(context).colorScheme.onPrimary,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: IconButton(
-                      icon:  Icon(Icons.store,color: state.shopCurrentTab==0?Theme.of(context).colorScheme.primary:
-                        Theme.of(context).colorScheme.outline,),
-                      onPressed: () => bloc.add(const ShopSelectTab(0)),
-                    ),
-                  ),
-                  Expanded(
-                    child: IconButton(
-                      icon:  Icon(Icons.location_on,color: state.shopCurrentTab == 1
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.outline,),
-                      onPressed: () => bloc.add(const ShopSelectTab(1)),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2, // 👈 gives more space to this one
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(50),
-                      onTap: () => bloc.add(const ShopSelectTab(2)),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: state.shopCurrentTab == 2
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.outline,
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.category_outlined,
-                                color: Theme.of(context).colorScheme.onPrimary),
-                            const SizedBox(width: 5),
-                            Text(
-                              Labels.products,
-                              style: TextStyle(
-                                fontFamily: FontFamily.fontsPoppinsSemiBold,
-                                color: Theme.of(context).colorScheme.onPrimary,
-                                fontSize: context.scaledFont(12),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
 
+            // Premium Bottom Navigation
+            bottomNavigationBar: _buildPremiumBottomNav(context, state, bloc),
           );
         },
       ),

@@ -163,104 +163,113 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         separatorBuilder: (_, __) => SizedBox(height: 10),
                         itemBuilder: (context, index) {
                           final shop = state.shops[index];
-                          return Container(
-                            clipBehavior: Clip.antiAlias,
-                            margin: EdgeInsets.only(
-                              right: 5,
-                              bottom: 5,
-                              left: 5,
-                            ),
+                          return GestureDetector(
+                            onTap: (){
+                              Navigator.pushNamed(
+                                context,
+                                RouteNames.shopNavBarScreen,
+                                arguments: shop.id,
+                              );
+                            },
+                            child: Container(
+                              clipBehavior: Clip.antiAlias,
+                              margin: EdgeInsets.only(
+                                right: 5,
+                                bottom: 5,
+                                left: 5,
+                              ),
 
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              color: Theme.of(context).colorScheme.onPrimary,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withValues(alpha: 0.2),
-                                  spreadRadius: 1,
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              children: [
-                                CustomImageView(
-                                  imagePath: shop.imageUrl,
-                                  width: 100,
-                                  height: 80,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: Theme.of(context).colorScheme.onPrimary,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withValues(alpha: 0.2),
+                                    spreadRadius: 1,
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  CustomImageView(
+                                    imagePath: shop.imageUrl,
+                                    width: 100,
+                                    height: 80,
 
-                                  fit: BoxFit.cover,
-                                ),
-                                SizedBox(width: context.widthPct(0.03)),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        shop.shopName,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: context.scaledFont(14),
-                                          fontFamily:
-                                              FontFamily.fontsPoppinsSemiBold,
-                                          color:
-                                              Theme.of(
-                                                context,
-                                              ).colorScheme.onSecondary,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  SizedBox(width: context.widthPct(0.03)),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          shop.shopName,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: context.scaledFont(14),
+                                            fontFamily:
+                                                FontFamily.fontsPoppinsSemiBold,
+                                            color:
+                                                Theme.of(
+                                                  context,
+                                                ).colorScheme.onSecondary,
+                                          ),
                                         ),
-                                      ),
-                                      Text(
-                                        shop.shopDescription,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: context.scaledFont(12),
-                                          fontFamily:
-                                              FontFamily.fontsPoppinsRegular,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSecondary
-                                              .withValues(alpha: .7),
+                                        Text(
+                                          shop.shopDescription,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: context.scaledFont(12),
+                                            fontFamily:
+                                                FontFamily.fontsPoppinsRegular,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSecondary
+                                                .withValues(alpha: .7),
+                                          ),
                                         ),
+
+                                        RatingDisplayWidget(
+                                          rating: shop.shopRating,
+                                          starSize: 14,
+                                        ),
+                                        //  SizedBox(height: context.heightPct(0.005)),
+                                      ],
+                                    ),
+                                  ),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          Theme.of(context).colorScheme.primary,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 8,
                                       ),
 
-                                      RatingDisplayWidget(
-                                        rating: shop.shopRating,
-                                        starSize: 14,
-                                      ),
-                                      //  SizedBox(height: context.heightPct(0.005)),
-                                    ],
-                                  ),
-                                ),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        Theme.of(context).colorScheme.primary,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(5),
+                                      tapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      elevation: 0,
                                     ),
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 8,
+                                    onPressed: () {},
+                                    child: Icon(
+                                      Icons.directions,
+                                      color:
+                                        Colors.white,
+                                      size: 25,
                                     ),
-
-                                    tapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
-                                    elevation: 0,
                                   ),
-                                  onPressed: () {},
-                                  child: Icon(
-                                    Icons.directions,
-                                    color:
-                                      Colors.white,
-                                    size: 25,
-                                  ),
-                                ),
-                                SizedBox(width: context.widthPct(0.02)),
-                              ],
+                                  SizedBox(width: context.widthPct(0.02)),
+                                ],
+                              ),
                             ),
                           );
                         },

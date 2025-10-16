@@ -35,11 +35,15 @@ class OrdersBloc extends Bloc<OrdersEvent, OrderState> {
           final completedOrders = ordersResponse.orders
               .where((order) => order.status.toLowerCase() == 'completed')
               .toList();
+          final cancelledOrders = ordersResponse.orders
+              .where((order) => order.status.toLowerCase() == 'cancelled')
+              .toList();
 
           emit(state.copyWith(
             status: OrderStatus.success,
             activeOrders: activeOrders,
             completedOrders: completedOrders,
+            cancelledOrders: cancelledOrders,
             errorMessage: null,
           ));
         } else {

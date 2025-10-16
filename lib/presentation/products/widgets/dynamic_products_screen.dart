@@ -6,7 +6,9 @@ import 'package:speezu/presentation/products/bloc/products_event.dart';
 import 'package:speezu/presentation/products/bloc/products_state.dart';
 import 'package:speezu/widgets/product_box_widget.dart';
 import 'package:speezu/widgets/products_tab_shimmer_widget.dart';
+import '../../../core/utils/labels.dart';
 import '../../../routes/route_names.dart';
+import '../../../widgets/error_widget.dart';
 
 class DynamicProductsScreen extends StatefulWidget {
   final String categoryName;
@@ -22,7 +24,7 @@ class _DynamicProductsScreenState extends State<DynamicProductsScreen> {
 
   Future<void> _onRefresh() async {
     context.read<ProductsBloc>().add(
-      LoadProductsEvent(categoryName: widget.categoryName,forceReload: true),
+      LoadProductsEvent(categoryName: widget.categoryName, forceReload: true),
     );
     await Future.delayed(const Duration(seconds: 1));
     _refreshController.refreshCompleted();
@@ -61,39 +63,20 @@ class _DynamicProductsScreenState extends State<DynamicProductsScreen> {
           if (status == ProductsStatus.loading ||
               status == ProductsStatus.initial) {
             // return const CircularProgressIndicator();
-            return  Center(child: ProductsTabShimmerWidget());
+            return Center(child: ProductsTabShimmerWidget());
           }
 
           // --- Error ---
           if (status == ProductsStatus.error) {
             return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(50.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 64,
-                      color: Colors.grey[400],
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Error: $message',
-                      style: TextStyle(color: Colors.grey[600], fontSize: 16),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        context.read<ProductsBloc>().add(
-                          LoadProductsEvent(categoryName: widget.categoryName),
-                        );
-                      },
-                      child: const Text('Retry'),
-                    ),
-                  ],
-                ),
+              child: CustomErrorWidget(
+                message:
+                    message,
+                onRetry: () {
+                  context.read<ProductsBloc>().add(
+                    LoadProductsEvent(categoryName: widget.categoryName),
+                  );
+                },
               ),
             );
           }
@@ -113,7 +96,7 @@ class _DynamicProductsScreenState extends State<DynamicProductsScreen> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'No ${widget.categoryName.toLowerCase()} products available',
+                      '${Labels.no} ${widget.categoryName.toLowerCase()} ${Labels.productAvailable}',
                       style: TextStyle(color: Colors.grey[600], fontSize: 16),
                       textAlign: TextAlign.center,
                     ),
@@ -143,8 +126,8 @@ class _DynamicProductsScreenState extends State<DynamicProductsScreen> {
                       productOriginalPrice: product.productOriginalPrice,
                       productCategory: product.productCategory,
                       productRating: product.productRating,
-                      // isProductFavourite: product.isProductFavourite,
 
+                      // isProductFavourite: product.isProductFavourite,
                       onProductTap: () {
                         Navigator.pushNamed(
                           context,

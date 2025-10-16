@@ -34,18 +34,6 @@ class PractiseScreen extends StatefulWidget {
 }
 
 class _PractiseScreenState extends State<PractiseScreen> {
-  final List<ShopModel> dummyShops = [
-    ShopModel(
-      imageUrl:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGUr0VYvQolmz3IkAsjFKavNsPcmmof6eWJg&s",
-      shopName: "Fresh Mart",
-      shopDescription: "Groceries & daily needs",
-      shopRating: 4.5,
-      isOpen: true,
-      isDelivering: true,
-    ),
-
-  ];
 
   List<String> imageUrl = [
     'https://t3.ftcdn.net/jpg/04/65/46/52/360_F_465465254_1pN9MGrA831idD6zIBL7q8r`1zxc nZZpUCQTy.jpg',
@@ -93,28 +81,6 @@ class _PractiseScreenState extends State<PractiseScreen> {
                 ),
                 SizedBox(height: context.heightPct(.02)),
                 SearchResultShimmar(),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children:
-                        dummyShops.map((shop) {
-                          return ShopBox(
-                            imageUrl: shop.imageUrl,
-                            shopName: shop.shopName,
-                            shopDescription: shop.shopDescription,
-                            shopRating: shop.shopRating,
-                            isOpen: shop.isOpen,
-                            isDelivering: shop.isDelivering,
-                            onShopBoxTap: () {
-                              print('Tapped on ${shop.shopName}');
-                            },
-                            onDirectionTap: () {
-                              print('Direction to ${shop.shopName}');
-                            },
-                          );
-                        }).toList(),
-                  ),
-                ),
               ],
             ),
           ),
@@ -133,21 +99,6 @@ class ProductCategory {
 
 
 
-class StoreScreen extends StatelessWidget {
-  const StoreScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text(
-          'Store Screen',
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-      ),
-    );
-  }
-}
 
 class ShopMapScreen extends StatelessWidget {
   const ShopMapScreen({super.key});
@@ -181,22 +132,5 @@ class ShopProductScreen extends StatelessWidget {
   }
 }
 
-class ShopModel {
-  final String imageUrl;
-  final String shopName;
-  final String shopDescription;
-  final double shopRating;
-  final bool isOpen;
-  final bool isDelivering;
-
-  ShopModel({
-    required this.imageUrl,
-    required this.shopName,
-    required this.shopDescription,
-    required this.shopRating,
-    required this.isOpen,
-    required this.isDelivering,
-  });
-}
 
 // Dummy data

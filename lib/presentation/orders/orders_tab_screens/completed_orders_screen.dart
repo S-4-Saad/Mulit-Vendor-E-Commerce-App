@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:speezu/presentation/order_details/order_details_screen.dart';
+import '../../../core/utils/labels.dart';
+import '../../../widgets/active_orders_shimmer.dart';
 import '../../../widgets/order_card.dart';
 import '../bloc/orders_bloc.dart';
 import '../bloc/orders_event.dart';
@@ -37,7 +39,7 @@ class _CompletedOrdersScreenState extends State<CompletedOrdersScreen> {
       body: BlocBuilder<OrdersBloc, OrderState>(
         builder: (context, state) {
           if (state.status == OrderStatus.loading) {
-            return const Center(child: CircularProgressIndicator());
+            return const ActiveOrdersShimmer();
           }
 
           if (state.status == OrderStatus.error) {
@@ -81,12 +83,12 @@ class _CompletedOrdersScreenState extends State<CompletedOrdersScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No Completed Orders',
+                  Labels.noCompletedOrders,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'You don\'t have any completed orders yet.',
+                   Labels.youDoNotHaveAnyCompletedOrders,
                     style: Theme.of(context).textTheme.bodyMedium,
                     textAlign: TextAlign.center,
                   ),

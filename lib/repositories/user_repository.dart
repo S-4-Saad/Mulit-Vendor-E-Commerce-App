@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:speezu/models/user_model.dart';
 import 'package:speezu/models/cart_model.dart';
@@ -14,6 +16,8 @@ import '../models/card_details_model.dart';
 import '../models/user_details_model.dart';
 
 class UserRepository {
+  double? latitude;
+  double? longitude;
   static final UserRepository _instance = UserRepository._internal();
   factory UserRepository() => _instance;
   UserRepository._internal();
@@ -70,9 +74,10 @@ class UserRepository {
       } else {
         log("No user data found, returning null.");
       }
-
+await _getCurrentLocation();  // Fetch location on initialization
       // Load cart data
       final savedCartData = await LocalStorage.getData(key: AppKeys.cartData);
+
       if (savedCartData != null) {
         _currentCart = Cart.fromJson(jsonDecode(savedCartData));
         log("Cart successfully decoded: ${_currentCart!.toJson()}");
@@ -89,6 +94,7 @@ class UserRepository {
       return null;
     }
   }
+
   Future<bool> isUserAuthenticated() async {
     final token = await LocalStorage.getData(key: AppKeys.authToken);
     return token != null;
@@ -142,60 +148,44 @@ class UserRepository {
     _cartController.close();
   }
 
-  // // User Details Management Methods
-  // Future<bool> updateBasicProfile({
-  //   String? name,
-  //   String? phoneNo,
-  //   File? profilePicture,
-  // }) async {
-  //   if (_currentUser?.userData == null) return false;
-  //
-  //   // Prepare the request data
-  //   Map<String, dynamic> requestData = {
-  //     'user_id': _currentUser!.userData!.id,
-  //   };
-  //
-  //   // Add fields only if they are provided
-  //   if (name != null) requestData['name'] = name;
-  //   if (phoneNo != null) requestData['phone_no'] = phoneNo;
-  //   if (profilePicture != null) requestData['profile_picture'] = profilePicture;
-  //
-  //   // Always include user_details JSON (even if empty)
-  //   requestData['user_details'] = _currentUser!.userData!.userDetails?.toJson() ?? {};
-  //
-  //   // Use Completer to wait for the callback
-  //   final completer = Completer<bool>();
-  //
-  //   await ApiService.postMultipartMethod(
-  //     file: profilePicture,
-  //     apiUrl: updateUserDetailsUrl,
-  //     formData: requestData,
-  //     authHeader: true,
-  //     executionMethod: (success, responseData) async {
-  //       if (success && responseData['success'] == true) {
-  //         log("Basic profile update API success: ${responseData['message']}");
-  //
-  //         // Parse the updated user data from response
-  //         final updatedUser = UserModel.fromJson(responseData);
-  //
-  //         // Update the current user with the response data
-  //         _currentUser = updatedUser;
-  //
-  //         // Save the updated user data locally
-  //         await setUser(_currentUser!);
-  //
-  //         log("Basic profile updated successfully on server and locally");
-  //         completer.complete(true);
-  //       } else {
-  //         log("API returned success: false - ${responseData['message']}");
-  //         completer.complete(false);
-  //       }
-  //     },
-  //   );
-  //
-  //   return await completer.future;
-  // }
-  // User Details Management Methods
+  Future<void> _getCurrentLocation() async {
+    try {
+      // Check if location services are enabled
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        debugPrint('❌ Location services are disabled.');
+        return;
+      }
+
+      // Check permission
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          debugPrint('❌ Location permissions are denied.');
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        debugPrint('❌ Location permissions are permanently denied.');
+        return;
+      }
+
+      // Get current position
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      latitude = position.latitude;
+      longitude = position.longitude;
+
+      debugPrint('✅ Location fetched: lat=$latitude, lng=$longitude');
+    } catch (e) {
+      debugPrint('⚠️ Error getting location: $e');
+    }
+  }
+
   Future<bool> updateBasicProfile({
     String? name,
     String? phoneNo,

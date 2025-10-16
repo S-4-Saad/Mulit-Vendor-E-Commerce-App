@@ -344,6 +344,18 @@ class Labels {
   static String get whatYouWillGet => 'whatYouWillGet'.tr();
   static String get access => 'access'.tr();
   static String get pleaseSelectA => 'pleaseSelectA'.tr();
+  static String get navigation => 'navigation'.tr();
+  static String get account => 'account'.tr();
+  static String get noActiveOrders => 'noActiveOrders'.tr();
+  static String get youDoNotHaveAnyActiveOrders => 'youDoNotHaveAnyActiveOrders'.tr();
+  static String get noCancelledOrders => 'noCancelledOrders'.tr();
+  static String get youDoNotHaveAnyCancelledOrders => 'youDoNotHaveAnyCancelledOrders'.tr();
+  static String get noCompletedOrders => 'noCompletedOrders'.tr();
+  static String get youDoNotHaveAnyCompletedOrders => 'youDoNotHaveAnyCompletedOrders'.tr();
+  static String get no => 'no'.tr();
+  static String get productAvailable => 'productAvailable'.tr();
+  static String get retry => 'retry'.tr();
+  static String get oopsSomethingWentWrong => 'oopsSomethingWentWrong'.tr();
 
 
 

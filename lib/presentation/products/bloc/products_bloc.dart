@@ -5,6 +5,7 @@ import 'package:speezu/core/utils/category_mapper.dart';
 import 'package:speezu/models/category_products_model.dart';
 import 'package:speezu/presentation/products/bloc/products_event.dart';
 import 'package:speezu/presentation/products/bloc/products_state.dart';
+
 class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
   ProductsBloc() : super(const ProductsState()) {
     on<ChangeTabEvent>(_changeTab);

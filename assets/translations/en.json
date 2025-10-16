@@ -321,5 +321,17 @@
   "trackYouOrders": "Track your orders",
   "whatYouWillGet": "What you'll get:",
   "access": "Access",
-  "pleaseSelectA": "Please select a"
+  "pleaseSelectA": "Please select a",
+  "account": "Account",
+  "navigation": "Navigation",
+  "noActiveOrders": "No Active Orders",
+  "youDoNotHaveAnyActiveOrders": "You don't have any active orders at the moment.",
+  "noCancelledOrders": "No Cancelled Orders",
+    "youDoNotHaveAnyCancelledOrders": "You don't have any cancelled orders.",
+    "noCompletedOrders": "No Completed Orders",
+    "youDoNotHaveAnyCompletedOrders": "You don't have any completed orders.",
+  "no": "No",
+  "productAvailable": "products available",
+  "retry": "Retry",
+  "oopsSomethingWentWrong": "Oops! Something went wrong"
 }
