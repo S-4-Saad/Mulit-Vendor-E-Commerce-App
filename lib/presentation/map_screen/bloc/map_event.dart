@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../../../models/shop_model.dart';
 
 abstract class MapEvent extends Equatable {
   const MapEvent();
@@ -77,45 +78,33 @@ class MapUseDefaultLocation extends MapEvent {
   const MapUseDefaultLocation();
 }
 
-class MapDrawRouteToRestaurant extends MapEvent {
-  final LatLng restaurantLocation;
-  final String restaurantName;
+class MapFetchNearbyRestaurants extends MapEvent {
+  final double latitude;
+  final double longitude;
 
-  const MapDrawRouteToRestaurant({
-    required this.restaurantLocation,
-    required this.restaurantName,
+  const MapFetchNearbyRestaurants({
+    required this.latitude,
+    required this.longitude,
   });
 
   @override
-  List<Object> get props => [restaurantLocation, restaurantName];
+  List<Object> get props => [latitude, longitude];
 }
 
-class MapRouteFetched extends MapEvent {
-  final List<LatLng> routePoints;
-  final String restaurantName;
-  final int distance; // in meters
-  final int duration; // in seconds
+class MapRestaurantsFetched extends MapEvent {
+  final List<ShopModel> restaurants;
 
-  const MapRouteFetched({
-    required this.routePoints,
-    required this.restaurantName,
-    required this.distance,
-    required this.duration,
-  });
+  const MapRestaurantsFetched(this.restaurants);
 
   @override
-  List<Object> get props => [routePoints, restaurantName, distance, duration];
+  List<Object> get props => [restaurants];
 }
 
-class MapRouteError extends MapEvent {
+class MapRestaurantsError extends MapEvent {
   final String error;
 
-  const MapRouteError(this.error);
+  const MapRestaurantsError(this.error);
 
   @override
   List<Object> get props => [error];
-}
-
-class MapClearRoute extends MapEvent {
-  const MapClearRoute();
 }

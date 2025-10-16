@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/assets/app_images.dart';
 import 'package:speezu/core/assets/font_family.dart';
@@ -10,9 +9,6 @@ import 'package:speezu/core/utils/labels.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
 import 'package:speezu/presentation/drawers/end_drawer.dart';
 import 'package:speezu/widgets/login_required_bottom%20sheet.dart';
-
-import '../../core/services/localStorage/my-local-controller.dart';
-import '../../core/utils/constants.dart';
 import '../../repositories/user_repository.dart';
 import '../../routes/route_names.dart';
 import '../../widgets/search_animated_container.dart';

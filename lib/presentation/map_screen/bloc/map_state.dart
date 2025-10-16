@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../../../models/shop_model.dart';
 
 abstract class MapState extends Equatable {
   const MapState();
@@ -27,8 +28,9 @@ class MapLoaded extends MapState {
   final MapType mapType;
   final GoogleMapController? controller;
   final CameraPosition cameraPosition;
-  final Set<Polyline> polylines;
   final Set<Marker> markers;
+  final List<ShopModel> restaurants;
+  final bool isLoadingRestaurants;
 
   const MapLoaded({
     this.currentPosition,
@@ -36,8 +38,9 @@ class MapLoaded extends MapState {
     required this.mapType,
     this.controller,
     required this.cameraPosition,
-    this.polylines = const {},
     this.markers = const {},
+    this.restaurants = const [],
+    this.isLoadingRestaurants = false,
   });
 
   @override
@@ -47,8 +50,9 @@ class MapLoaded extends MapState {
         mapType,
         controller,
         cameraPosition,
-        polylines,
         markers,
+        restaurants,
+        isLoadingRestaurants,
       ];
 
   MapLoaded copyWith({
@@ -57,8 +61,9 @@ class MapLoaded extends MapState {
     MapType? mapType,
     GoogleMapController? controller,
     CameraPosition? cameraPosition,
-    Set<Polyline>? polylines,
     Set<Marker>? markers,
+    List<ShopModel>? restaurants,
+    bool? isLoadingRestaurants,
   }) {
     return MapLoaded(
       currentPosition: currentPosition ?? this.currentPosition,
@@ -66,8 +71,9 @@ class MapLoaded extends MapState {
       mapType: mapType ?? this.mapType,
       controller: controller ?? this.controller,
       cameraPosition: cameraPosition ?? this.cameraPosition,
-      polylines: polylines ?? this.polylines,
       markers: markers ?? this.markers,
+      restaurants: restaurants ?? this.restaurants,
+      isLoadingRestaurants: isLoadingRestaurants ?? this.isLoadingRestaurants,
     );
   }
 }
@@ -92,13 +98,4 @@ class MapLocationPermissionDeniedPermanently extends MapState {
 
 class MapLocationServiceDisabled extends MapState {
   const MapLocationServiceDisabled();
-}
-
-class MapRouteLoading extends MapState {
-  final String restaurantName;
-
-  const MapRouteLoading(this.restaurantName);
-
-  @override
-  List<Object> get props => [restaurantName];
 }

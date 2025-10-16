@@ -3,7 +3,9 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../../../core/directions_service.dart';
+import '../../../core/services/api_services.dart';
+import '../../../core/services/urls.dart';
+import '../../../models/shop_model.dart';
 import 'map_event.dart';
 import 'map_state.dart';
 
@@ -13,8 +15,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     zoom: 12,
   );
 
-  final DirectionsService _directionsService = DirectionsService();
-  
   // Singleton instance
   static MapBloc? _instance;
   static MapBloc get instance {
@@ -42,10 +42,9 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<MapRefreshLocation>(_onRefreshLocation);
     on<MapToggleMapType>(_onToggleMapType);
     on<MapUseDefaultLocation>(_onUseDefaultLocation);
-    on<MapDrawRouteToRestaurant>(_onDrawRouteToRestaurant);
-    on<MapRouteFetched>(_onRouteFetched);
-    on<MapRouteError>(_onRouteError);
-    on<MapClearRoute>(_onClearRoute);
+    on<MapFetchNearbyRestaurants>(_onFetchNearbyRestaurants);
+    on<MapRestaurantsFetched>(_onRestaurantsFetched);
+    on<MapRestaurantsError>(_onRestaurantsError);
   }
 
   Future<void> _onMapInitialized(
@@ -241,33 +240,42 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         zoom: 15,
       );
 
-      print('MapBloc: Location received - Lat: ${position.latitude}, Lng: ${position.longitude}');
 
-      // Emit the loaded state with current location
+      // Emit the loaded state with current location and loading restaurants
       emit(MapLoaded(
         currentPosition: newPosition,
         isLocationEnabled: true,
         mapType: MapType.normal,
         cameraPosition: newCameraPosition,
+        restaurants: const [],
+        isLoadingRestaurants: true, // Start with loading restaurants
       ));
 
-      // Move camera to current location
+      // Try to move camera immediately if controller is available
       _moveToLocation(newPosition);
+
+      // Also try again after a longer delay in case controller becomes available later
+      Future.delayed(const Duration(milliseconds: 2000), () {
+        _moveToLocation(newPosition);
+      });
+
+      // Wait a bit for camera to move, then fetch nearby restaurants
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        add(MapFetchNearbyRestaurants(
+          latitude: position.latitude,
+          longitude: position.longitude,
+        ));
+      });
     } catch (e) {
-      // Provide more user-friendly error messages
-      String errorMessage;
-      if (e.toString().contains('TimeoutException')) {
-        errorMessage = 'Location request timed out. Please check your GPS settings and try again.';
-      } else if (e.toString().contains('LocationServiceDisabledException')) {
-        errorMessage = 'Location services are disabled. Please enable GPS in your device settings.';
-      } else if (e.toString().contains('PermissionDeniedException')) {
-        errorMessage = 'Location permission denied. Please enable location access in app settings.';
-      } else {
-        errorMessage = 'Unable to get your current location. Please check your GPS settings and try again.';
-      }
-      
-      // Emit error state
-      emit(MapError(errorMessage));
+      // Emit error state with fallback map
+      emit(MapLoaded(
+        currentPosition: null,
+        isLocationEnabled: false,
+        mapType: MapType.normal,
+        cameraPosition: _defaultLocation,
+        restaurants: const [],
+        isLoadingRestaurants: false,
+      ));
     }
   }
 
@@ -324,7 +332,10 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
       // Move to current location if available
       if (currentState.currentPosition != null) {
-        _moveToLocation(currentState.currentPosition!);
+        // Use a small delay to ensure the controller is fully ready
+        Future.delayed(const Duration(milliseconds: 100), () {
+          _moveToLocation(currentState.currentPosition!);
+        });
       }
     }
   }
@@ -355,26 +366,25 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     if (state is MapLoaded) {
       final currentState = state as MapLoaded;
       if (currentState.controller != null) {
-        await currentState.controller!.animateCamera(
-          CameraUpdate.newLatLngZoom(position, 15),
-        );
+        try {
+          await currentState.controller!.animateCamera(
+            CameraUpdate.newLatLngZoom(position, 15),
+          );
+        } catch (e) {
+          // Try alternative method
+          try {
+            await currentState.controller!.moveCamera(
+              CameraUpdate.newCameraPosition(
+                CameraPosition(target: position, zoom: 15),
+              ),
+            );
+          } catch (e2) {
+            debugPrint('🗺️ Error with moveCamera: $e2');
+          }
+        }
       }
     }
   }
-
-  // Public methods for external use
-  Future<void> moveToLocation(LatLng position) async {
-    await _moveToLocation(position);
-  }
-
-  Future<void> refreshLocation() async {
-    add(const MapRefreshLocation());
-  }
-
-  void toggleMapType(MapType mapType) {
-    add(MapToggleMapType(mapType));
-  }
-
 
   void _onUseDefaultLocation(
     MapUseDefaultLocation event,
@@ -383,151 +393,99 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     if (state is MapLoaded) {
       final currentState = state as MapLoaded;
       emit(currentState.copyWith(
-        currentPosition: null, // Clear current position
-        cameraPosition: _defaultLocation, // Use default location
+        currentPosition: null,
+        cameraPosition: _defaultLocation,
       ));
     }
   }
 
-  Future<void> _onDrawRouteToRestaurant(
-    MapDrawRouteToRestaurant event,
+  Future<void> _onFetchNearbyRestaurants(
+    MapFetchNearbyRestaurants event,
     Emitter<MapState> emit,
   ) async {
     if (state is MapLoaded) {
       final currentState = state as MapLoaded;
       
-      // Only draw route if we have current position
-      if (currentState.currentPosition == null) {
-        return;
-      }
-
-      // Show loading state
-      emit(MapRouteLoading(event.restaurantName));
+      // Set loading state
+      emit(currentState.copyWith(isLoadingRestaurants: true));
 
       try {
-        // Fetch directions from Google Directions API
-        final directionsResult = await _directionsService.getDirections(
-          origin: currentState.currentPosition!,
-          destination: event.restaurantLocation,
-        );
+        // Prepare request data
+        final requestData = {
+          'latitude': event.latitude,
+          'longitude': event.longitude,
+        };
 
-        if (directionsResult != null && directionsResult.routes.isNotEmpty) {
-          final route = directionsResult.routes.first;
-          
-          // Emit route fetched event
-          add(MapRouteFetched(
-            routePoints: route.points,
-            restaurantName: event.restaurantName,
-            distance: route.distance,
-            duration: route.duration,
-          ));
-        } else {
-          // Fallback to straight line if API fails
-          add(MapRouteError('Failed to fetch route, showing direct path'));
-        }
+        await ApiService.postMethod(
+          apiUrl: nearByStoresUrl,
+          postData: requestData,
+          executionMethod: (bool success, dynamic responseData) async {
+            if (success && responseData != null) {
+              if (responseData['success'] == true && responseData['restaurants'] != null) {
+                // Parse restaurants from response
+                final List<dynamic> restaurantsJson = responseData['restaurants'];
+                final List<ShopModel> restaurants = restaurantsJson
+                    .map((json) => ShopModel.fromJson(json))
+                    .toList();
+
+                // Create restaurant markers
+                final Set<Marker> restaurantMarkers = restaurants.map((restaurant) {
+                  return Marker(
+                    markerId: MarkerId('restaurant_${restaurant.id}'),
+                    position: LatLng(restaurant.latitude, restaurant.longitude),
+                    infoWindow: InfoWindow(
+                      title: restaurant.shopName,
+                      snippet: '${restaurant.shopRating.toStringAsFixed(1)} ⭐ • ${restaurant.isOpen ? 'Open' : 'Closed'}',
+                    ),
+                    icon: BitmapDescriptor.defaultMarkerWithHue(
+                      restaurant.isOpen ? BitmapDescriptor.hueGreen : BitmapDescriptor.hueRed,
+                    ),
+                  );
+                }).toSet();
+
+                // Add restaurant markers to existing markers
+                final Set<Marker> allMarkers = {...currentState.markers, ...restaurantMarkers};
+
+                // Emit success with restaurants and markers
+                add(MapRestaurantsFetched(restaurants));
+                
+                emit(currentState.copyWith(
+                  restaurants: restaurants,
+                  isLoadingRestaurants: false,
+                  markers: allMarkers,
+                ));
+              } else {
+                add(MapRestaurantsError('No restaurants found nearby'));
+              }
+            } else {
+              add(MapRestaurantsError('Failed to fetch restaurants'));
+            }
+          },
+        );
       } catch (e) {
-        add(MapRouteError('Error fetching route: $e'));
+        add(MapRestaurantsError('Error fetching restaurants: $e'));
       }
     }
   }
 
-  void _onRouteFetched(
-    MapRouteFetched event,
+  void _onRestaurantsFetched(
+    MapRestaurantsFetched event,
     Emitter<MapState> emit,
   ) {
-    if (state is MapRouteLoading) {
+    // This is handled in the _onFetchNearbyRestaurants method
+    // No additional action needed here
+  }
+
+  void _onRestaurantsError(
+    MapRestaurantsError event,
+    Emitter<MapState> emit,
+  ) {
+    if (state is MapLoaded) {
+      final currentState = state as MapLoaded;
+      emit(currentState.copyWith(isLoadingRestaurants: false));
       
-      // Create polyline from route points
-      final polyline = Polyline(
-        polylineId: const PolylineId('route_to_restaurant'),
-        points: event.routePoints,
-        color: const Color(0xFF1ABC9C), // Teal color to match the button
-        width: 4,
-        patterns: [],
-      );
-
-      // Create marker only for restaurant location
-      final restaurantMarker = Marker(
-        markerId: const MarkerId('restaurant_location'),
-        position: event.routePoints.last,
-        infoWindow: InfoWindow(
-          title: event.restaurantName,
-          snippet: '${(event.distance / 1000).toStringAsFixed(1)} km • ${(event.duration / 60).toStringAsFixed(0)} min',
-        ),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-      );
-
-      // Update state with new polylines and restaurant marker only
-      emit(MapLoaded(
-        currentPosition: event.routePoints.first,
-        isLocationEnabled: true,
-        mapType: MapType.normal,
-        cameraPosition: CameraPosition(
-          target: event.routePoints.first,
-          zoom: 15,
-        ),
-        polylines: {polyline},
-        markers: {restaurantMarker},
-      ));
-
-      // Move camera to show the route
-      _moveToShowRoute(event.routePoints.first, event.routePoints.last);
+      // You could show a snackbar or other error indication here
+      print('Restaurant fetch error: ${event.error}');
     }
-  }
-
-  void _onRouteError(
-    MapRouteError event,
-    Emitter<MapState> emit,
-  ) {
-    // Fallback to straight line if route fetching fails
-    if (state is MapRouteLoading) {
-      // For now, just show error and let user retry
-      emit(MapError(event.error));
-    }
-  }
-
-  void _onClearRoute(
-    MapClearRoute event,
-    Emitter<MapState> emit,
-  ) {
-    if (state is MapLoaded) {
-      final currentState = state as MapLoaded;
-      emit(currentState.copyWith(
-        polylines: const {},
-        markers: const {},
-      ));
-    }
-  }
-
-  Future<void> _moveToShowRoute(LatLng start, LatLng end) async {
-    if (state is MapLoaded) {
-      final currentState = state as MapLoaded;
-      if (currentState.controller != null) {
-        // Calculate bounds to show both points
-        final bounds = _calculateBounds([start, end]);
-        await currentState.controller!.animateCamera(
-          CameraUpdate.newLatLngBounds(bounds, 100.0),
-        );
-      }
-    }
-  }
-
-  LatLngBounds _calculateBounds(List<LatLng> points) {
-    double minLat = points.first.latitude;
-    double maxLat = points.first.latitude;
-    double minLng = points.first.longitude;
-    double maxLng = points.first.longitude;
-
-    for (final point in points) {
-      minLat = minLat < point.latitude ? minLat : point.latitude;
-      maxLat = maxLat > point.latitude ? maxLat : point.latitude;
-      minLng = minLng < point.longitude ? minLng : point.longitude;
-      maxLng = maxLng > point.longitude ? maxLng : point.longitude;
-    }
-
-    return LatLngBounds(
-      southwest: LatLng(minLat, minLng),
-      northeast: LatLng(maxLat, maxLng),
-    );
   }
 }

@@ -27,3 +27,4 @@ const String favouriteListUrl = "$baseUrl/favorites";
 const String searchProductsViaApiUrl = "$baseUrl/search-all";
 const String orderDetailUrl = "$baseUrl/order/";
 const String addReviewUrl = "$baseUrl/add-review";
+const String nearByStoresUrl = "$baseUrl/nearby-restaurants";

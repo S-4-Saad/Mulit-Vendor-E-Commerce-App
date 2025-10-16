@@ -8,9 +8,10 @@ import '../../widgets/custom_app_bar.dart';
 import '../../widgets/custom_text_form_field.dart';
 import '../../models/address_model.dart';
 import '../../repositories/user_repository.dart';
+import 'map_picker_screen.dart';
 
 class AddNewAddressScreen extends StatefulWidget {
-  AddNewAddressScreen({super.key});
+  const AddNewAddressScreen({super.key});
 
   @override
   State<AddNewAddressScreen> createState() => _AddNewAddressScreenState();
@@ -83,62 +84,6 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                   haveDropdownMenu: true,
                   dropdownMenuItems: addressTypes,
                 ),
-                // DropdownButtonFormField<String>(
-                //   value: selectedAddressType,
-                //   decoration: InputDecoration(
-                //     hintText: 'Select Address Type',
-                //     hintStyle: TextStyle(
-                //       fontFamily: FontFamily.fontsPoppinsRegular,
-                //       color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.6),
-                //     ),
-                //     border: OutlineInputBorder(
-                //       borderRadius: BorderRadius.circular(8),
-                //       borderSide: BorderSide(
-                //         color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
-                //       ),
-                //     ),
-                //     enabledBorder: OutlineInputBorder(
-                //       borderRadius: BorderRadius.circular(8),
-                //       borderSide: BorderSide(
-                //         color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
-                //       ),
-                //     ),
-                //     focusedBorder: OutlineInputBorder(
-                //       borderRadius: BorderRadius.circular(8),
-                //       borderSide: BorderSide(
-                //         color: Theme.of(context).colorScheme.primary,
-                //         width: 2,
-                //       ),
-                //     ),
-                //     filled: true,
-                //     fillColor: Theme.of(context).colorScheme.onPrimary,
-                //     contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                //   ),
-                //   dropdownColor: Theme.of(context).colorScheme.onPrimary,
-                //   items: addressTypes.map((String type) {
-                //     return DropdownMenuItem<String>(
-                //       value: type,
-                //       child: Text(
-                //         type,
-                //         style: TextStyle(
-                //           fontFamily: FontFamily.fontsPoppinsRegular,
-                //           color: Theme.of(context).colorScheme.onSecondary,
-                //         ),
-                //       ),
-                //     );
-                //   }).toList(),
-                //   onChanged: (String? newValue) {
-                //     setState(() {
-                //       selectedAddressType = newValue;
-                //     });
-                //   },
-                //   validator: (value) {
-                //     if (value == null || value.isEmpty) {
-                //       return 'Please select address type';
-                //     }
-                //     return null;
-                //   },
-                // ),
                 const SizedBox(height: 10),
                 Text(Labels.customerName, style: textStyle),
                 const SizedBox(height: 5),
@@ -180,6 +125,38 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                   hint: Labels.address,
                   focusNode: addressFocusNode,
                   maxLineLength: 2,
+                ),
+                const SizedBox(height: 15),
+                // Map picker button
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      // Navigate to map picker screen
+                      final selectedLocation = await Navigator.push<Map<String, dynamic>>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MapPickerScreen(),
+                        ),
+                      );
+                      
+                      if (selectedLocation != null) {
+                        // Update address field with selected location
+                        addressController.text = selectedLocation['address'] ?? '';
+                        setState(() {
+                          // Update any location-related state if needed
+                        });
+                      }
+                    },
+                    icon: const Icon(Icons.location_on),
+                    label: const Text('Pick Location from Map'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 30),
                 ElevatedButton(

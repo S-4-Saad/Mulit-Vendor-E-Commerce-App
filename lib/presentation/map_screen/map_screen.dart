@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../../models/restaurant_model.dart';
-import '../../models/shop_model.dart';
 import '../../widgets/restaurant_list.dart';
 import '../../widgets/dialog_boxes/permission_dialog.dart';
-import '../../core/distance_calculator.dart';
+import '../../widgets/restaurant_shimmer_widget.dart';
+import '../../core/services/map_launcher_service.dart';
 import 'bloc/map_bloc.dart';
 import 'bloc/map_event.dart';
 import 'bloc/map_state.dart';
@@ -33,81 +32,11 @@ class _MapViewState extends State<MapView> {
   @override
   void initState() {
     super.initState();
-    // Trigger the map screen shown event
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<MapBloc>().add(const MapScreenShown());
     });
   }
 
-  // Sample restaurant data - replace with API response
-  List<ShopModel> _getSampleShops([LatLng? currentLocation]) {
-    final shops = [
-      ShopModel(
-        id: 1,
-
-        shopName: "Home Cooking Experience",
-        shopDescription: "Letraset sheets containing Lorem Ipsum passages",
-        shopRating: 5.0,
-        isOpen: true,
-        isDelivering: true,
-        imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9oBl8oMj8unCKsHx9WuzVKgxc34HJnei-Qw&s',
-        latitude: 31.4205338, // ~500m north of your location
-        longitude: 73.1172914, // slightly west
-      ),
-      ShopModel(
-
-        id: 2,
-        shopName: "The Local Bistro",
-        shopDescription: "Letraset sheets containing Lorem Ipsum passages",
-        shopRating: 4.5,
-        isOpen: true,
-        isDelivering: true,
-        imageUrl:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQOOgoiSob7STY6T9gsLPRZA3omjcpx_KpiVw&s' ,
-
-        latitude: 31.4197338, // ~400m south of your location
-        longitude: 73.1180914, // slightly east
-      ),
-      ShopModel(
-        id: 3,
-        shopName: "Garden Fresh Cafe",
-
-        shopDescription: "Fresh ingredients and healthy options",
-        shopRating: 4.2,
-        isOpen:false,
-        isDelivering: false,
-        imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNgzW6LUDP_-oVca6nsAECRnKLUCtvp18HVA&s',
-        latitude: 31.4210338, // ~900m north of your location
-        longitude: 73.1168914, // slightly west
-      ),
-      ShopModel(
-        id: 4,
-        shopName: "Spice Palace",
-        shopDescription: "Authentic Indian cuisine with traditional flavors",
-        shopRating: 4.8,
-        isDelivering: true,
-        isOpen: true,
-        imageUrl: 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1b/1d/50/53/excellent-buffet.jpg?w=900&h=500&s=1',
-        latitude: 31.4192338, // ~800m south of your location
-        longitude: 73.1184914, // slightly east
-      ),
-    ];
-
-    // Calculate distances if current location is available
-    if (currentLocation != null) {
-      for (final shop in shops) {
-        if (shop.latitude != null && shop.longitude != null) {
-          shop.distance = DistanceCalculator.calculateDistance(
-            currentLocation.latitude,
-            currentLocation.longitude,
-            shop.latitude!,
-            shop.longitude!,
-          );
-        }
-      }
-    }
-
-    return shops;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -166,24 +95,40 @@ class _MapViewState extends State<MapView> {
   }
 
   Widget _buildMap(MapState state) {
+    CameraPosition cameraPosition;
+    bool isLocationEnabled = false;
+    Set<Marker> markers = const {};
+    MapType mapType = MapType.normal;
+
     if (state is MapLoaded) {
-      return GoogleMap(
-        mapType: state.mapType,
-        initialCameraPosition: state.cameraPosition,
-        myLocationEnabled: state.isLocationEnabled,
-        myLocationButtonEnabled: state.isLocationEnabled,
-        polylines: state.polylines,
-        markers: state.markers,
-        onMapCreated: (GoogleMapController controller) {
-          context.read<MapBloc>().add(MapControllerReady(controller));
-        },
-        onCameraMove: (CameraPosition position) {
-          context.read<MapBloc>().add(MapCameraMoved(position));
-        },
+      cameraPosition = state.cameraPosition;
+      isLocationEnabled = state.isLocationEnabled;
+      markers = state.markers;
+      mapType = state.mapType;
+    } else {
+      cameraPosition = const CameraPosition(
+        target: LatLng(31.5204, 74.3587), // Lahore, Pakistan
+        zoom: 12,
       );
     }
 
-    return const Center(child: CircularProgressIndicator());
+    return GoogleMap(
+      key: ValueKey('google_map_${state.runtimeType}'),
+      mapType: mapType,
+      initialCameraPosition: cameraPosition,
+      myLocationEnabled: isLocationEnabled,
+      myLocationButtonEnabled: isLocationEnabled,
+      markers: markers,
+      onMapCreated: (GoogleMapController controller) {
+        context.read<MapBloc>().add(MapControllerReady(controller));
+      },
+      onCameraMove: (CameraPosition position) {
+        context.read<MapBloc>().add(MapCameraMoved(position));
+      },
+      compassEnabled: true,
+      mapToolbarEnabled: false,
+      zoomControlsEnabled: false,
+    );
   }
 
   Widget _buildLoadingOverlay(MapState state) {
@@ -216,41 +161,61 @@ class _MapViewState extends State<MapView> {
   Widget _buildRestaurantList() {
     return BlocBuilder<MapBloc, MapState>(
       builder: (context, state) {
-        LatLng? currentLocation;
         if (state is MapLoaded) {
-          currentLocation = state.currentPosition;
+          return Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (state.isLoadingRestaurants)
+                  const RestaurantShimmerWidget()
+                else
+                  ShopList(
+                    height: 250,
+                    shops: state.restaurants,
+                    onShopTap: () {
+                      // Navigate to restaurant details
+                    },
+                    onOpenTap: () {
+                      // Handle open action
+                    },
+                    onPickupTap: () {
+                      // Handle pickup action
+                    },
+                    onLocationTap: (shop) {
+                      _quickNavigateToRestaurant(shop, state);
+                    },
+                  ),
+              ],
+            ),
+          );
         }
-        
-        return Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: ShopList(
-            height: 250,
-            shops: _getSampleShops(currentLocation),
-
-            onShopTap: () {
-              // Navigate to restaurant details
-              print("Restaurant tapped");
-            },
-            onOpenTap: () {
-              // Handle open action
-              print("Open tapped");
-            },
-            onPickupTap: () {
-              // Handle pickup action
-              print("Pickup tapped");
-            },
-            onLocationTap: (shop) {
-              // Draw route to restaurant
-              context.read<MapBloc>().add(MapDrawRouteToRestaurant(
-                restaurantLocation: LatLng(shop.latitude!, shop.longitude!),
-                restaurantName: shop.shopName ?? "Restaurant",
-              ));
-            },
-          ),
-        );
+        return const SizedBox.shrink();
       },
+    );
+  }
+
+
+  /// Quick navigation - directly opens Google Maps
+  void _quickNavigateToRestaurant(shop, MapLoaded state) {
+    // Get user's current location if available
+    double? userLatitude;
+    double? userLongitude;
+    
+    if (state.currentPosition != null) {
+      userLatitude = state.currentPosition!.latitude;
+      userLongitude = state.currentPosition!.longitude;
+    }
+
+    // Directly open Google Maps
+    MapLauncherService.navigateToLocation(
+      latitude: shop.latitude,
+      longitude: shop.longitude,
+      destinationName: shop.shopName,
+      userLatitude: userLatitude,
+      userLongitude: userLongitude,
     );
   }
 }
