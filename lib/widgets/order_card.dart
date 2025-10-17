@@ -31,7 +31,7 @@ class OrderCard extends StatelessWidget {
 
   Color _getStatusColor() {
     switch (status.toLowerCase()) {
-      case "active":
+      case "approved":
         return Colors.blue.shade900;
       case "completed":
         return Colors.green.shade700;
@@ -172,7 +172,7 @@ class OrderCard extends StatelessWidget {
 
         // Action Buttons
         // Action Buttons
-        if (status.toLowerCase() == "active") ...[
+        if (status.toLowerCase() == "approved") ...[
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [

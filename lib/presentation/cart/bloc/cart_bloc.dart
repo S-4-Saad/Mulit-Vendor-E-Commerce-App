@@ -1,6 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/services/urls.dart';
 import 'dart:convert';
+import '../../../models/coupon_model.dart';
 import 'cart_event.dart';
 import 'cart_state.dart';
 import '../../../models/cart_model.dart';
@@ -36,10 +38,161 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     on<PostOrder>(_onPostOrder);
     on<ResetCheckout>(_onResetCheckout);
     on<ResetCartStatus>(_onResetCartStatus); // Add this line
+    on<CouponCodeChanged>(_onCouponCodeChanged);
+    on<ResetCouponStatus>(_onResetCouponStatus);
 
     // Load cart data on initialization
     add(LoadCartFromStorage());
   }
+
+  void _onResetCouponStatus(ResetCouponStatus event, Emitter<CartState> emit) {
+    emit(
+      state.copyWith(
+        couponStatus: CouponStatus.initial,
+        couponLoading: CouponLoading.initial,
+        couponModel: null,
+        cart: state.cart.copyWith(couponDiscount: 0.0),
+      ),
+    );
+  }
+
+  Future<void> _onCouponCodeChanged(
+      CouponCodeChanged event,
+      Emitter<CartState> emit,
+      ) async {
+    print('🔹 Coupon change detected: ${event.code}');
+    emit(state.copyWith(couponLoading: CouponLoading.loading));
+
+    if (event.code.isEmpty) {
+      print('⚠️ Coupon code empty, resetting state');
+      emit(
+        state.copyWith(
+          couponModel: null,
+          couponStatus: CouponStatus.initial,
+            couponLoading: CouponLoading.initial,
+          cart: state.cart.copyWith(couponDiscount: 0.0),
+        ),
+      );
+      return;
+    }
+
+    try {
+      await ApiService.postMethod(
+        authHeader: true,
+        apiUrl: applyCouponUrl,
+        postData: {'coupon_code': event.code},
+        executionMethod: (bool success, dynamic responseData) {
+          print('✅ API response received: $responseData');
+
+          try {
+            final coupon = CouponModel.fromJson(responseData);
+            print('🧾 Parsed CouponModel: $coupon');
+
+            if (coupon.status == true) {
+              final minOrderAmount =
+                  double.tryParse(coupon.data?.minOrderAmount.toString() ?? '0') ??
+                      0.0;
+              final totalAmount = state.cart.totalAmount;
+              final discountAmount =
+                  double.tryParse(coupon.data?.maxDiscount.toString() ?? '0') ??
+                      0.0;
+
+              print('🧮 Cart total: $totalAmount | Min required: $minOrderAmount');
+
+              if (totalAmount >= minOrderAmount) {
+                print('💰 Coupon valid and applicable! Discount: $discountAmount');
+
+                final updatedCart =
+                state.cart.copyWith(couponDiscount: discountAmount);
+
+                emit(
+                  state.copyWith(
+                    couponModel: coupon,
+                    couponStatus: CouponStatus.success,
+                    couponLoading: CouponLoading.success,
+                    cart: updatedCart,
+                  ),
+                );
+
+                add(SaveCartToStorage(cart: updatedCart));
+
+                print(
+                  '✅ Updated cart saved with new total: ${updatedCart.totalAmount}',
+                );
+              } else {
+                print(
+                    '🚫 Coupon not applicable. Order must be at least $minOrderAmount.');
+
+                emit(
+                  state.copyWith(
+                    couponModel: coupon,
+                    couponStatus: CouponStatus.notApplicable,
+                    couponLoading: CouponLoading.error,
+                    cart: state.cart.copyWith(couponDiscount: 0.0),
+                  ),
+                );
+              }
+            } else {
+              print('🚫 Invalid coupon (status == false)');
+              emit(
+                state.copyWith(
+                  couponModel: null,
+                  couponStatus: CouponStatus.wrong,
+                  couponLoading: CouponLoading.error,
+                  cart: state.cart.copyWith(couponDiscount: 0.0),
+                ),
+              );
+            }
+          } catch (e) {
+            print('❌ Error parsing coupon: $e');
+            emit(
+              state.copyWith(
+                couponModel: null,
+                couponStatus: CouponStatus.wrong,
+                couponLoading: CouponLoading.error,
+                cart: state.cart.copyWith(couponDiscount: 0.0),
+              ),
+            );
+          }
+        },
+      );
+    } catch (e) {
+      print('⚠️ Dio or Network error: $e');
+      if (e is DioError && e.response?.data != null) {
+        print('🌐 Dio error with response data: ${e.response!.data}');
+        try {
+          final coupon = CouponModel.fromJson(e.response!.data);
+          emit(
+            state.copyWith(
+              couponModel: coupon,
+              couponStatus: CouponStatus.wrong,
+              couponLoading: CouponLoading.error,
+              cart: state.cart.copyWith(couponDiscount: 0.0),
+            ),
+          );
+        } catch (_) {
+          emit(
+            state.copyWith(
+              couponModel: null,
+              couponStatus: CouponStatus.wrong,
+              couponLoading: CouponLoading.error,
+              cart: state.cart.copyWith(couponDiscount: 0.0),
+            ),
+          );
+        }
+      } else {
+        emit(
+          state.copyWith(
+            couponModel: null,
+            couponStatus: CouponStatus.wrong,
+            couponLoading: CouponLoading.error,
+            cart: state.cart.copyWith(couponDiscount: 0.0),
+          ),
+        );
+      }
+    }
+  }
+
 
   // Load cart data from UserRepository
   Future<Cart?> _loadCartFromStorage() async {
@@ -509,10 +662,12 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   }
 
   void _onResetCartStatus(ResetCartStatus event, Emitter<CartState> emit) {
-    emit(state.copyWith(
-      status: CartStatus.initial,
-      orderPlacedSuccessfully: false,
-    ));
+    emit(
+      state.copyWith(
+        status: CartStatus.initial,
+        orderPlacedSuccessfully: false,
+      ),
+    );
   }
 
   // Load addresses from UserRepository
@@ -543,6 +698,10 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     final isPickup = state.selectedMethod == CheckoutMethod.pickup;
     final isDelivery = state.selectedMethod == CheckoutMethod.delivery;
     final paymentType = isCod ? 'cod' : 'online';
+    final CouponModel couponModel =
+        state.couponStatus == CouponStatus.success && state.couponModel != null
+            ? state.couponModel!
+            : CouponModel();
 
     // Dynamic delivery fee (0 for pickup, actual fee for delivery)
     final dynamicDeliveryFee = isPickup ? 0.0 : state.deliveryFee;
@@ -560,6 +719,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       'is_pickup': isPickup,
       'is_delivery': isDelivery,
       'is_cod': isCod,
+      'coupon_id': couponModel.data?.id,
       'payment_method': isPickup ? 'store_payment' : paymentType,
       'items':
           state.items

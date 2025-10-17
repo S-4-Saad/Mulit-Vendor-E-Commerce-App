@@ -18,34 +18,35 @@ class SearchContainer extends StatefulWidget {
 class _SearchContainerState extends State<SearchContainer> {
   bool _isPressed = false;
 
-  final List<Map<String, dynamic>> _searchItems = [
-    {
-      "text": Labels.searchFood,
-      "icon": Icons.restaurant_rounded,
-      "accentColor": Color(0xFFFF6B6B),
-    },
-    {
-      "text": Labels.searchSuperMarketProducts,
-      "icon": Icons.shopping_basket_rounded,
-      "accentColor": Color(0xFF4ECDC4),
-    },
-    {
-      "text": Labels.searchMedicine,
-      "icon": Icons.local_hospital_rounded,
-      "accentColor": Color(0xFF667EEA),
-    },
-    {
-      "text": Labels.searchRetailProducts,
-      "icon": Icons.shopping_bag_rounded,
-      "accentColor": Color(0xFFD66D75),
-    },
-  ];
+
 
   @override
   Widget build(BuildContext context) {
+    final List<Map<String, dynamic>> searchItems = [
+      {
+        "text": Labels.searchFood,
+        "icon": Icons.restaurant_rounded,
+        "accentColor": Color(0xFFFF6B6B),
+      },
+      {
+        "text": Labels.searchSuperMarketProducts,
+        "icon": Icons.shopping_basket_rounded,
+        "accentColor": Color(0xFF4ECDC4),
+      },
+      {
+        "text": Labels.searchMedicine,
+        "icon": Icons.local_hospital_rounded,
+        "accentColor": Color(0xFF667EEA),
+      },
+      {
+        "text": Labels.searchRetailProducts,
+        "icon": Icons.shopping_bag_rounded,
+        "accentColor": Color(0xFFD66D75),
+      },
+    ];
     return BlocBuilder<SearchCubit, int>(
       builder: (context, index) {
-        final item = _searchItems[index];
+        final item = searchItems[index];
         final accentColor = item["accentColor"] as Color;
 
         return GestureDetector(

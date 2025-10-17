@@ -5,6 +5,7 @@ import 'package:speezu/core/utils/media_querry_extention.dart';
 import 'package:speezu/models/store_detail_model.dart';
 import 'package:speezu/presentation/nav_bar_screen/bloc/nav_bar_event.dart';
 import 'package:speezu/presentation/shop_screen/shop/shop_review_screen.dart';
+import 'package:speezu/widgets/error_widget.dart';
 import 'package:speezu/widgets/image_gallery_viewer_widget.dart';
 import 'package:speezu/widgets/product_review_box.dart';
 
@@ -55,28 +56,15 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
 
         if (state.shopDetailStatus == ShopDetailStatus.error) {
           return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.error_outline, size: 64, color: Colors.red),
-                SizedBox(height: 16),
-                Text(
-                  state.message,
-                  style: TextStyle(fontSize: 16),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    if (widget.storeId != null) {
-                      context.read<ShopBloc>().add(
-                        LoadShopDetailEvent(storeId: widget.storeId!),
-                      );
-                    }
-                  },
-                  child: Text('Retry'),
-                ),
-              ],
+            child: CustomErrorWidget(
+              message: state.message,
+              onRetry: () {
+                if (widget.storeId != null) {
+                  context.read<ShopBloc>().add(
+                    LoadShopDetailEvent(storeId: widget.storeId!),
+                  );
+                }
+              },
             ),
           );
         }
@@ -95,7 +83,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
               Icon(Icons.error_outline, size: 64, color: Colors.red),
               SizedBox(height: 16),
               Text(
-                'Store details not available',
+                Labels.storeDetailNotAvailable,
                 style: TextStyle(fontSize: 16),
                 textAlign: TextAlign.center,
               ),
@@ -108,7 +96,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                     );
                   }
                 },
-                child: Text('Retry'),
+                child: Text(Labels.retry,style: TextStyle(color: Colors.white),),
               ),
             ],
           ),
@@ -225,8 +213,8 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           OpenStatusContainer(
-                            isOpened: storeModel.store?.isOpen??false,
-                            isDelivering: storeModel.store?.isDelivery??false,
+                            isOpened: storeModel.store?.isOpen ?? false,
+                            isDelivering: storeModel.store?.isDelivery ?? false,
                           ),
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -249,7 +237,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                             child: BlocBuilder<ShopBloc, ShopState>(
                               builder:
                                   (context, state) => Text(
-                                    '${state.shopDistance} KM',
+                                    '${state.shopDistance} ${Labels.km}',
                                     style: TextStyle(
                                       color:
                                           Theme.of(
@@ -436,7 +424,9 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                 ),
                                 IconButton(
                                   onPressed: () {
-                                    context.read<NavBarBloc>().add(ShopSelectTab(1));
+                                    context.read<NavBarBloc>().add(
+                                      ShopSelectTab(1),
+                                    );
                                   },
                                   icon: Icon(
                                     Icons.arrow_forward_ios_rounded,
@@ -491,7 +481,9 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                             Center(
                               child: TextButton(
                                 onPressed: () {
-                                  context.read<NavBarBloc>().add(ShopSelectTab(1));
+                                  context.read<NavBarBloc>().add(
+                                    ShopSelectTab(1),
+                                  );
                                 },
                                 child: Text(
                                   '${Labels.seeAllReviews} (${storeModel.store!.reviews!.length})',

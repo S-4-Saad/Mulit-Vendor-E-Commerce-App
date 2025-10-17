@@ -10,7 +10,8 @@ class ChangeViewEvent extends CategoryEvent{
 
 class LoadShopsEvent extends CategoryEvent{
   final String category;
-  LoadShopsEvent({required this.category});
+  final int categoryId;
+  LoadShopsEvent({required this.category,required this.categoryId});
   @override
-  List<Object?> get props => [category];
+  List<Object?> get props => [category,categoryId];
 }

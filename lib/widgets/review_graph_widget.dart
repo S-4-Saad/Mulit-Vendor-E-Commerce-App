@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:speezu/core/utils/labels.dart';
 import 'package:speezu/widgets/rating_display_widget.dart';
 
 import '../core/assets/font_family.dart';
@@ -64,7 +65,7 @@ class ReviewGraphWidget extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    '${reviewData.totalReviews} Reviews',
+                    '${reviewData.totalReviews} ${Labels.reviews}',
                     style: TextStyle(
                       fontSize: 14,
                       fontFamily: FontFamily.fontsPoppinsRegular,

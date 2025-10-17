@@ -69,7 +69,15 @@ void main() async {
   // printWrapped("Server Key: $serverKey");
   runApp(
     EasyLocalization(
-      supportedLocales: const [Locale('en'), Locale('ar')],
+      supportedLocales: const [
+        Locale('en'),
+      Locale('ar'),
+      Locale('es'),
+      Locale('fr'),
+      Locale('fr', 'CA'), // French (Canada)
+      Locale('ko'),
+      Locale('pt', 'BR'), // Portuguese (Brazil)
+       ],
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
       child: MultiBlocProvider(

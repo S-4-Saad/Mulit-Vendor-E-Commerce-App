@@ -561,13 +561,7 @@ class _NavBarScreenState extends State<NavBarScreen>
 
   final userRepo = UserRepository();
 
-  List<String> screenTitles = [
-    Labels.products,
-    Labels.mapExplorer,
-    Labels.speezu,
-    Labels.myOrders,
-    Labels.favourites,
-  ];
+
 
   @override
   void initState() {
@@ -727,92 +721,17 @@ class _NavBarScreenState extends State<NavBarScreen>
   }
 
   // Static app bar for tabs 1 & 3
-  PreferredSizeWidget _buildStaticAppBar(NavBarState state) {
-    return PreferredSize(
-      preferredSize: const Size.fromHeight(kToolbarHeight),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Theme.of(context).colorScheme.onPrimary,
-              Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.95),
-            ],
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Theme.of(
-                context,
-              ).colorScheme.shadow.withValues(alpha: 0.08),
-              offset: const Offset(0, 2),
-              blurRadius: 8,
-            ),
-          ],
-        ),
-        child: AppBar(
-          centerTitle: true,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          leading: _buildDrawerButton(),
-          title: ShaderMask(
-            shaderCallback:
-                (bounds) => LinearGradient(
-                  colors: [
-                    Theme.of(
-                      context,
-                    ).colorScheme.onSecondary.withValues(alpha: 0.95),
-                    Theme.of(
-                      context,
-                    ).colorScheme.onSecondary.withValues(alpha: 0.85),
-                  ],
-                ).createShader(bounds),
-            child: Text(
-              screenTitles[state.currentTab],
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: FontFamily.fontsPoppinsSemiBold,
-                fontSize: context.scaledFont(19),
-                letterSpacing: 0.3,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 4),
-              child: BlocBuilder<CartBloc, CartState>(
-                builder: (context, cartState) {
-                  return _buildCartBadge(cartState.totalItems);
-                },
-              ),
-            ),
-          ],
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(1),
-            child: Container(
-              height: 1,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.transparent,
-                    Theme.of(
-                      context,
-                    ).colorScheme.secondary.withValues(alpha: 0.15),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+
 
   @override
   Widget build(BuildContext context) {
+    List<String> screenTitles = [
+      Labels.products,
+      Labels.mapExplorer,
+      Labels.speezu,
+      Labels.myOrders,
+      Labels.favourites,
+    ];
     return BlocProvider(
       create: (_) => NavBarBloc()..add(InitPage(widget.currentTab)),
       child: BlocListener<NavBarBloc, NavBarState>(
@@ -830,11 +749,92 @@ class _NavBarScreenState extends State<NavBarScreen>
               // Static AppBar for tabs 1 & 3
               appBar:
                   (state.currentTab == 1 || state.currentTab == 3)
-                      ? _buildStaticAppBar(state)
+                      ? PreferredSize(
+                    preferredSize: const Size.fromHeight(kToolbarHeight),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Theme.of(context).colorScheme.onPrimary,
+                            Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.95),
+                          ],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.shadow.withValues(alpha: 0.08),
+                            offset: const Offset(0, 2),
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
+                      child: AppBar(
+                        centerTitle: true,
+                        backgroundColor: Colors.transparent,
+                        elevation: 0,
+                        scrolledUnderElevation: 0,
+                        leading: _buildDrawerButton(),
+                        title: ShaderMask(
+                          shaderCallback:
+                              (bounds) => LinearGradient(
+                            colors: [
+                              Theme.of(
+                                context,
+                              ).colorScheme.onSecondary.withValues(alpha: 0.95),
+                              Theme.of(
+                                context,
+                              ).colorScheme.onSecondary.withValues(alpha: 0.85),
+                            ],
+                          ).createShader(bounds),
+                          child: Text(
+                            screenTitles[state.currentTab],
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: FontFamily.fontsPoppinsSemiBold,
+                              fontSize: context.scaledFont(19),
+                              letterSpacing: 0.3,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        actions: [
+                          Padding(
+                            padding: const EdgeInsets.only(right: 4),
+                            child: BlocBuilder<CartBloc, CartState>(
+                              builder: (context, cartState) {
+                                return _buildCartBadge(cartState.totalItems);
+                              },
+                            ),
+                          ),
+                        ],
+                        bottom: PreferredSize(
+                          preferredSize: const Size.fromHeight(1),
+                          child: Container(
+                            height: 1,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.transparent,
+                                  Theme.of(
+                                    context,
+                                  ).colorScheme.secondary.withValues(alpha: 0.15),
+                                  Colors.transparent,
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
                       : null,
 
-              endDrawer: EndDrawer(),
+              // endDrawer: EndDrawer(),
               drawer: DrawerWidget(),
+
 
               // Body with collapsing app bar for tabs 0, 2, 4
               body:

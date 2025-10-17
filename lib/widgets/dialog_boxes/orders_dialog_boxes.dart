@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:speezu/core/utils/snackbar_helper.dart';
+import 'package:speezu/presentation/orders/bloc/order_state.dart';
+import 'package:speezu/presentation/orders/bloc/orders_bloc.dart';
+import 'package:speezu/widgets/auth_loader.dart';
 
 import '../../core/assets/font_family.dart';
 import '../../core/utils/labels.dart';
+import '../../presentation/orders/bloc/orders_event.dart';
 import '../custom_text_form_field.dart';
 
 class OrdersDialogBoxes {
@@ -67,56 +73,84 @@ class OrdersDialogBoxes {
                     },
                   ),
                   const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () => Navigator.pop(dialogContext),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey.shade300,
-                            foregroundColor: Colors.black87,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child:  Text(
-                            Labels.close,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.black87,
-                              fontFamily: FontFamily.fontsPoppinsRegular,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            if (formKey.currentState!.validate()) {
-                              print('object');
-                            }
+                  BlocConsumer<OrdersBloc, OrderState>(
+                    builder: (context, state) {
+                      if (state.cancelOrderStatus ==
+                          CancelOrderStatus.loading) {
+                        return Center(child: AuthLoader());
+                      }
 
-                            // call delete API
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                      return Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () => Navigator.pop(dialogContext),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.grey.shade300,
+                                foregroundColor: Colors.black87,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                Labels.close,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.black87,
+                                  fontFamily: FontFamily.fontsPoppinsRegular,
+                                ),
+                              ),
                             ),
                           ),
-                          child:  Text(
-                            Labels.submit,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white,
-                              fontFamily: FontFamily.fontsPoppinsRegular,
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (formKey.currentState!.validate()) {
+                                  context.read<OrdersBloc>().add(
+                                    CancelOrderEvent(
+                                      orderId: orderId.toString(),
+                                      reason: reasonController.text,
+                                    ),
+                                  );
+                                }
+
+                                // call delete API
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                Labels.submit,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.white,
+                                  fontFamily: FontFamily.fontsPoppinsRegular,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    ],
+                        ],
+                      );
+                    },
+                    listener: (context, state) {
+                      if (state.cancelOrderStatus == CancelOrderStatus.success) {
+                        // Navigator.pop(dialogContext);
+                        SnackBarHelper.showSuccess(
+                          context,
+                          state.errorMessage ?? 'Order Cancelled Successfully',
+                        );
+                      } else if (state.cancelOrderStatus == CancelOrderStatus.error) {
+                        SnackBarHelper.showError(
+                          context,
+                          state.errorMessage ?? 'Failed to Cancel Order',
+                        );
+                      }
+                    },
                   ),
                 ],
               ),

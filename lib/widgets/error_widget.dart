@@ -80,7 +80,7 @@ class CustomErrorWidget extends StatelessWidget {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   elevation: 8,
-                  shadowColor: Colors.blue.withOpacity(0.3),
+                  shadowColor: Colors.cyan.withValues(alpha: 0.3),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),

@@ -5,6 +5,7 @@ import 'package:speezu/presentation/category/bloc/category_event.dart';
 import 'package:speezu/presentation/category/bloc/category_state.dart';
 import 'package:speezu/routes/route_names.dart';
 import 'package:speezu/widgets/custom_app_bar.dart';
+import 'package:speezu/widgets/error_widget.dart';
 import 'package:speezu/widgets/image_type_extention.dart';
 import 'package:speezu/widgets/rating_display_widget.dart';
 import 'package:speezu/widgets/search_animated_container.dart';
@@ -17,8 +18,13 @@ import 'bloc/category_bloc.dart';
 
 class CategoryScreen extends StatefulWidget {
   final String categoryName;
-  
-  const CategoryScreen({super.key, required this.categoryName});
+  final int categoryId;
+
+  const CategoryScreen({
+    super.key,
+    required this.categoryName,
+    required this.categoryId,
+  });
 
   @override
   State<CategoryScreen> createState() => _CategoryScreenState();
@@ -29,7 +35,12 @@ class _CategoryScreenState extends State<CategoryScreen> {
   void initState() {
     super.initState();
     // Load shops when the screen initializes
-    context.read<CategoryBloc>().add(LoadShopsEvent(category: widget.categoryName));
+    context.read<CategoryBloc>().add(
+      LoadShopsEvent(
+        categoryId: widget.categoryId,
+        category: widget.categoryName,
+      ),
+    );
   }
 
   @override
@@ -84,47 +95,50 @@ class _CategoryScreenState extends State<CategoryScreen> {
               BlocBuilder<CategoryBloc, CategoryState>(
                 builder: (context, state) {
                   bool isGridView = state.isGridView;
-                  
+
                   if (state.shopStatus == ShopStatus.loading) {
                     return ShimmerLoadingWidget(
                       isGridView: isGridView,
                       itemCount: 6,
                     );
                   }
-                  
+
                   if (state.shopStatus == ShopStatus.error) {
                     return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.error_outline, size: 64, color: Colors.red),
-                          SizedBox(height: 16),
-                          Text(
-                            state.message ?? 'Failed to load shops',
-                            style: TextStyle(fontSize: 16),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(height: 16),
-                          ElevatedButton(
-                            onPressed: () {
-                              context.read<CategoryBloc>().add(LoadShopsEvent(category: widget.categoryName));
-                            },
-                            child: Text('Retry'),
-                          ),
-                        ],
+                      child: CustomErrorWidget(
+                        message: state.message ?? Labels.error,
+                        onRetry: () {
+                          context.read<CategoryBloc>().add(
+                            LoadShopsEvent(
+                              categoryId: widget.categoryId,
+                              category: widget.categoryName,
+                            ),
+                          );
+                        },
                       ),
                     );
                   }
-                  
+
                   if (state.shops.isEmpty) {
                     return Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.store_outlined, size: 64, color: Colors.grey),
+                          Icon(
+                            Icons.store_outlined,
+                            size: 64,
+                            color: Colors.grey,
+                          ),
                           SizedBox(height: 16),
                           Text(
-                            'No shops found for ${widget.categoryName}',
+                            widget.categoryId == 1
+                                ? Labels.noStoresForFood
+                                : widget.categoryId == 2
+                                ? Labels.noStoresForRetail
+                                : widget.categoryId == 3
+                                ? Labels.noStoresForSupermarket
+                                : Labels.noStoresForPharmacy,
+
                             style: TextStyle(fontSize: 16),
                             textAlign: TextAlign.center,
                           ),
@@ -132,7 +146,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                       ),
                     );
                   }
-                  
+
                   return isGridView
                       ? Column(
                         children:
@@ -164,7 +178,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         itemBuilder: (context, index) {
                           final shop = state.shops[index];
                           return GestureDetector(
-                            onTap: (){
+                            onTap: () {
                               Navigator.pushNamed(
                                 context,
                                 RouteNames.shopNavBarScreen,
@@ -205,7 +219,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Text(
                                           shop.shopName,
@@ -262,8 +277,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                     onPressed: () {},
                                     child: Icon(
                                       Icons.directions,
-                                      color:
-                                        Colors.white,
+                                      color: Colors.white,
                                       size: 25,
                                     ),
                                   ),

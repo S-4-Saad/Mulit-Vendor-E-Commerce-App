@@ -225,3 +225,11 @@ class PostOrder extends CartEvent {
 
 class ResetCheckout extends CartEvent {}
 class ResetCartStatus extends CartEvent {}
+
+class CouponCodeChanged extends CartEvent {
+  final String code;
+  CouponCodeChanged(this.code);
+  @override
+  List<Object?> get props => [code];
+}
+class ResetCouponStatus extends CartEvent {}

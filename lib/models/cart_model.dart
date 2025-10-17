@@ -86,7 +86,8 @@ class CartItem {
   }
 
   // Calculate the current price based on selected variations
-  static double _getCurrentPrice(ProductDetail product, {
+  static double _getCurrentPrice(
+    ProductDetail product, {
     String? variationParentValue,
     String? variationChildValue,
   }) {
@@ -94,33 +95,36 @@ class CartItem {
     if (product.variations.isEmpty) {
       return product.price;
     }
-    
+
     // If no parent selected, return base price
     if (variationParentValue == null) {
       return product.price;
     }
-    
+
     // Find the selected parent variation
     final selectedParentVariation = product.variations.firstWhere(
       (v) => v.parentName == variationParentValue,
       orElse: () => product.variations.first,
     );
-    
+
     // If parent has children and child is selected, use child price
-    if (selectedParentVariation.children.isNotEmpty && variationChildValue != null) {
-      final selectedChildVariation = selectedParentVariation.children.firstWhere(
-        (child) => child.name == variationChildValue,
-        orElse: () => selectedParentVariation.children.first,
-      );
+    if (selectedParentVariation.children.isNotEmpty &&
+        variationChildValue != null) {
+      final selectedChildVariation = selectedParentVariation.children
+          .firstWhere(
+            (child) => child.name == variationChildValue,
+            orElse: () => selectedParentVariation.children.first,
+          );
       return selectedChildVariation.price;
     }
-    
+
     // If parent has no children or child not selected, use parent price
     return selectedParentVariation.parentPrice;
   }
 
   // Calculate the current original price based on selected variations
-  static double _getCurrentOriginalPrice(ProductDetail product, {
+  static double _getCurrentOriginalPrice(
+    ProductDetail product, {
     String? variationParentValue,
     String? variationChildValue,
   }) {
@@ -128,27 +132,29 @@ class CartItem {
     if (product.variations.isEmpty) {
       return product.originalPrice;
     }
-    
+
     // If no parent selected, return base original price
     if (variationParentValue == null) {
       return product.originalPrice;
     }
-    
+
     // Find the selected parent variation
     final selectedParentVariation = product.variations.firstWhere(
       (v) => v.parentName == variationParentValue,
       orElse: () => product.variations.first,
     );
-    
+
     // If parent has children and child is selected, use child original price
-    if (selectedParentVariation.children.isNotEmpty && variationChildValue != null) {
-      final selectedChildVariation = selectedParentVariation.children.firstWhere(
-        (child) => child.name == variationChildValue,
-        orElse: () => selectedParentVariation.children.first,
-      );
+    if (selectedParentVariation.children.isNotEmpty &&
+        variationChildValue != null) {
+      final selectedChildVariation = selectedParentVariation.children
+          .firstWhere(
+            (child) => child.name == variationChildValue,
+            orElse: () => selectedParentVariation.children.first,
+          );
       return selectedChildVariation.originalPrice;
     }
-    
+
     // If parent has no children or child not selected, use parent original price
     return selectedParentVariation.parentOriginalPrice;
   }
@@ -166,21 +172,22 @@ class CartItem {
     String? storeId,
   }) {
     // Create unique item ID using real server IDs
-    final itemId = '${product.id}_${variationParentValue ?? ''}_${variationChildValue ?? ''}';
-    
+    final itemId =
+        '${product.id}_${variationParentValue ?? ''}_${variationChildValue ?? ''}';
+
     // Calculate variation-specific prices
     final variationPrice = _getCurrentPrice(
       product,
       variationParentValue: variationParentValue,
       variationChildValue: variationChildValue,
     );
-    
+
     final variationOriginalPrice = _getCurrentOriginalPrice(
       product,
       variationParentValue: variationParentValue,
       variationChildValue: variationChildValue,
     );
-    
+
     return CartItem(
       id: itemId,
       productId: product.id, // Real server product ID
@@ -213,7 +220,12 @@ class CartItem {
 
   @override
   int get hashCode {
-    return Object.hash(id, productId, variationParentValue, variationChildValue);
+    return Object.hash(
+      id,
+      productId,
+      variationParentValue,
+      variationChildValue,
+    );
   }
 
   // Convert to JSON
@@ -270,88 +282,90 @@ class Cart {
   final List<CartItem> items;
   final double deliveryFee;
   final double taxRate; // Tax rate as percentage (e.g., 10.0 for 10%)
+  final double? couponDiscount;
 
   const Cart({
     this.items = const [],
     this.deliveryFee = 0.0,
     this.taxRate = 0.0,
+    this.couponDiscount,
   });
 
-  // Get total items count
+  // 🧮 Get total items count
   int get totalItems => items.fold(0, (sum, item) => sum + item.quantity);
 
-  // Get subtotal (items total without tax and delivery)
+  // 🧾 Get subtotal (items total without tax and delivery)
   double get subtotal => items.fold(0.0, (sum, item) => sum + item.totalPrice);
 
-  // Get tax amount
+  // 💸 Get tax amount
   double get taxAmount => subtotal * (taxRate / 100);
 
-  // Get total amount including tax and delivery
-  double get totalAmount => subtotal + taxAmount + deliveryFee;
+  // ✅ Get total amount (already includes discount)
+  double get totalAmount {
+    final discount = couponDiscount ?? 0.0;
+    final total = subtotal + taxAmount + deliveryFee - discount;
+    return total < 0 ? 0 : total; // Never go below zero
+  }
 
-  // Check if cart is empty
+  // 🛒 Check if cart is empty
   bool get isEmpty => items.isEmpty;
-
-  // Check if cart is not empty
   bool get isNotEmpty => items.isNotEmpty;
 
-  // Get unique shops count
-  int get uniqueShopsCount {
-    final shops = items.map((item) => item.shopName).toSet();
-    return shops.length;
-  }
+  // 🏪 Get unique shops count
+  int get uniqueShopsCount => items.map((item) => item.shopName).toSet().length;
 
-  // Get current store ID (from first item if cart is not empty)
-  String? get currentStoreId {
-    if (items.isEmpty) return null;
-    return items.first.storeId;
-  }
+  // 🏬 Get current store ID (from first item)
+  String? get currentStoreId => items.isEmpty ? null : items.first.storeId;
 
-  // Check if cart has items from a specific store
-  bool hasItemsFromStore(String storeId) {
-    return items.any((item) => item.storeId == storeId);
-  }
+  // 🏷️ Check if cart has items from a specific store
+  bool hasItemsFromStore(String storeId) =>
+      items.any((item) => item.storeId == storeId);
 
-  // Get items count for a specific store
-  int getItemCountForStore(String storeId) {
-    return items.where((item) => item.storeId == storeId).length;
-  }
+  // 🔢 Get items count for a specific store
+  int getItemCountForStore(String storeId) =>
+      items.where((item) => item.storeId == storeId).length;
 
-  // Create a copy with updated items
+  // 🧩 Copy with updates
   Cart copyWith({
     List<CartItem>? items,
     double? deliveryFee,
     double? taxRate,
+    double? couponDiscount,
   }) {
     return Cart(
       items: items ?? this.items,
       deliveryFee: deliveryFee ?? this.deliveryFee,
       taxRate: taxRate ?? this.taxRate,
+      couponDiscount: couponDiscount ?? this.couponDiscount,
     );
   }
 
-  // Convert to JSON
+  // 🔄 Convert to JSON
   Map<String, dynamic> toJson() {
     return {
       'items': items.map((item) => item.toJson()).toList(),
       'deliveryFee': deliveryFee,
       'taxRate': taxRate,
+      'couponDiscount': couponDiscount,
     };
   }
 
-  // Create from JSON
+  // 🏗️ Create from JSON
   factory Cart.fromJson(Map<String, dynamic> json) {
     return Cart(
       items: (json['items'] as List<dynamic>?)
           ?.map((item) => CartItem.fromJson(item as Map<String, dynamic>))
-          .toList() ?? [],
+          .toList() ??
+          [],
       deliveryFee: (json['deliveryFee'] ?? 0.0).toDouble(),
       taxRate: (json['taxRate'] ?? 0.0).toDouble(),
+      couponDiscount: (json['couponDiscount'] ?? 0.0).toDouble(),
     );
   }
 
   @override
   String toString() {
-    return 'Cart(items: ${items.length}, totalItems: $totalItems, totalAmount: $totalAmount)';
+    return 'Cart(items: ${items.length}, totalItems: $totalItems, totalAmount: $totalAmount, couponDiscount: $couponDiscount)';
   }
 }
+
