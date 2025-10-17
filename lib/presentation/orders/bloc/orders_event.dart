@@ -19,3 +19,12 @@ class RefreshOrdersEvent extends OrdersEvent {
   @override
   List<Object?> get props => [];
 }
+class CancelOrderEvent extends OrdersEvent {
+  final String orderId;
+  final String reason;
+
+  CancelOrderEvent({required this.orderId, required this.reason});
+
+  @override
+  List<Object?> get props => [orderId, reason];
+}

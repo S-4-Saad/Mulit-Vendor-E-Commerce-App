@@ -344,6 +344,51 @@ class Labels {
   static String get whatYouWillGet => 'whatYouWillGet'.tr();
   static String get access => 'access'.tr();
   static String get pleaseSelectA => 'pleaseSelectA'.tr();
+  static String get navigation => 'navigation'.tr();
+  static String get account => 'account'.tr();
+  static String get noActiveOrders => 'noActiveOrders'.tr();
+  static String get youDoNotHaveAnyActiveOrders => 'youDoNotHaveAnyActiveOrders'.tr();
+  static String get noCancelledOrders => 'noCancelledOrders'.tr();
+  static String get youDoNotHaveAnyCancelledOrders => 'youDoNotHaveAnyCancelledOrders'.tr();
+  static String get noCompletedOrders => 'noCompletedOrders'.tr();
+  static String get youDoNotHaveAnyCompletedOrders => 'youDoNotHaveAnyCompletedOrders'.tr();
+  static String get no => 'no'.tr();
+  static String get productAvailable => 'productAvailable'.tr();
+  static String get retry => 'retry'.tr();
+  static String get oopsSomethingWentWrong => 'oopsSomethingWentWrong'.tr();
+  static String get startAddingFavProducts => 'startAddingFavProducts'.tr();
+  static String get noFavouritesYet => 'noFavouritesYet'.tr();
+  static String get noStoresForSupermarket => 'noStoresForSupermarket'.tr();
+  static String get noStoresForRetail => 'noStoresForRetail'.tr();
+  static String get noStoresForPharmacy => 'noStoresForPharmacy'.tr();
+  static String get noStoresForFood => 'noStoresForFood'.tr();
+  static String get km => 'km'.tr();
+  static String get storeDetailNotAvailable => 'storeDetailNotAvailable'.tr();
+  static String get noProductsAvailable => 'noProductsAvailable'.tr();
+  static String get weCouldNotFindStoreProducts => 'weCouldNotFindStoreProducts'.tr();
+  static String get areYouSureYouWantToRemoveThisItemFromTheCart => 'areYouSureYouWantToRemoveThisItemFromTheCart'.tr();
+  static String get removeItem => 'removeItem'.tr();
+  static String get remove => 'remove'.tr();
+  static String get yourCartIsEmpty => 'yourCartIsEmpty'.tr();
+  static String get addSomeProductsInCart => 'addSomeProductsInCart'.tr();
+  static String get continueShopping => 'continueShopping'.tr();
+  static String get required => 'required'.tr();
+  static String get from => 'from'.tr();
+  static String get paymentIntegrationNotAvailable => 'paymentIntegrationNotAvailable'.tr();
+  static String get addSpecialInstructionsForDeliveryPerson => 'addSpecialInstructionsForDeliveryPerson'.tr();
+  static String get deliveryInstructionsOptional => 'deliveryInstructionsOptional'.tr();
+  static String get placingYourOrder => 'placingYourOrder'.tr();
+  static String get noAddressesFound => 'noAddressesFound'.tr();
+  static String get pleaseAddAnAddressToContinue => 'pleaseAddAnAddressToContinue'.tr();
+  static String get couponDiscount => 'couponDiscount'.tr();
+  static String get minimumOrderAmount => 'minimumOrderAmount'.tr();
+  static String get invalidCouponCodeTryAgain => 'invalidCouponCodeTryAgain'.tr();
+  static String get couponAppliedSuccessfully => 'couponAppliedSuccessfully'.tr();
+  static String get clearCartAndSwitchProducts => 'clearCartAndSwitchProducts'.tr();
+  static String get viewCart => 'viewCart'.tr();
+  static String get youHaveItemsInYourCartFromAnotherStore => 'youHaveItemsInYourCartFromAnotherStore'.tr();
+  static String get differentStore => 'differentStore'.tr();
+
 
 
 

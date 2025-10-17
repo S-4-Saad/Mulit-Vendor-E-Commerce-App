@@ -15,6 +15,7 @@ import '../../../widgets/custom_app_bar.dart';
 import '../../../widgets/image_gallery_viewer_widget.dart';
 import '../../../widgets/rating_display_widget.dart';
 import '../../../widgets/review_graph_widget.dart';
+import '../../../widgets/shimmer/shimmer_reviews.dart';
 import '../bloc/shop_state.dart';
 
 class ProductReviewsScreen extends StatefulWidget {
@@ -42,109 +43,111 @@ class _ProductReviewsScreenState extends State<ProductReviewsScreen> {
     // Calculate ReviewData dynamically
 
     return Scaffold(
-      appBar: CustomAppBar(title: Labels.reviews),
+    
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SingleChildScrollView(
-        child: BlocBuilder<ShopBloc, ShopState>(
-          builder: (context, state) {
-            final reviewData = calculateReviewData(
-              state.shopReviewsModel?.reviews,
-            );
-            if(state.shopReviewsStatus==ShopReviewsStatus.loading){
-              return Center(
-                child: Padding(
-                  padding: EdgeInsets.all(20),
-                  child: CircularProgressIndicator(),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: BlocBuilder<ShopBloc, ShopState>(
+            builder: (context, state) {
+              final reviewData = calculateReviewData(
+                state.shopReviewsModel?.reviews,
+              );
+              if(state.shopReviewsStatus==ShopReviewsStatus.loading){
+                return Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(0),
+                    child: ShimmerReviews(),
+                  ),
+                );
+              }
+              return Padding(
+                padding: EdgeInsets.all(15),
+                child: Column(
+                  children: [
+                    ReviewGraphWidget(reviewData: reviewData),
+                    SizedBox(height: height * 0.015),
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        border: Border.all(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.outline.withValues(alpha: 0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child:
+                          state.shopReviewsModel?.reviews == null ||
+                                  state.shopReviewsModel!.reviews!.isEmpty
+                              ? Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.rate_review_outlined,
+                                      size: 55,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.outline.withOpacity(0.5),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      Labels.noReviewsYet,
+                                      style: TextStyle(
+                                        fontSize: context.scaledFont(13),
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily:
+                                            FontFamily.fontsPoppinsRegular,
+                                        color:
+                                            Theme.of(context).colorScheme.outline,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                              : ListView.separated(
+                            separatorBuilder: (context, index) => Divider(
+                              color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: .3),
+                            ),
+                            itemCount: state.shopReviewsModel?.reviews?.length ?? 0,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              final review = state.shopReviewsModel!.reviews![index];
+        
+                              // Parse rating safely
+                              final double rating = double.tryParse(review.rating ?? '0') ?? 0.0;
+        
+                              // Format date safely
+                              String formatDate(String? dateString) {
+                                if (dateString == null || dateString.isEmpty) return '';
+                                try {
+                                  final dateTime = DateTime.parse(dateString);
+                                  return DateFormat("dd MMM, yyyy").format(dateTime);
+                                } catch (e) {
+                                  return '';
+                                }
+                              }
+        
+                              return ProductReviewWidget(
+                                review: review.reviewText ?? 'No review',
+                                date: formatDate(review.createdAt),
+                                userName: review.userName ?? 'Anonymous',
+                                rating: rating.clamp(0, 5), // keeps rating between 0 and 5
+                                expandable: false,
+                              );
+                            },
+                          ),
+        
+                    ),
+                  ],
                 ),
               );
-            }
-            return Padding(
-              padding: EdgeInsets.all(15),
-              child: Column(
-                children: [
-                  ReviewGraphWidget(reviewData: reviewData),
-                  SizedBox(height: height * 0.015),
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Theme.of(context).colorScheme.onPrimary,
-                      border: Border.all(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.outline.withValues(alpha: 0.3),
-                        width: 1,
-                      ),
-                    ),
-                    child:
-                        state.shopReviewsModel?.reviews == null ||
-                                state.shopReviewsModel!.reviews!.isEmpty
-                            ? Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.rate_review_outlined,
-                                    size: 55,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.outline.withOpacity(0.5),
-                                  ),
-                                  SizedBox(height: 5),
-                                  Text(
-                                    Labels.noReviewsYet,
-                                    style: TextStyle(
-                                      fontSize: context.scaledFont(13),
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily:
-                                          FontFamily.fontsPoppinsRegular,
-                                      color:
-                                          Theme.of(context).colorScheme.outline,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
-                            : ListView.separated(
-                          separatorBuilder: (context, index) => Divider(
-                            color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: .3),
-                          ),
-                          itemCount: state.shopReviewsModel?.reviews?.length ?? 0,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemBuilder: (context, index) {
-                            final review = state.shopReviewsModel!.reviews![index];
-
-                            // Parse rating safely
-                            final double rating = double.tryParse(review.rating ?? '0') ?? 0.0;
-
-                            // Format date safely
-                            String formatDate(String? dateString) {
-                              if (dateString == null || dateString.isEmpty) return '';
-                              try {
-                                final dateTime = DateTime.parse(dateString);
-                                return DateFormat("dd MMM, yyyy").format(dateTime);
-                              } catch (e) {
-                                return '';
-                              }
-                            }
-
-                            return ProductReviewWidget(
-                              review: review.reviewText ?? 'No review',
-                              date: formatDate(review.createdAt),
-                              userName: review.userName ?? 'Anonymous',
-                              rating: rating.clamp(0, 5), // keeps rating between 0 and 5
-                              expandable: false,
-                            );
-                          },
-                        ),
-
-                  ),
-                ],
-              ),
-            );
-          },
+            },
+          ),
         ),
       ),
     );

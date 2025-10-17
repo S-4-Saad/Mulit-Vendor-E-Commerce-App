@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:speezu/core/utils/labels.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
+import 'package:speezu/models/product_category_model.dart';
 import 'package:speezu/presentation/nav_bar_screen/bloc/nav_bar_bloc.dart';
 import 'package:speezu/presentation/nav_bar_screen/bloc/nav_bar_event.dart';
 import 'package:speezu/presentation/products/bloc/products_bloc.dart';
 import 'package:speezu/routes/route_names.dart';
+import 'package:speezu/widgets/error_widget.dart';
 import 'package:speezu/widgets/product_box_widget.dart';
 import '../../core/assets/app_images.dart';
 import '../../models/product_model.dart';
@@ -48,13 +50,6 @@ class _HomeScreenState extends State<HomeScreen> {
     'https://t3.ftcdn.net/jpg/04/65/46/52/360_F_465465254_1pN9MGrA831idD6zIBL7q8rnZZpUCQTy.jpg',
     "https://static.vecteezy.com/system/resources/thumbnails/002/006/774/small/paper-art-shopping-online-on-smartphone-and-new-buy-sale-promotion-backgroud-for-banner-market-ecommerce-free-vector.jpg",
     "https://static.vecteezy.com/system/resources/thumbnails/004/299/835/small/online-shopping-on-phone-buy-sell-business-digital-web-banner-application-money-advertising-payment-ecommerce-illustration-search-free-vector.jpg",
-  ];
-
-  final List<ProductCategory> dummyCategories = [
-    ProductCategory(name: "Food", imageUrl: AppImages.foodStoreIcon),
-    ProductCategory(name: "Supermarket", imageUrl: AppImages.superMarketIcon),
-    ProductCategory(name: "Retail Store", imageUrl: AppImages.utilityStoreIcon),
-    ProductCategory(name: "Pharmacy", imageUrl: AppImages.pharmacyIcon),
   ];
 
   // Helper methods to get API data
@@ -115,6 +110,28 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final List<ProductCategoryModel> productCategories = [
+      ProductCategoryModel(
+        name: Labels.food,
+        imageUrl: AppImages.foodStoreIcon,
+        categoryId: 1,
+      ),
+      ProductCategoryModel(
+        name: Labels.superMarket,
+        imageUrl: AppImages.superMarketIcon,
+        categoryId: 3,
+      ),
+      ProductCategoryModel(
+        name: Labels.retailStore,
+        imageUrl: AppImages.utilityStoreIcon,
+        categoryId: 2,
+      ),
+      ProductCategoryModel(
+        name: Labels.pharmacy,
+        imageUrl: AppImages.pharmacyIcon,
+        categoryId: 4,
+      ),
+    ];
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SmartRefresher(
@@ -130,7 +147,14 @@ class _HomeScreenState extends State<HomeScreen> {
               return const HomeShimmerWidget();
             }
             if (state.status == HomeStatus.error) {
-              return Center(child: Text("Error: ${state.message}"));
+              return Center(
+                child: CustomErrorWidget(
+                  message: state.message,
+                  onRetry: () {
+                    context.read<HomeBloc>().add(LoadHomeData());
+                  },
+                ),
+              );
             }
             return SingleChildScrollView(
               child: Padding(
@@ -141,8 +165,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     SizedBox(height: context.heightPct(.01)),
 
-                    // SearchContainer(onSearchTap: () {}),
-                    // SizedBox(height: context.heightPct(.005)),
                     EcommerceBanner(
                       imageUrls: imageUrl,
                       height: context.heightPct(.18),
@@ -153,7 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children:
-                            dummyCategories.map((category) {
+                            productCategories.map((category) {
                               return CategoryBoxWidget(
                                 title: category.name,
                                 imageUrl: category.imageUrl,
@@ -161,7 +183,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Navigator.pushNamed(
                                     context,
                                     RouteNames.categoryScreen,
-                                    arguments: category.name,
+                                    arguments: {
+                                      'categoryName': category.name,
+                                      'categoryId': category.categoryId,
+                                    },
                                   );
                                 },
                               );
@@ -169,18 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     SizedBox(height: context.heightPct(.02)),
-                    IconButton(
-                      onPressed: () {
-                        OrderSuccessDialog.show(
-                          context,
-                          onContinue: () {
-                            Navigator.of(context).pop();
-                            // Navigate back to home
-                          },
-                        );
-                      },
-                      icon: Icon(Icons.add),
-                    ),
+
                     HomeHeaderTile(
                       title: Labels.topTrendingFoods,
                       onViewAllTap:

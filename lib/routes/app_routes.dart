@@ -45,8 +45,17 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => FaqsScreen());
 
       case RouteNames.categoryScreen:
-        final String categoryName = settings.arguments as String? ?? 'Categories';
-        return MaterialPageRoute(builder: (_) => CategoryScreen(categoryName: categoryName));
+        final args = settings.arguments as Map<String, dynamic>? ?? {};
+        final String categoryName = args['categoryName'] ?? 'Categories';
+        final int categoryId = args['categoryId'] ?? 1;
+
+        return MaterialPageRoute(
+          builder: (_) => CategoryScreen(
+            categoryName: categoryName,
+            categoryId: categoryId,
+          ),
+        );
+
       case RouteNames.shopNavBarScreen:
         final int? storeId = settings.arguments as int?;
         return MaterialPageRoute(builder: (_) => ShopNavbarScreen(storeId: storeId));

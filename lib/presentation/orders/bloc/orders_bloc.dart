@@ -11,13 +11,17 @@ class OrdersBloc extends Bloc<OrdersEvent, OrderState> {
     on<ChangeOrdersTabEvent>(_changeTab);
     on<LoadOrdersEvent>(_loadOrders);
     on<RefreshOrdersEvent>(_refreshOrders);
+    on<CancelOrderEvent>(_cancelOrder);
   }
 
   void _changeTab(ChangeOrdersTabEvent event, Emitter<OrderState> emit) {
     emit(state.copyWith(selectedTabIndex: event.index));
   }
 
-  Future<void> _loadOrders(LoadOrdersEvent event, Emitter<OrderState> emit) async {
+  Future<void> _loadOrders(
+    LoadOrdersEvent event,
+    Emitter<OrderState> emit,
+  ) async {
     emit(state.copyWith(status: OrderStatus.loading));
 
     await ApiService.getMethod(
@@ -26,33 +30,83 @@ class OrdersBloc extends Bloc<OrdersEvent, OrderState> {
       executionMethod: (bool success, dynamic response) async {
         if (success && response['success'] == true) {
           final ordersResponse = OrdersResponse.fromJson(response);
-          
-          // Separate orders by status
-          final activeOrders = ordersResponse.orders
-              .where((order) => order.status.toLowerCase() == 'active')
-              .toList();
-          
-          final completedOrders = ordersResponse.orders
-              .where((order) => order.status.toLowerCase() == 'completed')
-              .toList();
 
-          emit(state.copyWith(
-            status: OrderStatus.success,
-            activeOrders: activeOrders,
-            completedOrders: completedOrders,
-            errorMessage: null,
-          ));
+          // Separate orders by status
+          final activeOrders =
+              ordersResponse.orders
+                  .where((order) => order.status.toLowerCase() == 'approved')
+                  .toList();
+          print('Active Orders $activeOrders}');
+
+          final completedOrders =
+              ordersResponse.orders
+                  .where((order) => order.status.toLowerCase() == 'completed')
+                  .toList();
+          final cancelledOrders =
+              ordersResponse.orders
+                  .where((order) => order.status.toLowerCase() == 'cancelled')
+                  .toList();
+
+          emit(
+            state.copyWith(
+              status: OrderStatus.success,
+              activeOrders: activeOrders,
+              completedOrders: completedOrders,
+              cancelledOrders: cancelledOrders,
+              errorMessage: null,
+            ),
+          );
         } else {
-          emit(state.copyWith(
-            status: OrderStatus.error,
-            errorMessage: response['message'] ?? 'Failed to load orders',
-          ));
+          emit(
+            state.copyWith(
+              status: OrderStatus.error,
+              errorMessage: response['message'] ?? 'Failed to load orders',
+            ),
+          );
         }
       },
     );
   }
 
-  Future<void> _refreshOrders(RefreshOrdersEvent event, Emitter<OrderState> emit) async {
+  Future<void> _cancelOrder(
+    CancelOrderEvent event,
+    Emitter<OrderState> emit,
+  ) async {
+    emit(state.copyWith(cancelOrderStatus: CancelOrderStatus.loading));
+    final cancelUrl = '$cancelOrderUrl${event.orderId}/cancel';
+    print('Cancelling order at URL: $cancelUrl with reason: ${event.reason}');
+
+    await ApiService.postMethod(
+      apiUrl: cancelUrl,
+      postData: {'cancellation_reason': event.reason},
+      authHeader: true,
+      executionMethod: (bool success, dynamic response) async {
+        if (success && response['success'] == true) {
+          emit(
+            state.copyWith(
+              cancelOrderStatus: CancelOrderStatus.success,
+              errorMessage: response['message'] ?? null,
+            ),
+          );
+
+          // Automatically refresh the orders list after successful cancellation
+          add(LoadOrdersEvent());
+        } else {
+          emit(
+            state.copyWith(
+              cancelOrderStatus: CancelOrderStatus.error,
+              errorMessage: response['message'] ?? 'Failed to Cancel orders',
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  Future<void> _refreshOrders(
+    RefreshOrdersEvent event,
+    Emitter<OrderState> emit,
+  ) async {
     add(LoadOrdersEvent());
   }
 }

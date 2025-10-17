@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:speezu/presentation/order_details/order_details_screen.dart';
+import 'package:speezu/widgets/error_widget.dart';
+import '../../../core/utils/labels.dart';
 import '../../../widgets/active_orders_shimmer.dart';
 import '../../../widgets/dialog_boxes/orders_dialog_boxes.dart';
 import '../../../widgets/order_card.dart';
@@ -37,7 +39,14 @@ class _ActiveOrdersScreenState extends State<ActiveOrdersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocBuilder<OrdersBloc, OrderState>(
+      body: BlocConsumer<OrdersBloc, OrderState>(
+        listener: (context, state) {
+          if(state.cancelOrderStatus==CancelOrderStatus.success){
+            Navigator.pop(context); // Close dialog
+
+            // context.read<OrdersBloc>().add(RefreshOrdersEvent());
+          }
+        },
         builder: (context, state) {
           if (state.status == OrderStatus.loading) {
             return const ActiveOrdersShimmer();
@@ -45,33 +54,11 @@ class _ActiveOrdersScreenState extends State<ActiveOrdersScreen> {
 
           if (state.status == OrderStatus.error) {
             return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 64,
-                    color: Colors.red[300],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Error loading orders',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    state.errorMessage ?? 'Unknown error',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.read<OrdersBloc>().add(RefreshOrdersEvent());
-                    },
-                    child: const Text('Retry'),
-                  ),
-                ],
+              child: CustomErrorWidget(
+                message: state.errorMessage ?? Labels.error,
+                onRetry: () {
+                  context.read<OrdersBloc>().add(RefreshOrdersEvent());
+                },
               ),
             );
           }
@@ -88,12 +75,12 @@ class _ActiveOrdersScreenState extends State<ActiveOrdersScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No Active Orders',
+                    Labels.noActiveOrders,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'You don\'t have any active orders at the moment.',
+                    Labels.youDoNotHaveAnyActiveOrders,
                     style: Theme.of(context).textTheme.bodyMedium,
                     textAlign: TextAlign.center,
                   ),
@@ -123,7 +110,9 @@ class _ActiveOrdersScreenState extends State<ActiveOrdersScreen> {
                     onVerify: () async {
                       final result = await Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const QrScannerScreen()),
+                        MaterialPageRoute(
+                          builder: (_) => const QrScannerScreen(),
+                        ),
                       );
 
                       if (result != null) {
@@ -137,8 +126,9 @@ class _ActiveOrdersScreenState extends State<ActiveOrdersScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => OrderDetailsScreen(orderId: order.orderId,
-                          ),
+                          builder:
+                              (context) =>
+                                  OrderDetailsScreen(orderId: order.orderId),
                         ),
                       );
                     },

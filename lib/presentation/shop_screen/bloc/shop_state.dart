@@ -24,6 +24,7 @@ class ShopState extends Equatable {
   final List<ProductModel> currentProducts;
   final String? currentCategoryId;
   final ShopReviewsModel? shopReviewsModel;
+  final double? shopDistance;
 
   ShopState({
     this.message = '',
@@ -37,6 +38,7 @@ class ShopState extends Equatable {
     this.productsStatus = ProductsStatus.initial,
     this.currentProducts = const [],
     this.currentCategoryId,
+    this.shopDistance
   });
 
   ShopState copyWith({
@@ -51,6 +53,7 @@ class ShopState extends Equatable {
     ProductsStatus? productsStatus,
     List<ProductModel>? currentProducts,
     String? currentCategoryId,
+    double? shopDistance
   }) {
     return ShopState(
       message: message ?? this.message,
@@ -64,6 +67,7 @@ class ShopState extends Equatable {
       shopReviewsStatus: shopReviewsStatus ?? this.shopReviewsStatus,
       currentProducts: currentProducts ?? this.currentProducts,
       currentCategoryId: currentCategoryId ?? this.currentCategoryId,
+      shopDistance: shopDistance ?? this.shopDistance
     );
   }
 
@@ -79,6 +83,7 @@ class ShopState extends Equatable {
     currentProducts,
     currentCategoryId,
     shopReviewsStatus,
-    shopReviewsModel
+    shopReviewsModel,
+    shopDistance
   ];
 }

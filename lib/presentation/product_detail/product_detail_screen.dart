@@ -17,6 +17,7 @@ import 'package:speezu/core/services/localStorage/my-local-controller.dart';
 import 'package:speezu/core/utils/constants.dart';
 import 'package:speezu/repositories/user_repository.dart';
 import 'package:speezu/routes/route_names.dart';
+import 'package:speezu/widgets/error_widget.dart';
 import 'package:speezu/widgets/login_required_bottom%20sheet.dart';
 import '../../core/assets/font_family.dart';
 import '../../core/utils/labels.dart';
@@ -360,139 +361,200 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         variationChildId: selectedChildVariation?.id,
       ),
     );
-  }
-
-  void _showStoreConflictDialog(
-    BuildContext context,
-    String errorMessage,
-    ProductDetail product,
-  ) {
-    // Check if the widget is still mounted before showing dialog
+  }void _showStoreConflictDialog(
+      BuildContext context,
+      String errorMessage,
+      ProductDetail product,
+      ) {
     if (!mounted) return;
 
     final parts = errorMessage.split(':');
     final newStoreId = parts.length > 1 ? parts[1] : product.shopName;
+    final newStoreName = product.shopName;
     final currentStoreId = parts.length > 2 ? parts[2] : 'Unknown Store';
     final currentQuantity = context.read<ProductDetailBloc>().state.quantity;
 
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Store Conflict',
-            style: TextStyle(
-              fontFamily: FontFamily.fontsPoppinsSemiBold,
-              fontSize: 18,
-            ),
-          ),
-          content: Text(
-            'You have items from "$currentStoreId" in your cart. '
-            'To add items from "$newStoreId", you need to either:\n\n'
-            '• Checkout current items first, or\n'
-            '• Clear your cart to add items from the new store',
-            style: TextStyle(
-              fontFamily: FontFamily.fontsPoppinsRegular,
-              fontSize: 14,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                'Cancel',
-                style: TextStyle(
-                  fontFamily: FontFamily.fontsPoppinsRegular,
-                  color: Theme.of(context).colorScheme.onSecondary,
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Icon
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade50,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.warning_amber_rounded,
+                    size: 48,
+                    color: Colors.orange.shade600,
+                  ),
                 ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                // Navigate to cart
-                Navigator.pushNamed(context, RouteNames.cartScreen);
-              },
-              child: Text(
-                'Checkout',
-                style: TextStyle(
-                  fontFamily: FontFamily.fontsPoppinsSemiBold,
-                  color: Theme.of(context).colorScheme.primary,
+
+                SizedBox(height: 20),
+
+                // Title
+                Text(
+                  Labels.differentStore,
+                  style: TextStyle(
+                    fontFamily: FontFamily.fontsPoppinsSemiBold,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                // Clear cart and add new item
-                context.read<CartBloc>().add(
-                  ClearCartForNewStore(newStoreId: newStoreId),
-                );
 
-                // Add the new item after clearing
-                Future.delayed(Duration(milliseconds: 100), () {
-                  // Check if widget is still mounted before proceeding
-                  if (!mounted) return;
+                SizedBox(height: 12),
 
-                  // Handle products with no variations
-                  if (product.variations.isEmpty) {
-                    context.read<CartBloc>().add(
-                      AddToCart(
-                        product: product,
-                        quantity: currentQuantity,
-                        variationParentName: null,
-                        variationParentValue: null,
-                        variationChildName: null,
-                        variationChildValue: null,
-                        variationParentId: null,
-                        variationChildId: null,
+                // Message
+                Text(
+                  '${Labels.youHaveItemsInYourCartFromAnotherStore} $newStoreName?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: FontFamily.fontsPoppinsRegular,
+                    fontSize: 14,
+                    color: Colors.grey.shade700,
+                    height: 1.5,
+                  ),
+                ),
+
+                SizedBox(height: 24),
+
+                // Buttons
+                Row(
+                  children: [
+                    // Cancel
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          Labels.cancel,
+                          style: TextStyle(
+                            fontFamily: FontFamily.fontsPoppinsSemiBold,
+                            fontSize: 15,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
                       ),
-                    );
-                    return;
-                  }
-
-                  // Find the selected parent variation
-                  final selectedParentVariation = product.variations.firstWhere(
-                    (v) => v.parentName == selectedParent,
-                    orElse: () => product.variations.first,
-                  );
-
-                  // Find the selected child variation if child is selected and parent has children
-                  ProductSubVariation? selectedChildVariation;
-                  if (selectedChild != null &&
-                      selectedParentVariation.children.isNotEmpty) {
-                    selectedChildVariation = selectedParentVariation.children
-                        .firstWhere(
-                          (child) => child.name == selectedChild,
-                          orElse: () => selectedParentVariation.children.first,
-                        );
-                  }
-
-                  context.read<CartBloc>().add(
-                    AddToCart(
-                      product: product,
-                      quantity: currentQuantity,
-                      variationParentName: selectedParent,
-                      variationParentValue: selectedParent,
-                      variationChildName: selectedChild,
-                      variationChildValue: selectedChild,
-                      variationParentId: selectedParentVariation.id,
-                      variationChildId: selectedChildVariation?.id,
                     ),
-                  );
-                });
-              },
-              child: Text(
-                'Clear & Add',
-                style: TextStyle(
-                  fontFamily: FontFamily.fontsPoppinsSemiBold,
-                  color: Colors.red,
+
+                    SizedBox(width: 12),
+
+                    // View Cart
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          Navigator.pushNamed(context, RouteNames.cartScreen);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          padding: EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          Labels.viewCart,
+                          style: TextStyle(
+                            fontFamily: FontFamily.fontsPoppinsSemiBold,
+                            fontSize: 15,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
+
+                SizedBox(height: 8),
+
+                // Clear Cart Button
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      context.read<CartBloc>().add(
+                        ClearCartForNewStore(newStoreId: newStoreId),
+                      );
+
+                      Future.delayed(Duration(milliseconds: 100), () {
+                        if (!mounted) return;
+
+                        if (product.variations.isEmpty) {
+                          context.read<CartBloc>().add(
+                            AddToCart(
+                              product: product,
+                              quantity: currentQuantity,
+                              variationParentName: null,
+                              variationParentValue: null,
+                              variationChildName: null,
+                              variationChildValue: null,
+                              variationParentId: null,
+                              variationChildId: null,
+                            ),
+                          );
+                          return;
+                        }
+
+                        final selectedParentVariation = product.variations.firstWhere(
+                              (v) => v.parentName == selectedParent,
+                          orElse: () => product.variations.first,
+                        );
+
+                        ProductSubVariation? selectedChildVariation;
+                        if (selectedChild != null && selectedParentVariation.children.isNotEmpty) {
+                          selectedChildVariation = selectedParentVariation.children.firstWhere(
+                                (child) => child.name == selectedChild,
+                            orElse: () => selectedParentVariation.children.first,
+                          );
+                        }
+
+                        context.read<CartBloc>().add(
+                          AddToCart(
+                            product: product,
+                            quantity: currentQuantity,
+                            variationParentName: selectedParent,
+                            variationParentValue: selectedParent,
+                            variationChildName: selectedChild,
+                            variationChildValue: selectedChild,
+                            variationParentId: selectedParentVariation.id,
+                            variationChildId: selectedChildVariation?.id,
+                          ),
+                        );
+                      });
+                    },
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: Text(
+                      Labels.clearCartAndSwitchProducts,
+                      style: TextStyle(
+                        fontFamily: FontFamily.fontsPoppinsSemiBold,
+                        fontSize: 14,
+                        color: Colors.red.shade600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
@@ -557,26 +619,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             state.productDetail == null) {
           return Scaffold(
             body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error, size: 64, color: Colors.red),
-                  SizedBox(height: 16),
-                  Text(
-                    state.errorMessage ?? 'Failed to load product details',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.read<ProductDetailBloc>().add(
-                        LoadProductDetail(productId: widget.productId),
-                      );
-                    },
-                    child: Text('Retry'),
-                  ),
-                ],
+              child: CustomErrorWidget(
+                message: state.errorMessage ?? Labels.error,
+                onRetry: () {
+                  context.read<ProductDetailBloc>().add(
+                    LoadProductDetail(productId: widget.productId),
+                  );
+                },
               ),
             ),
           );
@@ -800,7 +849,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                           ),
                                         ),
                                         child: Text(
-                                          'Required',
+                                          Labels.required,
                                           style: TextStyle(
                                             color: Colors.red,
                                             fontSize: 10,
@@ -1198,7 +1247,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                           ),
                                         ),
                                         onPressed: () async {
-                                          final isLoggedIn=await UserRepository().isUserAuthenticated();
+                                          final isLoggedIn =
+                                              await UserRepository()
+                                                  .isUserAuthenticated();
 
                                           if (!isLoggedIn) {
                                             // 🔸 If not logged in, show login sheet and stop here
@@ -1274,7 +1325,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                     );
                                                   }
                                                   : () {
-                                                _showVariationRequiredSnackBar(
+                                                    _showVariationRequiredSnackBar(
                                                       context,
                                                       product,
                                                     );
@@ -1331,9 +1382,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(100),
                           ),
-                          onPressed: ()async {
-                            final isLoggedIn=await UserRepository().isUserAuthenticated();
-                            if(!isLoggedIn){
+                          onPressed: () async {
+                            final isLoggedIn =
+                                await UserRepository().isUserAuthenticated();
+                            if (!isLoggedIn) {
                               await LoginRequiredBottomSheet.show(context);
                               return;
                             }

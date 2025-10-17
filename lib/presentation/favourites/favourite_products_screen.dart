@@ -5,6 +5,8 @@ import 'package:speezu/core/services/urls.dart';
 import 'package:speezu/presentation/favourites/bloc/favourite_event.dart';
 
 import '../../routes/route_names.dart';
+import '../../widgets/empty_favourite_list.dart';
+import '../../widgets/error_widget.dart';
 import '../../widgets/product_box_widget.dart';
 import '../../widgets/products_tab_shimmer_widget.dart';
 import 'bloc/favourite_bloc.dart';
@@ -53,11 +55,16 @@ class _FavouriteProductsScreenState extends State<FavouriteProductsScreen> {
               return Center(child: const ProductsTabShimmerWidget());
             } else if (state.status == FavouriteStatus.failure) {
               return Center(
-                child: Text(state.message ?? 'Error loading favourites'),
+                child: CustomErrorWidget(
+                  message: state.message,
+                  onRetry: () {
+                    context.read<FavouriteBloc>().add(FetchFavouritesEvent());
+                  },
+                ),
               );
             } else if (state.favouriteListModel?.data == null ||
                 state.favouriteListModel!.data!.isEmpty) {
-              return const Center(child: Text('No favourite products found.'));
+              return const Center(child: EmptyFavouritesWidget());
             }
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),

@@ -26,12 +26,12 @@ class OrderCard extends StatelessWidget {
     required this.dateTime,
     this.onVerify,
     required this.onViewDetails,
-     this.onCancel,
+    this.onCancel,
   });
 
   Color _getStatusColor() {
     switch (status.toLowerCase()) {
-      case "active":
+      case "approved":
         return Colors.blue.shade900;
       case "completed":
         return Colors.green.shade700;
@@ -121,7 +121,7 @@ class OrderCard extends StatelessWidget {
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   color:
-                                  Theme.of(context).colorScheme.onSecondary,
+                                      Theme.of(context).colorScheme.onSecondary,
                                   fontSize: 16,
                                 ),
                                 overflow: TextOverflow.ellipsis,
@@ -130,7 +130,7 @@ class OrderCard extends StatelessWidget {
                                 "${Labels.customer}: $customerName",
                                 style: TextStyle(
                                   color:
-                                  Theme.of(context).colorScheme.onSecondary,
+                                      Theme.of(context).colorScheme.onSecondary,
                                   fontSize: 16,
                                 ),
                                 overflow: TextOverflow.ellipsis,
@@ -139,7 +139,7 @@ class OrderCard extends StatelessWidget {
                                 "${Labels.payment}: $paymentMethod",
                                 style: TextStyle(
                                   color:
-                                  Theme.of(context).colorScheme.onSecondary,
+                                      Theme.of(context).colorScheme.onSecondary,
                                   fontSize: 16,
                                 ),
                                 overflow: TextOverflow.ellipsis,
@@ -172,7 +172,7 @@ class OrderCard extends StatelessWidget {
 
         // Action Buttons
         // Action Buttons
-        if (status.toLowerCase() == "active") ...[
+        if (status.toLowerCase() == "approved") ...[
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -185,14 +185,14 @@ class OrderCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
 
-              //   CustomMiniElevatedButton(
-              //     title: Labels.cancel, // changed from delete -> cancel
-              //     onPressed: onCancel ?? () {},
-              //     backgroundColor: Colors.red,
-              //     textColor: Colors.white,
-              //   ),
+              CustomMiniElevatedButton(
+                title: Labels.cancel, // changed from delete -> cancel
+                onPressed: onCancel ?? () {},
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+              ),
 
-              // const SizedBox(width: 8),
+              const SizedBox(width: 8),
 
               // 👁 View Details (always visible)
               CustomMiniElevatedButton(
@@ -217,7 +217,6 @@ class OrderCard extends StatelessWidget {
             ],
           ),
         ],
-
       ],
     );
   }
