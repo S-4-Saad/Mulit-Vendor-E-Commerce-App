@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 
 abstract class OrdersEvent extends Equatable {}
 
@@ -22,9 +23,9 @@ class RefreshOrdersEvent extends OrdersEvent {
 class CancelOrderEvent extends OrdersEvent {
   final String orderId;
   final String reason;
-
-  CancelOrderEvent({required this.orderId, required this.reason});
+   final BuildContext context;
+  CancelOrderEvent({required this.orderId, required this.reason, required this.context});
 
   @override
-  List<Object?> get props => [orderId, reason];
+  List<Object?> get props => [orderId, reason, context];
 }

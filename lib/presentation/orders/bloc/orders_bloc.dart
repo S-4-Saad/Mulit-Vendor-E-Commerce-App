@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:speezu/core/services/urls.dart';
 import 'package:speezu/models/order_model.dart';
 import 'package:speezu/presentation/orders/bloc/order_state.dart';
@@ -90,7 +91,9 @@ class OrdersBloc extends Bloc<OrdersEvent, OrderState> {
           );
 
           // Automatically refresh the orders list after successful cancellation
+
           add(LoadOrdersEvent());
+          Navigator.pop(event.context);
         } else {
           emit(
             state.copyWith(

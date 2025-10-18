@@ -4,9 +4,7 @@ import 'package:confetti/confetti.dart';
 
 class OrderSuccessDialog {
   static Future<void> show(
-      BuildContext context, {
-        VoidCallback? onContinue,
-      }) {
+      BuildContext context) {
     return showGeneralDialog(
       context: context,
       barrierDismissible: false,
@@ -21,7 +19,7 @@ class OrderSuccessDialog {
           ),
           child: FadeTransition(
             opacity: animation,
-            child: _OrderSuccessContent(onContinue: onContinue),
+            child: _OrderSuccessContent(),
           ),
         );
       },
@@ -30,9 +28,8 @@ class OrderSuccessDialog {
 }
 
 class _OrderSuccessContent extends StatefulWidget {
-  final VoidCallback? onContinue;
 
-  const _OrderSuccessContent({this.onContinue});
+  const _OrderSuccessContent();
 
   @override
   State<_OrderSuccessContent> createState() => _OrderSuccessContentState();
@@ -79,16 +76,8 @@ class _OrderSuccessContentState extends State<_OrderSuccessContent>
   void _handleContinue(BuildContext context) {
     if (!mounted) return;
 
-    // Store the callback locally
-    final onContinue = widget.onContinue;
-
     // Close the dialog first
     Navigator.of(context).pop();
-
-    // Then execute the callback if it exists
-    if (mounted && onContinue != null) {
-      onContinue();
-    }
   }
 
   @override
@@ -198,7 +187,7 @@ class _OrderSuccessContentState extends State<_OrderSuccessContent>
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () => _handleContinue(context),
+                      onPressed: () => Navigator.pop(context),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.colorScheme.primary,
                         foregroundColor: theme.colorScheme.onPrimary,
