@@ -3,7 +3,7 @@ import 'package:speezu/models/shop_model.dart';
 import 'package:speezu/widgets/shop_box_widget.dart';
 class ShopList extends StatelessWidget {
   final List<ShopModel> shops;
-  final VoidCallback? onShopTap;
+  final Function(ShopModel)? onShopTap;
   final VoidCallback? onOpenTap;
   final VoidCallback? onPickupTap;
   final Function(ShopModel)? onLocationTap;
@@ -38,7 +38,7 @@ class ShopList extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.all(8.0),
             child: ShopBox(
-              onShopBoxTap: () => onOpenTap?.call(),
+              onShopBoxTap: () => onShopTap?.call(shop),
 
               imageUrl: shop.imageUrl.toString(),
               isDelivering: true,
@@ -48,13 +48,6 @@ class ShopList extends StatelessWidget {
               shopName: shop.shopName,
               shopDescription: shop.shopDescription,
               shopRating: shop.shopRating,
-
-
-              // restaurant: restaurant,
-              // onShopBoxTap: onRestaurantTap??(){},
-              // onOpenTap: onOpenTap,
-              // onPickupTap: onPickupTap,
-              // onLocationTap: onLocationTap,
             ),
           );
         },
