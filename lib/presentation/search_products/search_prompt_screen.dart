@@ -10,7 +10,6 @@ import '../../core/assets/font_family.dart';
 import 'bloc/search_product_state.dart';
 import 'bloc/search_products_event.dart';
 
-
 class SearchPromptScreen extends StatefulWidget {
   const SearchPromptScreen({super.key});
 
@@ -18,7 +17,8 @@ class SearchPromptScreen extends StatefulWidget {
   State<SearchPromptScreen> createState() => _SearchPromptScreenState();
 }
 
-class _SearchPromptScreenState extends State<SearchPromptScreen> with SingleTickerProviderStateMixin {
+class _SearchPromptScreenState extends State<SearchPromptScreen>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   late AnimationController _animationController;
@@ -93,7 +93,9 @@ class _SearchPromptScreenState extends State<SearchPromptScreen> with SingleTick
             ),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.2),
               width: 1,
             ),
           ),
@@ -135,10 +137,14 @@ class _SearchPromptScreenState extends State<SearchPromptScreen> with SingleTick
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.06),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSecondary.withValues(alpha: 0.06),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.1),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSecondary.withValues(alpha: 0.1),
               width: 1,
             ),
           ),
@@ -148,7 +154,9 @@ class _SearchPromptScreenState extends State<SearchPromptScreen> with SingleTick
               Icon(
                 Icons.history,
                 size: 14,
-                color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.6),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSecondary.withValues(alpha: 0.6),
               ),
               const SizedBox(width: 6),
               Text(
@@ -156,7 +164,9 @@ class _SearchPromptScreenState extends State<SearchPromptScreen> with SingleTick
                 style: TextStyle(
                   fontFamily: FontFamily.fontsPoppinsRegular,
                   fontSize: 12,
-                  color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.8),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSecondary.withValues(alpha: 0.8),
                 ),
               ),
             ],
@@ -292,7 +302,9 @@ class _SearchPromptScreenState extends State<SearchPromptScreen> with SingleTick
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.05),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSecondary.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
@@ -315,7 +327,9 @@ class _SearchPromptScreenState extends State<SearchPromptScreen> with SingleTick
               color: Theme.of(context).colorScheme.onPrimary,
               boxShadow: [
                 BoxShadow(
-                  color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.05),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSecondary.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -323,18 +337,21 @@ class _SearchPromptScreenState extends State<SearchPromptScreen> with SingleTick
             ),
             child: BlocBuilder<SearchProductsBloc, SearchProductsState>(
               builder: (context, state) {
-                final allSuggestions = [
-                  ...?state.productNames,
-                  ...?state.categoryNames,
-                  ...?state.searchTags,
-                ].toSet().toList();
+                final allSuggestions =
+                    [
+                      ...?state.productNames,
+                      ...?state.categoryNames,
+                      ...?state.searchTags,
+                    ].toSet().toList();
 
                 return Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: [
                       BoxShadow(
-                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.08),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -351,9 +368,9 @@ class _SearchPromptScreenState extends State<SearchPromptScreen> with SingleTick
                       return allSuggestions
                           .where(
                             (item) => item.toLowerCase().contains(
-                          pattern.toLowerCase(),
-                        ),
-                      )
+                              pattern.toLowerCase(),
+                            ),
+                          )
                           .toList();
                     },
                     itemBuilder: (context, suggestion) {
@@ -362,23 +379,32 @@ class _SearchPromptScreenState extends State<SearchPromptScreen> with SingleTick
                           color: Theme.of(context).colorScheme.onPrimary,
                           border: Border(
                             bottom: BorderSide(
-                              color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.05),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSecondary.withValues(alpha: 0.05),
                               width: 1,
                             ),
                           ),
                         ),
                         child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 4,
+                          ),
                           leading: Icon(
                             Icons.search,
-                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.6),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary.withValues(alpha: 0.6),
                             size: 20,
                           ),
                           trailing: Transform.rotate(
                             angle: -0.785398,
                             child: Icon(
                               Icons.arrow_forward,
-                              color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.3),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSecondary.withValues(alpha: 0.3),
                               size: 18,
                             ),
                           ),
@@ -430,7 +456,9 @@ class _SearchPromptScreenState extends State<SearchPromptScreen> with SingleTick
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.15),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSecondary.withValues(alpha: 0.15),
                               width: 1.5,
                             ),
                           ),
@@ -438,51 +466,73 @@ class _SearchPromptScreenState extends State<SearchPromptScreen> with SingleTick
                           hintStyle: TextStyle(
                             fontFamily: FontFamily.fontsPoppinsRegular,
                             fontSize: 14,
-                            color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.4),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSecondary.withValues(alpha: 0.4),
                           ),
-                          suffixIcon: controller.text.isNotEmpty
-                              ? Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: Icon(
-                                  Icons.clear,
-                                  color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.4),
-                                  size: 20,
-                                ),
-                                onPressed: () {
-                                  controller.clear();
-                                  setState(() {});
-                                },
-                              ),
-                              Container(
-                                margin: const EdgeInsets.only(right: 8),
-                                child: Material(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: InkWell(
-                                    onTap: () => _handleSearch(controller.text),
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 10,
+                          suffixIcon:
+                              controller.text.isNotEmpty
+                                  ? Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(
+                                          Icons.clear,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSecondary
+                                              .withValues(alpha: 0.4),
+                                          size: 20,
+                                        ),
+                                        onPressed: () {
+                                          controller.clear();
+                                          setState(() {});
+                                        },
                                       ),
-                                      child: Text(
-                                        Labels.search,
-                                        style: TextStyle(
-                                          fontFamily: FontFamily.fontsPoppinsMedium,
-                                          fontSize: 13,
-                                          color: Theme.of(context).colorScheme.onPrimary,
+                                      Container(
+                                        margin: const EdgeInsets.only(right: 8),
+                                        child: Material(
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.primary,
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                          child: InkWell(
+                                            onTap:
+                                                () => _handleSearch(
+                                                  controller.text,
+                                                ),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 16,
+                                                    vertical: 10,
+                                                  ),
+                                              child: Text(
+                                                Labels.search,
+                                                style: TextStyle(
+                                                  fontFamily:
+                                                      FontFamily
+                                                          .fontsPoppinsMedium,
+                                                  fontSize: 13,
+                                                  color:
+                                                      Theme.of(
+                                                        context,
+                                                      ).colorScheme.onPrimary,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )
-                              : null,
+                                    ],
+                                  )
+                                  : null,
                           border: InputBorder.none,
                         ),
                       );
@@ -561,7 +611,8 @@ class _SearchPromptScreenState extends State<SearchPromptScreen> with SingleTick
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
-                        children: state.searchHistory.map(_buildHistoryChip).toList(),
+                        children:
+                            state.searchHistory.map(_buildHistoryChip).toList(),
                       ),
                       const SizedBox(height: 24),
                     ],
@@ -570,23 +621,23 @@ class _SearchPromptScreenState extends State<SearchPromptScreen> with SingleTick
               ),
 
               // Browse Categories Section
-              _buildSectionHeader(Labels.browseCategories),
-              const SizedBox(height: 16),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 1.3,
-                ),
-                itemCount: categorySuggestions.length,
-                itemBuilder: (context, index) {
-                  return _buildCategoryCard(categorySuggestions[index]);
-                },
-              ),
-              const SizedBox(height: 24),
+              // _buildSectionHeader(Labels.browseCategories),
+              // const SizedBox(height: 16),
+              // GridView.builder(
+              //   shrinkWrap: true,
+              //   physics: const NeverScrollableScrollPhysics(),
+              //   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              //     crossAxisCount: 2,
+              //     crossAxisSpacing: 12,
+              //     mainAxisSpacing: 12,
+              //     childAspectRatio: 1.3,
+              //   ),
+              //   itemCount: categorySuggestions.length,
+              //   itemBuilder: (context, index) {
+              //     return _buildCategoryCard(categorySuggestions[index]);
+              //   },
+              // ),
+              const SizedBox(height: 1),
 
               // Browse Tags Section
               BlocBuilder<SearchProductsBloc, SearchProductsState>(
@@ -603,18 +654,19 @@ class _SearchPromptScreenState extends State<SearchPromptScreen> with SingleTick
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
-                        children: state.searchTags!
-                            .map(
-                              (tag) => _buildChipButton(
-                            text: tag,
-                            onTap: () {
-                              _controller.text = tag;
-                              _handleSearch(tag);
-                            },
-                            icon: Icons.local_offer_outlined,
-                          ),
-                        )
-                            .toList(),
+                        children:
+                            state.searchTags!
+                                .map(
+                                  (tag) => _buildChipButton(
+                                    text: tag,
+                                    onTap: () {
+                                      _controller.text = tag;
+                                      _handleSearch(tag);
+                                    },
+                                    icon: Icons.local_offer_outlined,
+                                  ),
+                                )
+                                .toList(),
                       ),
                       const SizedBox(height: 16),
                     ],

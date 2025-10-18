@@ -335,24 +335,24 @@ class ShopBoxBigWidget extends StatelessWidget {
                       ],
                     ),
                   ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      padding: EdgeInsets.symmetric(horizontal: 8),
-
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      elevation: 0,
-                    ),
-                    onPressed: onDirectionTap,
-                    child: Icon(
-                      Icons.directions,
-                      color: Colors.white,
-                      size: 25,
-                    ),
-                  ),
+                  // ElevatedButton(
+                  //   style: ElevatedButton.styleFrom(
+                  //     backgroundColor: Theme.of(context).colorScheme.primary,
+                  //     shape: RoundedRectangleBorder(
+                  //       borderRadius: BorderRadius.circular(5),
+                  //     ),
+                  //     padding: EdgeInsets.symmetric(horizontal: 8),
+                  //
+                  //     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  //     elevation: 0,
+                  //   ),
+                  //   onPressed: onDirectionTap,
+                  //   child: Icon(
+                  //     Icons.directions,
+                  //     color: Colors.white,
+                  //     size: 25,
+                  //   ),
+                  // ),
                 ],
               ),
             ),
