@@ -72,6 +72,7 @@ dependencies:
   image_picker: ^1.2.0
   flutter_typeahead: ^5.2.0
   confetti: ^0.8.0
+  flutter_launcher_icons: ^0.14.4
 
 
 dev_dependencies:
@@ -164,3 +165,11 @@ flutter:
   # see https://flutter.dev/to/font-from-package
 flutter_intl:
   enabled: true
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/appicon.png"
+  adaptive_icon_background: "#2f3d44"
+  adaptive_icon_foreground: "assets/images/appicon.png"
+  remove_alpha_ios: true
