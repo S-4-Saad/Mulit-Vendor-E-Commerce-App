@@ -42,7 +42,7 @@ class _ActiveOrdersScreenState extends State<ActiveOrdersScreen> {
       body: BlocConsumer<OrdersBloc, OrderState>(
         listener: (context, state) {
           if(state.cancelOrderStatus==CancelOrderStatus.success){
-            Navigator.pop(context); // Close dialog
+            // Navigator.pop(context); // Close dialog
 
             // context.read<OrdersBloc>().add(RefreshOrdersEvent());
           }

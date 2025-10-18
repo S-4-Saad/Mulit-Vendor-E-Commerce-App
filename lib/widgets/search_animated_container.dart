@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/assets/font_family.dart';
-import 'package:speezu/core/utils/media_querry_extention.dart';
 import 'package:speezu/presentation/search_products/search_prompt_screen.dart';
 import '../core/utils/labels.dart';
 

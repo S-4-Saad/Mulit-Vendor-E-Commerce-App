@@ -73,7 +73,7 @@ class OrdersDialogBoxes {
                     },
                   ),
                   const SizedBox(height: 20),
-                  BlocConsumer<OrdersBloc, OrderState>(
+                  BlocBuilder<OrdersBloc, OrderState>(
                     builder: (context, state) {
                       if (state.cancelOrderStatus ==
                           CancelOrderStatus.loading) {
@@ -109,6 +109,7 @@ class OrdersDialogBoxes {
                                 if (formKey.currentState!.validate()) {
                                   context.read<OrdersBloc>().add(
                                     CancelOrderEvent(
+context: context,
                                       orderId: orderId.toString(),
                                       reason: reasonController.text,
                                     ),
@@ -137,20 +138,7 @@ class OrdersDialogBoxes {
                         ],
                       );
                     },
-                    listener: (context, state) {
-                      if (state.cancelOrderStatus == CancelOrderStatus.success) {
-                        // Navigator.pop(dialogContext);
-                        SnackBarHelper.showSuccess(
-                          context,
-                          state.errorMessage ?? 'Order Cancelled Successfully',
-                        );
-                      } else if (state.cancelOrderStatus == CancelOrderStatus.error) {
-                        SnackBarHelper.showError(
-                          context,
-                          state.errorMessage ?? 'Failed to Cancel Order',
-                        );
-                      }
-                    },
+                    
                   ),
                 ],
               ),

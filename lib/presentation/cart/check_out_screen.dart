@@ -91,14 +91,8 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
     );
   }
 
-  void _showOrderSuccessDialog(BuildContext dialogContext) {
-    OrderSuccessDialog.show(
-      dialogContext,
-      onContinue: () {
-        Navigator.of(dialogContext).pop();
-        // Navigate back to home
-      },
-    );
+  void _showOrderSuccessDialog(BuildContext context) {
+    OrderSuccessDialog.show(context);
   }
 
   @override
@@ -1283,10 +1277,10 @@ class _PaymentMethodBottomSheetState extends State<PaymentMethodBottomSheet> {
                                 ),
                               ),
                               SizedBox(width: 10),
-                              Text('Processing...'),
+                              Text('Processing...',style: TextStyle(fontFamily: FontFamily.fontsPoppinsSemiBold,color: Colors.white,fontSize: 15),),
                             ],
                           )
-                          : Text(Labels.confirmOrder),
+                          : Text(Labels.confirmOrder,style: TextStyle(fontFamily: FontFamily.fontsPoppinsSemiBold,color: Colors.white,fontSize: 15),),
                 ),
               ],
             ),
