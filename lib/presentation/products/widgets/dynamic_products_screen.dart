@@ -34,11 +34,11 @@ class _DynamicProductsScreenState extends State<DynamicProductsScreen> {
   void initState() {
     super.initState();
     print('🎯 Init DynamicProductsScreen for: ${widget.categoryName}');
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ProductsBloc>().add(
-        LoadProductsEvent(categoryName: widget.categoryName),
-      );
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   context.read<ProductsBloc>().add(
+    //     LoadProductsEvent(categoryName: widget.categoryName,forceReload: true),
+    //   );
+    // });
   }
 
   @override

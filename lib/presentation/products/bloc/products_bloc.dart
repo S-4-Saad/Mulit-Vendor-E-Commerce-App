@@ -13,7 +13,14 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
   }
 
   void _changeTab(ChangeTabEvent event, Emitter<ProductsState> emit) {
+    if (state.selectedTabIndex == event.index)
+      return; // avoid duplicate trigger
+
     emit(state.copyWith(selectedTabIndex: event.index));
+
+    final categories = ['food', 'supermarket', 'retailstore', 'pharmacy'];
+    final categoryName = categories[event.index];
+    add(LoadProductsEvent(categoryName: categoryName));
   }
 
   void _loadProducts(
