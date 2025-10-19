@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:speezu/routes/route_names.dart';
 import '../../widgets/restaurant_list.dart';
 import '../../widgets/dialog_boxes/permission_dialog.dart';
 import '../../widgets/restaurant_shimmer_widget.dart';
@@ -175,14 +176,12 @@ class _MapViewState extends State<MapView> {
                   ShopList(
                     height: 250,
                     shops: state.restaurants,
-                    onShopTap: () {
-                      // Navigate to restaurant details
-                    },
-                    onOpenTap: () {
-                      // Handle open action
-                    },
-                    onPickupTap: () {
-                      // Handle pickup action
+                    onShopTap: (shop) {
+                      Navigator.pushNamed(
+                        context,
+                        RouteNames.shopNavBarScreen,
+                        arguments: shop.id,
+                      );
                     },
                     onLocationTap: (shop) {
                       _quickNavigateToRestaurant(shop, state);
