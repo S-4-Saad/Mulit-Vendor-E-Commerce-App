@@ -388,6 +388,8 @@ class Labels {
   static String get viewCart => 'viewCart'.tr();
   static String get youHaveItemsInYourCartFromAnotherStore => 'youHaveItemsInYourCartFromAnotherStore'.tr();
   static String get differentStore => 'differentStore'.tr();
+  static String get noAddressesFoundPleaseAddAnAddress => 'noAddressesFoundPleaseAddAnAddress'.tr();
+  static String get somethingWentWrongPleaseTryAgain => 'somethingWentWrongPleaseTryAgain'.tr();
 
 
 

@@ -489,11 +489,18 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                                       right: index < stores.length - 1 ? 12 : 0,
                                     ),
                                     child: ShopBox(
+                                      isRequireDirection: false,
                                       imageUrl: '$imageBaseUrl/${store.image}',
                                       isDelivering: store.isDelivery ?? false,
                                       isOpen: store.isOpen ?? false,
                                       shopName: store.name ?? '',
-                                      onShopBoxTap: () {},
+                                      onShopBoxTap: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          RouteNames.shopNavBarScreen,
+                                          arguments: store.id,
+                                        );
+                                      },
                                       shopDescription: store.description ?? '',
                                       onDirectionTap: () {},
                                       shopRating:

@@ -24,6 +24,13 @@ class ShopBloc extends Bloc<ShopEvent, ShopState> {
     on<ClearStoreDataEvent>(_clearStoreData);
     on<FetchShopReviewsEvent>(_fetchShopReviews);
     on<CalculateShopDistanceEvent>(_calculateShopDistance);
+    on<ClearStoreDetail>(_clearStoreDetail);
+  }
+  void _clearStoreDetail(ClearStoreDetail event, Emitter<ShopState> emit) {
+    final newState = state.copyWith(shopDetailStatus: ShopDetailStatus.initial);
+    emit(newState);
+    print('Hello');
+    print('Model: ${newState.storeDetail?.store?.name}');
   }
 
   void _changeTab(ChangeTabEvent event, Emitter<ShopState> emit) {
@@ -38,7 +45,8 @@ class ShopBloc extends Bloc<ShopEvent, ShopState> {
     LoadShopDetailEvent event,
     Emitter<ShopState> emit,
   ) async {
-    emit(state.copyWith(shopDetailStatus: ShopDetailStatus.loading));
+
+    emit(state.copyWith(shopDetailStatus: ShopDetailStatus.loading,));
 
     try {
       final apiUrl = '$shopDetailUrl${event.storeId}';

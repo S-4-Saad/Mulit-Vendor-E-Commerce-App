@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/utils/snackbar_helper.dart';
 
 import '../../core/assets/font_family.dart';
@@ -8,6 +9,7 @@ import '../../widgets/custom_app_bar.dart';
 import '../../widgets/custom_text_form_field.dart';
 import '../../models/address_model.dart';
 import '../../repositories/user_repository.dart';
+import '../cart/bloc/cart_bloc.dart';
 import 'map_picker_screen.dart';
 
 class AddNewAddressScreen extends StatefulWidget {
@@ -202,6 +204,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                         if (success) {
                           SnackBarHelper.showSuccess(context, Labels.addressSavedSuccessfully);
                           Navigator.pop(context);
+                          context.read<CartBloc>().loadAddresses();
                         } else {
                           SnackBarHelper.showError(context, Labels.failedToSaveAddress);
                           // Show error message

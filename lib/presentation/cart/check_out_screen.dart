@@ -9,6 +9,7 @@ import '../../core/utils/currency_icon.dart';
 import '../../core/utils/labels.dart';
 import '../../routes/route_names.dart';
 import '../../widgets/dialog_boxes/order_success_dialog.dart';
+import '../../widgets/shimmer/address_shimmer.dart';
 import '../settings/add_address_screen.dart';
 import 'bloc/cart_bloc.dart';
 import 'bloc/cart_state.dart';
@@ -18,7 +19,6 @@ import '../../models/card_details_model.dart';
 import '../../repositories/user_repository.dart';
 import '../../services/paystack_service.dart';
 import '../../models/payment_model.dart';
-import '../../core/config/paystack_config.dart' as config;
 import 'widgets/saved_card_selection_widget.dart';
 
 class CheckOutScreen extends StatefulWidget {
@@ -106,153 +106,50 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
             (Route<dynamic> route) => false,
           );
           _showOrderSuccessDialog(context);
+        }else if(state.status == CartStatus.error){
+          SnackBarHelper.showError(
+            context,
+            state.errorMessage ?? Labels.somethingWentWrongPleaseTryAgain,
+          );
         }
       },
       builder: (context, state) {
         return Scaffold(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: CustomAppBar(title: Labels.checkout),
-          body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            child: Column(
-              children: [
-                const SizedBox(height: 10),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
 
-                /// ---------- PICKUP ----------
-                Row(
-                  children: [
-                    Icon(
-                      Icons.store_mall_directory,
-                      size: 30,
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
-                    const SizedBox(width: 15),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          Labels.pickUp,
-                          style: TextStyle(
-                            fontFamily: FontFamily.fontsPoppinsSemiBold,
-                            color: Theme.of(context).colorScheme.onSecondary,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Text(
-                          Labels.pickUpYouItemFromStore,
-                          style: TextStyle(
-                            fontFamily: FontFamily.fontsPoppinsRegular,
-                            color: Theme.of(context).colorScheme.outline,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                  /// ---------- PICKUP SECTION ----------
+                  _buildSectionHeader(
+                    context,
+                    icon: Icons.store_mall_directory_rounded,
+                    title: Labels.pickUp,
+                    subtitle: Labels.pickUpYouItemFromStore,
+                  ),
 
-                const SizedBox(height: 10),
-                ListTile(
-                  onTap: () {
-                    context.read<CartBloc>().add(
-                      SetCheckoutMethod(method: CheckoutMethod.pickup),
-                    );
-                  },
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                  tileColor:
-                      state.selectedMethod == CheckoutMethod.pickup
-                          ? Theme.of(
-                            context,
-                          ).colorScheme.primary.withValues(alpha: .05)
-                          : Theme.of(context).colorScheme.onPrimary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    side: BorderSide(
-                      color:
-                          state.selectedMethod == CheckoutMethod.pickup
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(
-                                context,
-                              ).colorScheme.onSecondary.withValues(alpha: .1),
-                      width: 1.5,
-                    ),
-                  ),
-                  leading: CustomImageView(
-                    imagePath: AppImages.storeImage,
-                    radius: BorderRadius.circular(5),
-                    height: 60,
-                    width: 60,
-                    fit: BoxFit.fill,
-                  ),
-                  title: Text(
-                    Labels.pickUpFromStore,
-                    style: TextStyle(
-                      fontFamily: FontFamily.fontsPoppinsSemiBold,
-                      color: Theme.of(context).colorScheme.onSecondary,
-                      fontSize: 16,
-                    ),
-                  ),
-                  subtitle: Text(
-                    Labels.youShouldPayAtTheStore,
-                    style: TextStyle(
-                      fontFamily: FontFamily.fontsPoppinsLight,
-                      color: Theme.of(context).colorScheme.outline,
-                      fontSize: 16,
-                    ),
-                  ),
-                  trailing: Radio<CheckoutMethod>(
-                    value: CheckoutMethod.pickup,
-                    groupValue: state.selectedMethod,
-                    onChanged:
-                        (value) => context.read<CartBloc>().add(
-                          SetCheckoutMethod(method: value!),
-                        ),
-                  ),
-                ),
+                  const SizedBox(height: 12),
 
-                const SizedBox(height: 20),
+                  _buildPickupCard(context, state),
 
-                /// ---------- DELIVERY ----------
-                Row(
-                  children: [
-                    Icon(
-                      Icons.map_outlined,
-                      size: 30,
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
-                    const SizedBox(width: 15),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          Labels.delivery,
-                          style: TextStyle(
-                            fontFamily: FontFamily.fontsPoppinsSemiBold,
-                            color: Theme.of(context).colorScheme.onSecondary,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Text(
-                          Labels.itemDeliverToYourAddress,
-                          style: TextStyle(
-                            fontFamily: FontFamily.fontsPoppinsRegular,
-                            color: Theme.of(context).colorScheme.outline,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Spacer(),
-                    IconButton(
+                  const SizedBox(height: 28),
+
+                  /// ---------- DELIVERY SECTION ----------
+                  _buildSectionHeader(
+                    context,
+                    icon: Icons.local_shipping_rounded,
+                    title: Labels.delivery,
+                    subtitle: Labels.itemDeliverToYourAddress,
+                    trailing: IconButton(
                       onPressed: () {
                         showModalBottomSheet(
                           context: context,
                           isScrollControlled: true,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(
-                              top: Radius.circular(20),
-                            ),
-                          ),
+                          backgroundColor: Colors.transparent,
                           builder:
                               (context) => DeliveryAddressBottomSheet(
                                 onAddressSelected: (address) {
@@ -265,493 +162,690 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                               ),
                         );
                       },
-                      icon: Icon(
-                        Icons.edit,
-                        size: 20,
-                        color: Theme.of(context).colorScheme.onSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 10),
-                InkWell(
-                  onTap: () {
-                    context.read<CartBloc>().add(
-                      SetCheckoutMethod(method: CheckoutMethod.delivery),
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color:
-                          state.selectedMethod == CheckoutMethod.delivery
-                              ? Theme.of(
-                                context,
-                              ).colorScheme.primary.withValues(alpha: .05)
-                              : Theme.of(context).colorScheme.onPrimary,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color:
-                            state.selectedMethod == CheckoutMethod.delivery
-                                ? Theme.of(context).colorScheme.primary
-                                : Theme.of(
-                                  context,
-                                ).colorScheme.outline.withValues(alpha: .3),
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withValues(alpha: 0.1),
-                          spreadRadius: 1,
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        /// Address Information 🔹
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                state.selectedAddress?.title ??
-                                    "Delivery Address",
-                                style: TextStyle(
-                                  fontFamily: FontFamily.fontsPoppinsSemiBold,
-                                  color:
-                                      Theme.of(context).colorScheme.onSecondary,
-                                  fontSize: 15,
-                                ),
-                              ),
-                              if (state.selectedAddress != null) ...[
-                                const SizedBox(height: 4),
-                                Text(
-                                  state.selectedAddress!.address ?? '',
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontFamily: FontFamily.fontsPoppinsRegular,
-                                    color:
-                                        Theme.of(context).colorScheme.outline,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  '${state.selectedAddress!.customerName ?? ''} • ${state.selectedAddress!.primaryPhoneNumber ?? ''}',
-                                  style: TextStyle(
-                                    fontFamily: FontFamily.fontsPoppinsRegular,
-                                    color:
-                                        Theme.of(context).colorScheme.outline,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ] else ...[
-                                Text(
-                                  Labels.selectDeliveryAddress,
-                                  style: TextStyle(
-                                    fontFamily: FontFamily.fontsPoppinsRegular,
-                                    color:
-                                        Theme.of(context).colorScheme.outline,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                        Radio<CheckoutMethod>(
-                          value: CheckoutMethod.delivery,
-                          groupValue: state.selectedMethod,
-                          onChanged:
-                              (value) => context.read<CartBloc>().add(
-                                SetCheckoutMethod(method: value!),
-                              ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // Delivery Instructions Field (only show for delivery)
-                if (state.selectedMethod == CheckoutMethod.delivery) ...[
-                  const SizedBox(height: 16),
-                  Text(
-                    Labels.deliveryInstructionsOptional,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: FontFamily.fontsPoppinsSemiBold,
-                      color: Theme.of(context).colorScheme.onSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _deliveryInstructionsController,
-                    maxLines: 3,
-                    onChanged: (value) {
-                      context.read<CartBloc>().add(
-                        SetDeliveryInstructions(instructions: value),
-                      );
-                    },
-                    decoration: InputDecoration(
-                      hintText: Labels.addSpecialInstructionsForDeliveryPerson,
-                      hintStyle: TextStyle(
-                        fontSize: 14,
-                        fontFamily: FontFamily.fontsPoppinsRegular,
-                        color: Theme.of(context).colorScheme.outline,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(
+                      icon: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
                           color: Theme.of(
                             context,
-                          ).colorScheme.outline.withOpacity(0.3),
+                          ).colorScheme.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.outline.withOpacity(0.3),
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(
+                        child: Icon(
+                          Icons.edit_rounded,
+                          size: 18,
                           color: Theme.of(context).colorScheme.primary,
-                          width: 2,
                         ),
                       ),
-                      contentPadding: const EdgeInsets.all(12),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                ],
 
-                Spacer(),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: SafeArea(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 15.0,
-                            vertical: 8.0,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.onPrimary,
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(30),
-                              topRight: Radius.circular(30),
-                            ),
-                            border: Border.all(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.primary.withValues(alpha: .3),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
-                                spreadRadius: 1,
-                                blurRadius: 4,
-                                offset: const Offset(2, 0),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(height: 10),
-                              Text(
-                                Labels.summary,
-                                style: TextStyle(
-                                  fontFamily: FontFamily.fontsPoppinsSemiBold,
-                                  color:
-                                      Theme.of(context).colorScheme.onSecondary,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              SizedBox(height: 10),
-                              Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        '${Labels.itemsTotal} ( ${state.totalItems} ${state.totalItems == 1 ? Labels.item : '${Labels.item}s'} )',
-                                        style: TextStyle(
-                                          fontFamily:
-                                              FontFamily.fontsPoppinsRegular,
-                                          color:
-                                              Theme.of(
-                                                context,
-                                              ).colorScheme.onSecondary,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                      Text(
-                                        '${CurrencyIcon.currencyIcon} ${state.subtotal.toStringAsFixed(2)}',
-                                        style: TextStyle(
-                                          fontFamily:
-                                              FontFamily.fontsPoppinsRegular,
-                                          color:
-                                              Theme.of(
-                                                context,
-                                              ).colorScheme.onSecondary,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        Labels.deliveryFee,
-                                        style: TextStyle(
-                                          fontFamily:
-                                              FontFamily.fontsPoppinsRegular,
-                                          color:
-                                              Theme.of(
-                                                context,
-                                              ).colorScheme.onSecondary,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                      Text(
-                                        '${CurrencyIcon.currencyIcon} ${state.deliveryFee.toStringAsFixed(2)}',
-                                        style: TextStyle(
-                                          fontFamily:
-                                              FontFamily.fontsPoppinsRegular,
-                                          color:
-                                              Theme.of(
-                                                context,
-                                              ).colorScheme.onSecondary,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        Labels.tax,
-                                        style: TextStyle(
-                                          fontFamily:
-                                              FontFamily.fontsPoppinsRegular,
-                                          color:
-                                              Theme.of(
-                                                context,
-                                              ).colorScheme.onSecondary,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                      Text(
-                                        '${CurrencyIcon.currencyIcon} ${state.taxAmount.toStringAsFixed(2)}',
-                                        style: TextStyle(
-                                          fontFamily:
-                                              FontFamily.fontsPoppinsRegular,
-                                          color:
-                                              Theme.of(
-                                                context,
-                                              ).colorScheme.onSecondary,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  if (state.couponStatus == CouponStatus.success)
-                                    Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          Labels.couponDiscount,
-                                          style: TextStyle(
-                                            fontFamily:
-                                            FontFamily.fontsPoppinsRegular,
-                                            color:
-                                            Theme.of(
-                                              context,
-                                            ).colorScheme.onSecondary,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                        Text(
-                                          '-${CurrencyIcon.currencyIcon}${state.couponModel?.data?.maxDiscount?.toStringAsFixed(2)}',
-                                          style: TextStyle(
-                                            fontFamily:
-                                            FontFamily.fontsPoppinsRegular,
-                                            color: Colors.blue,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        Labels.grandTotal,
-                                        style: TextStyle(
-                                          fontFamily:
-                                              FontFamily.fontsPoppinsSemiBold,
-                                          color:
-                                              Theme.of(
-                                                context,
-                                              ).colorScheme.onSecondary,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                      Text(
-                                        '${CurrencyIcon.currencyIcon} ${state.totalAmount.toStringAsFixed(2)}',
-                                        style: TextStyle(
-                                          fontFamily:
-                                              FontFamily.fontsPoppinsSemiBold,
-                                          color:
-                                              Theme.of(
-                                                context,
-                                              ).colorScheme.onSecondary,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 10),
-                              Center(
-                                child: ElevatedButton(
-                                  style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all(
-                                      state.selectedMethod != null
-                                          ? Theme.of(
-                                            context,
-                                          ).colorScheme.primary
-                                          : Theme.of(
-                                            context,
-                                          ).colorScheme.outline,
-                                    ),
-                                    minimumSize: MaterialStateProperty.all(
-                                      Size(300, 50),
-                                    ),
-                                    shape: MaterialStateProperty.all(
-                                      RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(50),
-                                      ),
-                                    ),
-                                  ),
-                                  onPressed:
-                                      state.selectedMethod != null &&
-                                              state.status != CartStatus.loading
-                                          ? () {
-                                            if (state.selectedMethod ==
-                                                CheckoutMethod.delivery) {
-                                              // Show payment method bottom sheet for delivery
-                                              showModalBottomSheet(
-                                                context: context,
-                                                isScrollControlled: true,
-                                                shape:
-                                                    const RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.vertical(
-                                                            top:
-                                                                Radius.circular(
-                                                                  20,
-                                                                ),
-                                                          ),
-                                                    ),
-                                                builder: (context) {
-                                                  return PaymentMethodBottomSheet(
-                                                    onOrderConfirmed:
-                                                        _handleDeliveryOrder,
-                                                    paystackService:
-                                                        _paystackService,
-                                                    totalAmount:
-                                                        state.totalAmount,
-                                                    userEmail:
-                                                        _userRepository
-                                                            .currentUser
-                                                            ?.userData
-                                                            ?.email ??
-                                                        'user@example.com',
-                                                  );
-                                                },
-                                              );
-                                            } else if (state.selectedMethod ==
-                                                CheckoutMethod.pickup) {
-                                              // Handle pickup order directly (no payment method needed)
-                                              _handlePickupOrder();
-                                            }
-                                          }
-                                          : null,
-                                  child:
-                                      state.status == CartStatus.loading
-                                          ? Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              SizedBox(
-                                                width: 20,
-                                                height: 20,
-                                                child: CircularProgressIndicator(
-                                                  strokeWidth: 2,
-                                                  valueColor:
-                                                      AlwaysStoppedAnimation<
-                                                        Color
-                                                      >(Colors.white),
-                                                ),
-                                              ),
-                                              SizedBox(width: 10),
-                                              Text(
-                                                Labels.placingYourOrder,
-                                                style: TextStyle(
-                                                  fontFamily:
-                                                      FontFamily
-                                                          .fontsPoppinsSemiBold,
-                                                  color: Colors.white,
-                                                  fontSize: 15,
-                                                ),
-                                              ),
-                                            ],
-                                          )
-                                          : Text(
-                                            Labels.placeOrder,
-                                            style: TextStyle(
-                                              fontFamily:
-                                                  FontFamily
-                                                      .fontsPoppinsSemiBold,
-                                              color: Colors.white,
-                                              fontSize: 15,
-                                            ),
-                                          ),
-                                ),
-                              ),
-                            ],
-                          ),
+                  const SizedBox(height: 12),
+                  state.addressLoadStatus == AddressLoadStatus.loading
+                      ? const Center(child: AddressShimmerTile())
+                      : state.addresses.isEmpty
+                      ? Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.red),
                         ),
-                      ],
+                        child: Text(
+                          Labels.noAddressesFoundPleaseAddAnAddress,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ],
+                  )
+                      : _buildDeliveryCard(context, state),
+
+
+                  // Delivery Instructions Field
+                  if (state.selectedMethod == CheckoutMethod.delivery) ...[
+                    const SizedBox(height: 20),
+                    _buildDeliveryInstructions(context),
+                  ],
+
+                  SizedBox(height: 20),
+
+                  /// ---------- SUMMARY & CHECKOUT BUTTON ----------
+                  _buildCheckoutSummary(context, state),
+                ],
+              ),
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildSectionHeader(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    Widget? trailing,
+  }) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            icon,
+            size: 24,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontFamily: FontFamily.fontsPoppinsSemiBold,
+                  color: Theme.of(context).colorScheme.onSecondary,
+                  fontSize: 16,
+                ),
+              ),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontFamily: FontFamily.fontsPoppinsRegular,
+                  color: Theme.of(context).colorScheme.outline,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (trailing != null) trailing,
+      ],
+    );
+  }
+
+  // Enhanced Pickup Card
+  Widget _buildPickupCard(BuildContext context, CartState state) {
+    final isSelected = state.selectedMethod == CheckoutMethod.pickup;
+
+    return InkWell(
+      onTap: () {
+        context.read<CartBloc>().add(
+          SetCheckoutMethod(method: CheckoutMethod.pickup),
+        );
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color:
+              isSelected
+                  ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.08)
+                  : Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color:
+                isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+            width: isSelected ? 2 : 1.5,
+          ),
+          boxShadow:
+              isSelected
+                  ? [
+                    BoxShadow(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.15),
+                      spreadRadius: 0,
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                  : [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha:0.04),
+                      spreadRadius: 0,
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+        ),
+        child: Row(
+          children: [
+            // Store Image
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: CustomImageView(
+                imagePath: AppImages.storeImage,
+                height: 70,
+                width: 70,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 14),
+
+            // Content
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    Labels.pickUpFromStore,
+                    style: TextStyle(
+                      fontFamily: FontFamily.fontsPoppinsSemiBold,
+                      color: Theme.of(context).colorScheme.onSecondary,
+                      fontSize: 15,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    Labels.youShouldPayAtTheStore,
+                    style: TextStyle(
+                      fontFamily: FontFamily.fontsPoppinsRegular,
+                      color: Theme.of(context).colorScheme.outline,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Radio Button
+            Radio<CheckoutMethod>(
+              value: CheckoutMethod.pickup,
+              groupValue: state.selectedMethod,
+              onChanged:
+                  (value) => context.read<CartBloc>().add(
+                    SetCheckoutMethod(method: value!),
+                  ),
+              activeColor: Theme.of(context).colorScheme.primary,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Enhanced Delivery Card
+  Widget _buildDeliveryCard(BuildContext context, CartState state) {
+    final isSelected = state.selectedMethod == CheckoutMethod.delivery;
+
+    return InkWell(
+      onTap: () {
+        context.read<CartBloc>().add(
+          SetCheckoutMethod(method: CheckoutMethod.delivery),
+        );
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color:
+              isSelected
+                  ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.08)
+                  : Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color:
+                isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.outline.withValues(alpha:0.2),
+            width: isSelected ? 2 : 1.5,
+          ),
+          boxShadow:
+              isSelected
+                  ? [
+                    BoxShadow(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.15),
+                      spreadRadius: 0,
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                  : [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha:0.04),
+                      spreadRadius: 0,
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+        ),
+        child: Row(
+          children: [
+            // Address Icon
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                Icons.location_on_rounded,
+                size: 28,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            const SizedBox(width: 14),
+
+            // Address Information
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    state.selectedAddress?.title ?? "Delivery Address",
+                    style: TextStyle(
+                      fontFamily: FontFamily.fontsPoppinsSemiBold,
+                      color: Theme.of(context).colorScheme.onSecondary,
+                      fontSize: 15,
+                    ),
+                  ),
+                  if (state.selectedAddress != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      state.selectedAddress!.address ?? '',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontFamily: FontFamily.fontsPoppinsRegular,
+                        color: Theme.of(context).colorScheme.outline,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.person_outline_rounded,
+                          size: 14,
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            '${state.selectedAddress!.customerName ?? ''} • ${state.selectedAddress!.primaryPhoneNumber ?? ''}',
+                            style: TextStyle(
+                              fontFamily: FontFamily.fontsPoppinsRegular,
+                              color: Theme.of(context).colorScheme.outline,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ] else ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      Labels.selectDeliveryAddress,
+                      style: TextStyle(
+                        fontFamily: FontFamily.fontsPoppinsRegular,
+                        color: Theme.of(context).colorScheme.outline,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+
+            // Radio Button
+            Radio<CheckoutMethod>(
+              value: CheckoutMethod.delivery,
+              groupValue: state.selectedMethod,
+              onChanged:
+                  (value) => context.read<CartBloc>().add(
+                    SetCheckoutMethod(method: value!),
+                  ),
+              activeColor: Theme.of(context).colorScheme.primary,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Delivery Instructions Field
+  Widget _buildDeliveryInstructions(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              Icons.note_alt_rounded,
+              size: 18,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              Labels.deliveryInstructionsOptional,
+              style: TextStyle(
+                fontSize: 15,
+                fontFamily: FontFamily.fontsPoppinsSemiBold,
+                color: Theme.of(context).colorScheme.onSecondary,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        TextField(
+          controller: _deliveryInstructionsController,
+          maxLines: 3,
+          onChanged: (value) {
+            context.read<CartBloc>().add(
+              SetDeliveryInstructions(instructions: value),
+            );
+          },
+          style: TextStyle(
+            fontSize: 14,
+            fontFamily: FontFamily.fontsPoppinsRegular,
+            color: Theme.of(context).colorScheme.onSecondary,
+          ),
+          decoration: InputDecoration(
+            hintText: Labels.addSpecialInstructionsForDeliveryPerson,
+            hintStyle: TextStyle(
+              fontSize: 13,
+              fontFamily: FontFamily.fontsPoppinsRegular,
+              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.7),
+            ),
+            filled: true,
+            fillColor: Theme.of(context).colorScheme.surface,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.primary,
+                width: 2,
+              ),
+            ),
+            contentPadding: const EdgeInsets.all(14),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Enhanced Summary Section
+  Widget _buildCheckoutSummary(BuildContext context, CartState state) {
+    return SafeArea(
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.15),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.08),
+              spreadRadius: 0,
+              blurRadius: 20,
+              offset: const Offset(0, -4),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Summary Header
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.receipt_long_rounded,
+                    size: 20,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    Labels.summary,
+                    style: TextStyle(
+                      fontFamily: FontFamily.fontsPoppinsSemiBold,
+                      color: Theme.of(context).colorScheme.onSecondary,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Divider
+            Divider(
+              height: 1,
+              thickness: 1,
+              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+            ),
+
+            // Summary Details
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  _buildSummaryRow(
+                    context,
+                    label:
+                        '${Labels.itemsTotal} (${state.totalItems} ${state.totalItems == 1 ? Labels.item : '${Labels.item}s'})',
+                    value:
+                        '${CurrencyIcon.currencyIcon} ${state.subtotal.toStringAsFixed(2)}',
+                  ),
+                  const SizedBox(height: 10),
+                  _buildSummaryRow(
+                    context,
+                    label: Labels.deliveryFee,
+                    value:
+                        '${CurrencyIcon.currencyIcon} ${state.deliveryFee.toStringAsFixed(2)}',
+                  ),
+                  const SizedBox(height: 10),
+                  _buildSummaryRow(
+                    context,
+                    label: Labels.tax,
+                    value:
+                        '${CurrencyIcon.currencyIcon} ${state.taxAmount.toStringAsFixed(2)}',
+                  ),
+                  if (state.couponStatus == CouponStatus.success) ...[
+                    const SizedBox(height: 10),
+                    _buildSummaryRow(
+                      context,
+                      label: Labels.couponDiscount,
+                      value:
+                          '-${CurrencyIcon.currencyIcon}${state.couponModel?.data?.maxDiscount?.toStringAsFixed(2)}',
+                      valueColor: Colors.green,
+                    ),
+                  ],
+
+                  const SizedBox(height: 12),
+
+                  // Divider
+                  Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.outline.withValues(alpha: 0.1),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Grand Total
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        Labels.grandTotal,
+                        style: TextStyle(
+                          fontFamily: FontFamily.fontsPoppinsSemiBold,
+                          color: Theme.of(context).colorScheme.onSecondary,
+                          fontSize: 17,
+                        ),
+                      ),
+                      Text(
+                        '${CurrencyIcon.currencyIcon} ${state.totalAmount.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          fontFamily: FontFamily.fontsPoppinsBold,
+                          color: Theme.of(context).colorScheme.primary,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Place Order Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            state.selectedMethod != null
+                                ? Theme.of(context).colorScheme.primary
+                                : Theme.of(
+                                  context,
+                                ).colorScheme.outline.withValues(alpha: 0.5),
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      onPressed:
+                          state.selectedMethod != null &&
+                                  state.status != CartStatus.loading
+                              ? () {
+                                if (state.selectedMethod ==
+                                    CheckoutMethod.delivery) {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    backgroundColor: Colors.transparent,
+                                    builder: (context) {
+                                      return PaymentMethodBottomSheet(
+                                        onOrderConfirmed: _handleDeliveryOrder,
+                                        paystackService: _paystackService,
+                                        totalAmount: state.totalAmount,
+                                        userEmail:
+                                            _userRepository
+                                                .currentUser
+                                                ?.userData
+                                                ?.email ??
+                                            'user@example.com',
+                                      );
+                                    },
+                                  );
+                                } else if (state.selectedMethod ==
+                                    CheckoutMethod.pickup) {
+                                  _handlePickupOrder();
+                                }
+                              }
+                              : null,
+                      child:
+                          state.status == CartStatus.loading
+                              ? Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    Labels.placingYourOrder,
+                                    style: TextStyle(
+                                      fontFamily:
+                                          FontFamily.fontsPoppinsSemiBold,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ],
+                              )
+                              : Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    Labels.placeOrder,
+                                    style: TextStyle(
+                                      fontFamily:
+                                          FontFamily.fontsPoppinsSemiBold,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Icon(Icons.arrow_forward_rounded, size: 20),
+                                ],
+                              ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Summary Row Widget
+  Widget _buildSummaryRow(
+    BuildContext context, {
+    required String label,
+    required String value,
+    Color? valueColor,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontFamily: FontFamily.fontsPoppinsRegular,
+            color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.8),
+            fontSize: 14,
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontFamily: FontFamily.fontsPoppinsMedium,
+            color: valueColor ?? Theme.of(context).colorScheme.onSecondary,
+            fontSize: 14,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -850,24 +944,6 @@ class _DeliveryAddressBottomSheetState
                     ),
                   ),
                   const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () async {
-                      Navigator.of(context).pop();
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddNewAddressScreen(),
-                        ),
-                      );
-                    },
-                    child: Text(
-                      Labels.addNewAddress,
-                      style: TextStyle(
-                        fontFamily: FontFamily.fontsPoppinsRegular,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -895,7 +971,7 @@ class _DeliveryAddressBottomSheetState
                         isSelected
                             ? Theme.of(
                               context,
-                            ).colorScheme.primary.withOpacity(0.1)
+                            ).colorScheme.primary.withValues(alpha: 0.1)
                             : Theme.of(context).colorScheme.surface,
                     border: Border.all(
                       color:
@@ -958,30 +1034,19 @@ class _DeliveryAddressBottomSheetState
             }),
           ],
           const SizedBox(height: 10),
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.push(
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => AddNewAddressScreen()),
+                MaterialPageRoute(builder: (context) => AddNewAddressScreen()),
               );
             },
-            icon: Icon(
-              Icons.add_location_alt,
-              size: 20,
-              color: Theme.of(context).colorScheme.onPrimary,
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.secondary,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            label: Text(
+            child: Text(
               Labels.addNewAddress,
               style: TextStyle(
                 fontFamily: FontFamily.fontsPoppinsRegular,
-                color: Theme.of(context).colorScheme.onPrimary,
+                color: Colors.white,
               ),
             ),
           ),
@@ -1176,7 +1241,7 @@ class _PaymentMethodBottomSheetState extends State<PaymentMethodBottomSheet> {
                             isSelected
                                 ? Theme.of(
                                   context,
-                                ).colorScheme.primary.withOpacity(0.1)
+                                ).colorScheme.primary.withValues(alpha: 0.1)
                                 : Theme.of(context).colorScheme.surface,
                         border: Border.all(
                           color:
@@ -1277,10 +1342,24 @@ class _PaymentMethodBottomSheetState extends State<PaymentMethodBottomSheet> {
                                 ),
                               ),
                               SizedBox(width: 10),
-                              Text('Processing...',style: TextStyle(fontFamily: FontFamily.fontsPoppinsSemiBold,color: Colors.white,fontSize: 15),),
+                              Text(
+                                'Processing...',
+                                style: TextStyle(
+                                  fontFamily: FontFamily.fontsPoppinsSemiBold,
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                ),
+                              ),
                             ],
                           )
-                          : Text(Labels.confirmOrder,style: TextStyle(fontFamily: FontFamily.fontsPoppinsSemiBold,color: Colors.white,fontSize: 15),),
+                          : Text(
+                            Labels.confirmOrder,
+                            style: TextStyle(
+                              fontFamily: FontFamily.fontsPoppinsSemiBold,
+                              color: Colors.white,
+                              fontSize: 15,
+                            ),
+                          ),
                 ),
               ],
             ),

@@ -9,6 +9,8 @@ import '../nav_bar_screen/bloc/nav_bar_event.dart';
 import '../nav_bar_screen/bloc/nav_bar_state.dart';
 import '../cart/bloc/cart_bloc.dart';
 import '../cart/bloc/cart_state.dart';
+import 'bloc/shop_bloc.dart';
+import 'bloc/shop_event.dart';
 
 class ShopNavbarScreen extends StatelessWidget {
   final dynamic shopCurrentTab;
@@ -98,7 +100,11 @@ class ShopNavbarScreen extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
-          onTap: () => Navigator.pop(context),
+          onTap: (){
+
+            Navigator.pop(context);
+            context.read<ShopBloc>().add(ClearStoreDetail());
+          },
           child: Container(
             margin: const EdgeInsets.all(8),
             decoration: BoxDecoration(
@@ -360,26 +366,33 @@ class ShopNavbarScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => NavBarBloc()..add(ShopInitPage(shopCurrentTab, storeId: storeId)),
-      child: BlocBuilder<NavBarBloc, NavBarState>(
-        builder: (context, state) {
-          final bloc = context.read<NavBarBloc>();
+    return WillPopScope(
+      onWillPop: () async {
+        // Clear store details when navigating back
+        context.read<ShopBloc>().add(ClearStoreDetail());
+        return true;
+      },
+      child: BlocProvider(
+        create: (_) => NavBarBloc()..add(ShopInitPage(shopCurrentTab, storeId: storeId)),
+        child: BlocBuilder<NavBarBloc, NavBarState>(
+          builder: (context, state) {
+            final bloc = context.read<NavBarBloc>();
 
-          return Scaffold(
-            backgroundColor: Theme.of(context).colorScheme.onPrimary,
+            return Scaffold(
+              backgroundColor: Theme.of(context).colorScheme.onPrimary,
 
-            // Show AppBar for all tabs except tab 0
-            appBar: state.shopCurrentTab == 0
-                ? null
-                : _buildPremiumAppBar(context, state),
+              // Show AppBar for all tabs except tab 0
+              appBar: state.shopCurrentTab == 0
+                  ? null
+                  : _buildPremiumAppBar(context, state),
 
-            body: state.shopCurrentPage,
+              body: state.shopCurrentPage,
 
-            // Premium Bottom Navigation
-            bottomNavigationBar: _buildPremiumBottomNav(context, state, bloc),
-          );
-        },
+              // Premium Bottom Navigation
+              bottomNavigationBar: _buildPremiumBottomNav(context, state, bloc),
+            );
+          },
+        ),
       ),
     );
   }
