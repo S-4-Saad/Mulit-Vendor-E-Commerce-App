@@ -60,3 +60,4 @@ class CalculateShopDistanceEvent extends ShopEvent {
   @override
   List<Object?> get props => [];
 }
+class ClearStoreDetail extends ShopEvent {}

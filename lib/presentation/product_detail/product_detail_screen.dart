@@ -670,8 +670,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   SliverAppBar(
                     backgroundColor: Theme.of(
                       context,
-                    ).colorScheme.primary.withValues(alpha: 0.9),
+                    ).colorScheme.primary,
                     expandedHeight: 300,
+                    pinned: true,
                     elevation: 0,
                     automaticallyImplyLeading: false,
                     leading: IconButton(
@@ -1369,7 +1370,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ),
               ),
               Positioned(
-                top: 50,
+                top: 45,
                 right: 20,
                 child: BlocBuilder<CartBloc, CartState>(
                   builder: (context, cartState) {

@@ -48,7 +48,7 @@ class BusinessHoursWidget extends StatelessWidget {
                   gradient: LinearGradient(
                     colors: [
                       Theme.of(context).colorScheme.primary,
-                      Theme.of(context).colorScheme.secondary,
+                      Theme.of(context).colorScheme.primary.withValues(alpha: .5),
                     ],
                   ),
                   boxShadow: [

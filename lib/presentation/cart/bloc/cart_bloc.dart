@@ -672,7 +672,9 @@ class CartBloc extends Bloc<CartEvent, CartState> {
 
   // Load addresses from UserRepository
   Future<void> loadAddresses() async {
+    emit(state.copyWith(addressLoadStatus: AddressLoadStatus.loading));
     try {
+
       final userRepository = UserRepository();
       await userRepository.init();
       final addresses = userRepository.deliveryAddresses ?? [];
@@ -681,8 +683,10 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       // Use add() to trigger events instead of emit() directly
       add(SetAddresses(addresses: addresses));
       add(SetSelectedAddress(address: defaultAddress));
+      emit(state.copyWith(addressLoadStatus: AddressLoadStatus.success));
     } catch (e) {
       print('Error loading addresses: $e');
+      emit(state.copyWith(addressLoadStatus: AddressLoadStatus.error));
     }
   }
 

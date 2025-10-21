@@ -88,9 +88,7 @@ class OrderDetailsProductTile extends StatelessWidget {
                         ),
                       ),
                       Spacer(),
-                      IconButton(onPressed: (){
-                        print(isReviewed);
-                      }, icon: Icon(Icons.add)),
+
                       if(!isReviewed)
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(

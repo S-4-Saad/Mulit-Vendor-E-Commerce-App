@@ -365,7 +365,9 @@
   "clearCartAndSwitchProducts": "Clear Cart & Switch Products",
   "viewCart": "View Cart",
   "differentStore": "Different Store",
-  "youHaveItemsInYourCartFromAnotherStore": "You have items in your cart from another store. Do you want to clear the cart and switch to "
+  "youHaveItemsInYourCartFromAnotherStore": "You have items in your cart from another store. Do you want to clear the cart and switch to ",
+  "noAddressesFoundPleaseAddAnAddress": "No addresses found.\nPlease add an address to continue.",
+  "somethingWentWrongPleaseTryAgain": "Something went wrong. Please try again."
 
 
 }

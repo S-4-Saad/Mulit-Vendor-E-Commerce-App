@@ -7,12 +7,14 @@ import '../../../models/payment_model.dart';
 import 'cart_event.dart';
 
 enum CartStatus { initial, loading, success, error }
+enum AddressLoadStatus { initial, loading, success, error }
 enum CouponLoading { initial, loading, success, error }
 enum CouponStatus { initial, wrong, success,notApplicable }
 
 class CartState extends Equatable {
   final CartStatus status;
   final CouponLoading couponLoading;
+  final AddressLoadStatus addressLoadStatus;
   final Cart cart;
   final String? errorMessage;
   final CouponModel? couponModel;
@@ -31,6 +33,7 @@ class CartState extends Equatable {
     this.status = CartStatus.initial,
     this.couponStatus = CouponStatus.initial,
     this.couponLoading = CouponLoading.initial,
+    this.addressLoadStatus = AddressLoadStatus.initial,
     this.cart = const Cart(),
     this.errorMessage,
     this.selectedMethod,
@@ -46,6 +49,7 @@ class CartState extends Equatable {
   CartState copyWith({
     CartStatus? status,
     CouponLoading? couponLoading,
+    AddressLoadStatus? addressLoadStatus,
     Cart? cart,
     String? errorMessage,
     CouponStatus? couponStatus,
@@ -57,12 +61,14 @@ class CartState extends Equatable {
     PaymentResult? paymentResult,
     List<AddressModel>? addresses,
     bool? orderPlacedSuccessfully,
+
   }) {
     return CartState(
       status: status ?? this.status,
       cart: cart ?? this.cart,
       couponLoading: couponLoading ?? this.couponLoading,
       errorMessage: errorMessage ?? this.errorMessage,
+      addressLoadStatus: addressLoadStatus ?? this.addressLoadStatus,
       couponStatus: couponStatus ?? this.couponStatus,
       selectedMethod: selectedMethod ?? this.selectedMethod,
       selectedAddress: selectedAddress ?? this.selectedAddress,
@@ -108,6 +114,7 @@ class CartState extends Equatable {
     orderPlacedSuccessfully,
     couponModel,
     couponStatus,
-    couponLoading
+    couponLoading,
+    addressLoadStatus,
   ];
 }

@@ -4,11 +4,9 @@ import 'package:speezu/core/assets/font_family.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
 import 'package:speezu/models/store_detail_model.dart';
 import 'package:speezu/presentation/nav_bar_screen/bloc/nav_bar_event.dart';
-import 'package:speezu/presentation/shop_screen/shop/shop_review_screen.dart';
 import 'package:speezu/widgets/error_widget.dart';
 import 'package:speezu/widgets/image_gallery_viewer_widget.dart';
 import 'package:speezu/widgets/product_review_box.dart';
-
 import '../../../core/utils/labels.dart';
 import '../../../widgets/business_hours_widget.dart';
 import '../../../widgets/image_type_extention.dart';
@@ -33,27 +31,30 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
   @override
   void initState() {
     super.initState();
-    // Load shop detail when the screen initializes
+    // Clear previous data and load fresh
     if (widget.storeId != null) {
       context.read<ShopBloc>().add(
         LoadShopDetailEvent(storeId: widget.storeId!),
       );
+
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          context.read<ShopBloc>().add(CalculateShopDistanceEvent());
+        }
+      });
     }
-    Future.delayed(Duration(seconds: 1), () {
-      if (widget.storeId != null) {
-        context.read<ShopBloc>().add(CalculateShopDistanceEvent());
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ShopBloc, ShopState>(
       builder: (context, state) {
+        // Always show loading shimmer when loading
         if (state.shopDetailStatus == ShopDetailStatus.loading) {
           return const ShopDetailShimmerWidget();
         }
 
+        // Show error screen
         if (state.shopDetailStatus == ShopDetailStatus.error) {
           return Center(
             child: CustomErrorWidget(
@@ -69,211 +70,200 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
           );
         }
 
-        // Check if storeDetail is available and status is success
+        // Show content when success
         if (state.shopDetailStatus == ShopDetailStatus.success &&
             state.storeDetail != null) {
-          return _buildStoreDetail(context, state.storeDetail!);
+          return _buildStoreDetail(context, state.storeDetail!, state);
         }
 
-        // If we reach here, something went wrong - show error
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.error_outline, size: 64, color: Colors.red),
-              SizedBox(height: 16),
-              Text(
-                Labels.storeDetailNotAvailable,
-                style: TextStyle(fontSize: 16),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  if (widget.storeId != null) {
-                    context.read<ShopBloc>().add(
-                      LoadShopDetailEvent(storeId: widget.storeId!),
-                    );
-                  }
-                },
-                child: Text(Labels.retry,style: TextStyle(color: Colors.white),),
-              ),
-            ],
-          ),
-        );
+        // Fallback
+        return const ShopDetailShimmerWidget();
       },
     );
   }
 
-  // Store _getDummyStore() {
-  //   return Store(
-  //     ratting: 4.5,
-  //     isDelivering: true,
-  //     isOpen: true,
-  //     openingTime: '9 AM',
-  //     closingTime: "10 PM",
-  //     id: "1",
-  //     name: "Sample Store",
-  //     image: "https://via.placeholder.com/400x300",
-  //     moreImages: [],
-  //     latitude: 0.0,
-  //     longitude: 0.0,
-  //     description: "Sample store description",
-  //     information: "Sample store information",
-  //     whatsappNumber: "",
-  //     primaryNumber: "",
-  //     secondaryNumber: "",
-  //     address: "Sample Address",
-  //     reviews: [],
-  //   );
-  // }
+  Widget _buildStoreDetail(
+    BuildContext context,
+    StoreDetailModel storeModel,
+    ShopState state,
+  ) {
+    final theme = Theme.of(context);
 
-  Widget _buildStoreDetail(BuildContext context, StoreDetailModel storeModel) {
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            backgroundColor: Theme.of(
-              context,
-            ).colorScheme.primary.withValues(alpha: 0.9),
-            expandedHeight: 300,
-            elevation: 0,
-            automaticallyImplyLeading: false,
-            leading: IconButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(
-                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+    return  WillPopScope(
+        onWillPop: () async {
+          // 👇 Do whatever you want before leaving
+          context.read<ShopBloc>().add(ClearStoreDetail());
+          return true;},
+      child: Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: CustomScrollView(
+          slivers: [
+            // App Bar with Image
+            SliverAppBar(
+              backgroundColor: theme.colorScheme.primary,
+              expandedHeight: 300,
+              elevation: 0,
+              pinned: true,
+              automaticallyImplyLeading: false,
+              leading: Container(
+                margin: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    context.read<ShopBloc>().add(ClearStoreDetail());
+                  },
                 ),
               ),
-              icon: Icon(
-                Icons.arrow_back,
-                color: Theme.of(context).colorScheme.onPrimary,
+
+              flexibleSpace: FlexibleSpaceBar(
+                background: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    CustomImageView(
+                      fit: BoxFit.cover,
+                      imagePath: storeModel.store?.image ?? '',
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            Colors.black.withOpacity(0.1),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              onPressed: () {
-                Navigator.pop(context);
-              },
             ),
-            flexibleSpace: FlexibleSpaceBar(
-              collapseMode: CollapseMode.parallax,
-              background: CustomImageView(
-                fit: BoxFit.cover,
-                imagePath: storeModel.store?.image ?? '',
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Wrap(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Column(
-                    children: [
-                      // Name + Rating
-                      SizedBox(height: context.heightPct(.01)),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              storeModel.store?.name ?? '',
-                              style: TextStyle(
-                                fontFamily: FontFamily.fontsPoppinsSemiBold,
-                                color:
-                                    Theme.of(context).colorScheme.onSecondary,
-                                fontSize: context.scaledFont(18),
-                              ),
+
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Store Name & Rating
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            storeModel.store?.name ?? '',
+                            style: TextStyle(
+                              fontFamily: FontFamily.fontsPoppinsSemiBold,
+                              color: theme.colorScheme.onSecondary,
+                              fontSize: context.scaledFont(20),
                             ),
                           ),
-                          const SizedBox(width: 10),
-                          Row(
+                        ),
+                        const SizedBox(width: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Color(0xFFffbf00).withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
                             children: [
                               Icon(
                                 Icons.star,
-                                size: context.scaledFont(16),
-                                color:
-                                    Theme.of(
-                                      context,
-                                    ).colorScheme.onSurfaceVariant,
+                                size: 16,
+                                color: Color(0xFFffbf00),
                               ),
-                              const SizedBox(width: 5),
+                              const SizedBox(width: 4),
                               Text(
                                 (storeModel.store?.rating ?? 0).toString(),
                                 style: TextStyle(
-                                  fontFamily: FontFamily.fontsPoppinsLight,
-                                  color:
-                                      Theme.of(context).colorScheme.onSecondary,
-                                  fontSize: context.scaledFont(12),
+                                  fontFamily: FontFamily.fontsPoppinsSemiBold,
+                                  color: theme.colorScheme.onSecondary,
+                                  fontSize: context.scaledFont(13),
                                 ),
                               ),
                             ],
                           ),
-                        ],
-                      ),
-                      SizedBox(height: context.heightPct(.01)),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          OpenStatusContainer(
-                            isOpened: storeModel.store?.isOpen ?? false,
-                            isDelivering: storeModel.store?.isDelivery ?? false,
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 5,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSecondary.withValues(alpha: .2),
-                              borderRadius: BorderRadius.circular(50),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.2),
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: BlocBuilder<ShopBloc, ShopState>(
-                              builder:
-                                  (context, state) => Text(
-                                    '${state.shopDistance} ${Labels.km}',
-                                    style: TextStyle(
-                                      color:
-                                          Theme.of(
-                                            context,
-                                          ).colorScheme.onPrimary,
-                                      fontFamily:
-                                          FontFamily.fontsPoppinsSemiBold,
-                                      fontSize: context.scaledFont(10),
-                                    ),
-                                  ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: context.heightPct(.02)),
-                      Text(
-                        storeModel.store?.description ?? '',
-                        style: TextStyle(
-                          fontFamily: FontFamily.fontsPoppinsLight,
+                        ),
+                      ],
+                    ),
 
-                          color: Theme.of(context).colorScheme.onSecondary,
-                          fontSize: context.scaledFont(12),
+                    const SizedBox(height: 12),
+
+                    // Status & Distance
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        OpenStatusContainer(
+                          isOpened: storeModel.store?.isOpen ?? false,
+                          isDelivering: storeModel.store?.isDelivery ?? false,
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.onSecondary.withValues(
+                              alpha: .4,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '${state.shopDistance} ${Labels.km}',
+                            style: TextStyle(
+                              color: theme.colorScheme.onPrimary,
+                              fontFamily: FontFamily.fontsPoppinsSemiBold,
+                              fontSize: context.scaledFont(12),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Description
+                    if (storeModel.store?.description?.isNotEmpty ?? false)
+                      Text(
+                        storeModel.store!.description!,
+                        style: TextStyle(
+                          fontFamily: FontFamily.fontsPoppinsRegular,
+                          color: theme.colorScheme.onSecondary.withOpacity(0.7),
+                          fontSize: context.scaledFont(13),
+                          height: 1.5,
                         ),
                       ),
-                      SizedBox(height: context.heightPct(.01)),
+
+                    const SizedBox(height: 16),
+
+                    // Image Gallery
+                    if ((storeModel.store?.moreImages?.length ?? 0) > 0) ...[
+                      Text(
+                        Labels.gallery ?? 'Photos',
+                        style: TextStyle(
+                          fontFamily: FontFamily.fontsPoppinsSemiBold,
+                          color: theme.colorScheme.onSecondary,
+                          fontSize: context.scaledFont(16),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
                       SizedBox(
-                        height: context.heightPct(.2),
+                        height: 160,
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.all(12),
-                          itemCount:
-                              (storeModel.store?.moreImages ?? []).length,
-                          separatorBuilder:
-                              (_, __) => const SizedBox(width: 10),
+                          itemCount: storeModel.store?.moreImages?.length ?? 0,
+                          separatorBuilder: (_, __) => const SizedBox(width: 10),
                           itemBuilder: (context, index) {
-                            return CustomImageView(
+                            return GestureDetector(
                               onTap: () {
                                 Navigator.push(
                                   context,
@@ -281,233 +271,145 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                     builder:
                                         (context) => ImageGalleryViewer(
                                           imageUrls:
-                                              storeModel.store?.moreImages ??
-                                              [],
+                                              storeModel.store?.moreImages ?? [],
                                           initialIndex: index,
                                         ),
                                   ),
                                 );
-                                print(index);
                               },
-                              radius: BorderRadius.circular(10),
-
-                              imagePath:
-                                  (storeModel.store?.moreImages ?? [])[index],
-                              width: context.widthPct(.55),
-                              fit: BoxFit.cover,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: CustomImageView(
+                                  imagePath: storeModel.store!.moreImages![index],
+                                  width: context.widthPct(.55),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                             );
                           },
                         ),
                       ),
-                      SizedBox(height: context.heightPct(.01)),
-                      BusinessHoursWidget(
-                        openingTime: storeModel.store?.openingTime ?? '',
-                        closingTime: storeModel.store?.closingTime ?? '',
-                      ),
+                      const SizedBox(height: 16),
+                    ],
 
-                      SizedBox(height: context.heightPct(.01)),
-                      // CustomActionContainer(
-                      //   text:
-                      //       Labels
-                      //           .forMoreDetailsPleaseContactWithOurManagerOnWhatsApp,
-                      //   icon: Icons.chat,
-                      //   onTap: () {},
-                      // ),
-                      // SizedBox(height: context.heightPct(.01)),
-                      // CustomActionContainer(
-                      //   text: storeModel.store!.??'',
-                      //   icon: Icons.directions,
-                      //   onTap: () {},
-                      // ),
-                      SizedBox(height: context.heightPct(.01)),
-                      // CustomActionContainer(
-                      //   text:
-                      //       '${storeModel.store!.}\n${storeModel.store!.secondaryNumber}',
-                      //   icon: Icons.phone,
-                      //   onTap: () {},
-                      // ),
-                      SizedBox(height: context.heightPct(.02)),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.closed_caption_off_outlined,
-                            size: context.scaledFont(20),
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            Labels.information,
-                            style: TextStyle(
-                              fontFamily: FontFamily.fontsPoppinsSemiBold,
-                              color: Theme.of(context).colorScheme.onSecondary,
-                              fontSize: context.scaledFont(18),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        storeModel.store?.description ?? '',
-                        style: TextStyle(
-                          fontFamily: FontFamily.fontsPoppinsLight,
+                    // Business Hours
+                    BusinessHoursWidget(
+                      openingTime: storeModel.store?.openingTime ?? '',
+                      closingTime: storeModel.store?.closingTime ?? '',
+                    ),
 
-                          color: Theme.of(context).colorScheme.onSecondary,
-                          fontSize: context.scaledFont(12),
-                        ),
-                      ),
+                    const SizedBox(height: 20),
 
-                      SizedBox(height: context.heightPct(.02)),
+                    // Reviews Section
+                    if ((storeModel.store?.reviews.length ?? 0) > 0) ...[
                       Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 10,
-                        ),
+                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Theme.of(context).colorScheme.onPrimary,
+                          color: theme.colorScheme.onPrimary,
+                          borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.outline.withValues(alpha: 0.3),
-                            width: 1,
+                            color: theme.colorScheme.outline.withOpacity(0.2),
                           ),
                         ),
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              children: [
-                                Text(
-                                  Labels.rattingAndReviews,
-                                  style: TextStyle(
-                                    fontSize: context.scaledFont(13),
-                                    fontFamily: FontFamily.fontsPoppinsSemiBold,
-                                    color:
-                                        Theme.of(
-                                          context,
-                                        ).colorScheme.onSecondary,
-                                  ),
-                                ),
-                                SizedBox(width: 5),
-                                Text(
-                                  '(${(storeModel.store?.reviews ?? []).length})',
-                                  style: TextStyle(
-                                    fontSize: context.scaledFont(12),
-                                    fontFamily: FontFamily.fontsPoppinsRegular,
-                                    color:
-                                        Theme.of(
-                                          context,
-                                        ).colorScheme.onSecondary,
-                                  ),
-                                ),
-                                const Spacer(),
-                                Row(
-                                  children: [
-                                    Text(
-                                      (storeModel.store?.rating ?? 0)
-                                          .toString(),
-                                      style: TextStyle(
-                                        fontSize: context.scaledFont(14),
-                                        fontFamily: FontFamily.fontsPoppinsBold,
-                                        color:
-                                            Theme.of(
-                                              context,
-                                            ).colorScheme.onSecondary,
-                                      ),
+                            GestureDetector(
+                              onTap: () {
+                                context.read<NavBarBloc>().add(ShopSelectTab(1));
+                              },
+                              child: Row(
+                                children: [
+                                  Text(
+                                    Labels.rattingAndReviews,
+                                    style: TextStyle(
+                                      fontSize: context.scaledFont(15),
+                                      fontFamily: FontFamily.fontsPoppinsSemiBold,
+                                      color: theme.colorScheme.onSecondary,
                                     ),
-                                    RatingDisplayWidget(
-                                      rating:
-                                          (storeModel.store?.rating ?? 0)
-                                              .toDouble(),
-                                      starSize: context.scaledFont(16),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    '(${storeModel.store!.reviews!.length})',
+                                    style: TextStyle(
+                                      fontSize: context.scaledFont(13),
+                                      color: theme.colorScheme.outline,
                                     ),
-                                    // Icon(Icons.arrow_forward_ios_rounded, size: 15.w),
-                                  ],
-                                ),
-                                IconButton(
+                                  ),
+                                  const Spacer(),
+                                  RatingDisplayWidget(
+                                    rating:
+                                        (storeModel.store?.rating ?? 0)
+                                            .toDouble(),
+                                    starSize: context.scaledFont(17),
+                                  ),
+                                  SizedBox(width: 5),
+                                  Icon(
+                                    Icons.arrow_forward_ios,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondary
+                                        .withValues(alpha: .5),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Divider(
+                              color: theme.colorScheme.outline.withOpacity(0.2),
+                              height: 24,
+                            ),
+                            ListView.separated(
+                              padding: EdgeInsets.zero,
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount:
+                                  storeModel.store!.reviews!.length > 3
+                                      ? 3
+                                      : storeModel.store!.reviews!.length,
+                              separatorBuilder:
+                                  (context, index) => Divider(
+                                    color: theme.colorScheme.outline.withOpacity(
+                                      0.1,
+                                    ),
+                                    height: 20,
+                                  ),
+                              itemBuilder: (context, index) {
+                                final review = storeModel.store!.reviews![index];
+                                return ProductReviewBox(
+                                  userName: review.userName ?? '',
+                                  review: review.review ?? '',
+                                  rating: double.parse(review.rating.toString()),
+                                );
+                              },
+                            ),
+                            if (storeModel.store!.reviews!.length > 3)
+                              Center(
+                                child: TextButton(
                                   onPressed: () {
                                     context.read<NavBarBloc>().add(
                                       ShopSelectTab(1),
                                     );
                                   },
-                                  icon: Icon(
-                                    Icons.arrow_forward_ios_rounded,
-                                    size: context.scaledFont(12),
-                                    color:
-                                        Theme.of(context).colorScheme.outline,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Divider(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.outline.withValues(alpha: 0.3),
-                            ),
-                            // Display up to 4 reviews
-                            if (storeModel.store!.reviews!.isNotEmpty)
-                              ListView.separated(
-                                padding: const EdgeInsets.only(top: 0),
-                                separatorBuilder:
-                                    (context, index) => Divider(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .outline
-                                          .withValues(alpha: 0.3),
+                                  child: Text(
+                                    '${Labels.seeAllReviews} (${storeModel.store!.reviews!.length})',
+                                    style: TextStyle(
+                                      fontSize: context.scaledFont(13),
+                                      fontFamily: FontFamily.fontsPoppinsSemiBold,
+                                      color: theme.colorScheme.primary,
                                     ),
-                                physics: const NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                itemCount:
-                                    storeModel.store!.reviews.length > 3
-                                        ? 3
-                                        : storeModel
-                                            .store!
-                                            .reviews
-                                            .length, // Limit to 4 reviews
-                                itemBuilder: (context, index) {
-                                  final review =
-                                      storeModel.store!.reviews[index];
-                                  return ProductReviewBox(
-                                    userName: review.userName ?? '',
-                                    review: review.review ?? '',
-                                    rating: double.parse(
-                                      review.rating.toString() ?? '0',
-                                    ),
-                                    // imgUrl:
-                                    //      'https://via.placeholder.com/55',
-                                  );
-                                },
-                              ),
-                            // Show "See All Reviews" if there are more than 4 reviews
-                            // if (storeModel.store!.lastReviews!.length > 4)
-                            Center(
-                              child: TextButton(
-                                onPressed: () {
-                                  context.read<NavBarBloc>().add(
-                                    ShopSelectTab(1),
-                                  );
-                                },
-                                child: Text(
-                                  '${Labels.seeAllReviews} (${storeModel.store!.reviews!.length})',
-                                  style: TextStyle(
-                                    fontSize: context.scaledFont(12),
-                                    fontFamily: FontFamily.fontsPoppinsSemiBold,
-                                    color:
-                                        Theme.of(
-                                          context,
-                                        ).colorScheme.onSecondary,
                                   ),
                                 ),
                               ),
-                            ),
                           ],
                         ),
                       ),
                     ],
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

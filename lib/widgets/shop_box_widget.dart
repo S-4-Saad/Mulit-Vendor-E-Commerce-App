@@ -16,6 +16,7 @@ class ShopBox extends StatelessWidget {
     required this.onDirectionTap,
     required this.isOpen,
     required this.isDelivering,
+    this.isRequireDirection=true,
   });
   final String imageUrl;
   final String shopName;
@@ -25,6 +26,7 @@ class ShopBox extends StatelessWidget {
   final VoidCallback onDirectionTap;
   final bool isOpen;
   final bool isDelivering;
+  final bool isRequireDirection;
 
   @override
   Widget build(BuildContext context) {
@@ -147,6 +149,7 @@ class ShopBox extends StatelessWidget {
                       ],
                     ),
                   ),
+                  if(isRequireDirection)
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).colorScheme.primary,
