@@ -64,6 +64,9 @@
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Speezu needs access to save images to your photo library.</string>
 	
+	<!-- Export Compliance -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 
 </dict>
 </plist>
