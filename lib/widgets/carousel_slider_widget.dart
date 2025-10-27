@@ -5,34 +5,35 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:speezu/widgets/widget_bloc/banner_slider_bloc/banner_slider_bloc.dart';
 import 'package:speezu/widgets/widget_bloc/banner_slider_bloc/banner_slider_event.dart';
+import '../core/assets/font_family.dart';
 import 'image_gallery_viewer_widget.dart';
 import 'widget_bloc/banner_slider_bloc/banner_slider_state.dart';
+
 class EcommerceBanner extends StatefulWidget {
   const EcommerceBanner({
     super.key,
     required this.imageUrls,
-    this.height = 200.0, // Default height
-    this.autoPlay =
-    true, // Auto-scroll through images (ignored if only one image)
+    this.height = 200.0,
+    this.autoPlay = true,
     this.autoPlayInterval = const Duration(seconds: 3),
-    this.dotSize = 8.0, // Size of pagination dots
-    this.activeDotColor = Colors.blue, // Color of active dot
-    this.inactiveDotColor = Colors.grey, // Color of inactive dots
-    this.borderRadius = 10.0, // Corner radius of the banner
-    this.titleText, // Optional title text for the banner
-    this.isImageTap = false, // Callback when an image is tapped
+    this.dotSize = 8.0,
+    this.activeDotColor = Colors.blue,
+    this.inactiveDotColor = Colors.grey,
+    this.borderRadius = 12.0,
+    this.titleText,
+    this.isImageTap = false,
   });
 
-  final List<String> imageUrls; // List of image URLs to display
-  final double height; // Height of the banner
-  final bool autoPlay; // Whether to auto-scroll (overridden if only one image)
-  final Duration autoPlayInterval; // Interval for auto-scrolling
-  final double dotSize; // Size of pagination dots
-  final Color activeDotColor; // Color for the active dot
-  final Color inactiveDotColor; // Color for inactive dots
-  final double borderRadius; // Corner radius of the banner
+  final List<String> imageUrls;
+  final double height;
+  final bool autoPlay;
+  final Duration autoPlayInterval;
+  final double dotSize;
+  final Color activeDotColor;
+  final Color inactiveDotColor;
+  final double borderRadius;
   final List<String>? titleText;
-  final bool? isImageTap; // Callback when an image is tapped
+  final bool? isImageTap;
 
   @override
   State<EcommerceBanner> createState() => _EcommerceBannerState();
@@ -41,196 +42,243 @@ class EcommerceBanner extends StatefulWidget {
 class _EcommerceBannerState extends State<EcommerceBanner> {
   @override
   Widget build(BuildContext context) {
-    // Disable autoPlay if there's only one image
     final bool effectiveAutoPlay =
         widget.imageUrls.length > 1 && widget.autoPlay;
 
-    return BlocBuilder<BannerSliderBloc,BannerSliderState>(
+    return BlocBuilder<BannerSliderBloc, BannerSliderState>(
       builder: (context, state) {
-        return Column(
-          children: [
-            // Carousel Slider for images
-            widget.imageUrls.length > 1
-                ? CarouselSlider(
-              options: CarouselOptions(
-                height: widget.height,
-                viewportFraction: 1.0, // Full width of the screen
-                enlargeCenterPage: false, // No scaling effect
-                autoPlay:
-                effectiveAutoPlay, // Auto-play only if more than one image
-                autoPlayInterval: widget.autoPlayInterval,
-                onPageChanged: (index, reason) {
-                  context
-                      .read<BannerSliderBloc>()
-                      .add(UpdateBannerIndexEvent(index));
-                },
+        return Container(
+          height: widget.height,
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(widget.borderRadius),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.06),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
+                spreadRadius: 0,
               ),
-              items: widget.imageUrls.asMap().entries.map((entry) {
-                int index = entry.key;
-                String imageUrl = entry.value;
-                String? title = widget.titleText != null &&
-                    index < widget.titleText!.length
-                    ? widget.titleText![index]
-                    : null;
+            ],
+          ),
+          child: Stack(
+            children: [
+              // Carousel Slider
+              widget.imageUrls.length > 1
+                  ? CarouselSlider(
+                    options: CarouselOptions(
+                      height: widget.height,
+                      viewportFraction: 1.0,
+                      enlargeCenterPage: true,
 
-                return Builder(
-                  builder: (BuildContext context) {
-                    return Container(
-                      width: double.infinity,
-                      margin: EdgeInsets.symmetric(horizontal: 5),
-                      decoration: BoxDecoration(
-                        borderRadius:
-                        BorderRadius.circular(widget.borderRadius),
-                      ),
-                      child: Stack(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                                widget.borderRadius),
-                            child: GestureDetector(
-                              onTap: () {
-                                widget.isImageTap == true
-                                    ? Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          ImageGalleryViewer(
-                                            imageUrls:
-                                            widget.imageUrls,
-                                            initialIndex: index,
-                                          ),
-                                    ))
-                                    : print(
-                                    'object'); // Callback when an image is tapped
-                              },
-                              child: CachedNetworkImage(
-                                imageUrl: imageUrl,
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: widget.height,
-                                color: Colors.black.withValues(
-                                    alpha: 0.9), // Overlay for contrast
-                                colorBlendMode: BlendMode.dstATop,
-                                placeholder: (context, url) => Center(
-                                  child: SpinKitThreeInOut(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .primary,
-                                    size: 25,
-                                  ),
-                                ), // Loading indicator
-                                errorWidget: (context, url, error) =>
-                                    Center(
-                                      child: Icon(
-                                        Icons.error_outline,
-                                        color: Colors.red,
-                                        size: 40,
-                                      ),
-                                    ), // Error icon
-                              ),
-                            ),
-                          ),
+                      autoPlay: effectiveAutoPlay,
+                      autoPlayInterval: widget.autoPlayInterval,
+                      autoPlayCurve: Curves.easeInOutCubic,
+                      onPageChanged: (index, reason) {
+                        context.read<BannerSliderBloc>().add(
+                          UpdateBannerIndexEvent(index),
+                        );
+                      },
+                    ),
+                    items:
+                        widget.imageUrls.asMap().entries.map((entry) {
+                          int index = entry.key;
+                          String imageUrl = entry.value;
+                          String? title =
+                              widget.titleText != null &&
+                                      index < widget.titleText!.length
+                                  ? widget.titleText![index]
+                                  : null;
 
-                          // Show title for this image
-                          // if (title != null && title.isNotEmpty)
-                          //   Positioned(
-                          //     bottom: 10.h,
-                          //     left: 10.w,
-                          //     child: Text(
-                          //       title,
-                          //       style: TextStyle(
-                          //         color: Colors.white,
-                          //         fontSize: 15.sp,
-                          //         fontFamily: FontFamily.fontsPoppinsBold,
-                          //         shadows: [
-                          //           Shadow(
-                          //             offset: const Offset(
-                          //                 1.5, 1.5), // X and Y offset
-                          //             blurRadius:
-                          //                 4.0, // Softness of the shadow
-                          //             color: Colors.black.withValues(
-                          //                 alpha: 0.7), // Shadow color
-                          //           ),
-                          //         ],
-                          //       ),
-                          //     ),
-                          //   ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              }).toList(),
-            )
-                : Container(
-              height: widget.height,
-              width: double.infinity,
-              margin: EdgeInsets.symmetric(horizontal: 5),
-              decoration: BoxDecoration(
-                borderRadius:
-                BorderRadius.circular(widget.borderRadius),
-              ),
-              child: GestureDetector(
-                onTap: () {
-                  widget.isImageTap == true
-                      ? Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ImageGalleryViewer(
-                            imageUrls: widget.imageUrls),
-                      ))
-                      : print(
-                      'object'); // Callback when an image is tapped
-                },
-                child: ClipRRect(
-                  borderRadius:
-                  BorderRadius.circular(widget.borderRadius),
-                  child: CachedNetworkImage(
+                          return _buildBannerItem(
+                            context: context,
+                            imageUrl: imageUrl,
+                            title: title,
+                            index: index,
+                          );
+                        }).toList(),
+                  )
+                  : _buildBannerItem(
+                    context: context,
                     imageUrl: widget.imageUrls[0],
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: widget.height,
-                    color: Colors.black.withValues(alpha: 0.9),
-                    colorBlendMode: BlendMode.dstATop,
-                    placeholder: (context, url) => Center(
-                      child: SpinKitThreeInOut(
-                        color: Theme.of(context).colorScheme.primary,
-                        size: 25,
+                    title:
+                        widget.titleText?.isNotEmpty == true
+                            ? widget.titleText![0]
+                            : null,
+                    index: 0,
+                  ),
+
+              // Elegant dots positioned at bottom of image
+              if (widget.imageUrls.length > 1)
+                Positioned(
+                  bottom: 10,
+                  left: 0,
+                  right: 0,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children:
+                        widget.imageUrls.asMap().entries.map((entry) {
+                          bool isActive = state.currentBannerIndex == entry.key;
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            width:
+                                isActive ? widget.dotSize * 3 : widget.dotSize,
+                            height: widget.dotSize,
+                            margin: const EdgeInsets.symmetric(horizontal: 3),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(
+                                widget.dotSize / 2,
+                              ),
+                              color:
+                                  isActive
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Theme.of(context).colorScheme.primary
+                                          .withValues(alpha: 0.3),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildBannerItem({
+    required BuildContext context,
+    required String imageUrl,
+    String? title,
+    required int index,
+  }) {
+    return GestureDetector(
+      onTap: () {
+        if (widget.isImageTap == true) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder:
+                  (context) => ImageGalleryViewer(
+                    imageUrls: widget.imageUrls,
+                    initialIndex: index,
+                  ),
+            ),
+          );
+        }
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(widget.borderRadius),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Image with elegant loading state
+            CachedNetworkImage(
+              imageUrl: imageUrl,
+              fit: BoxFit.cover,
+              placeholder:
+                  (context, url) => Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.grey[200]!,
+                          Colors.grey[100]!,
+                          Colors.grey[200]!,
+                        ],
+                        stops: const [0.0, 0.5, 1.0],
                       ),
                     ),
-                    errorWidget: (context, url, error) => Center(
-                      child: Icon(
-                        Icons.error_outline,
-                        color: Colors.red,
-                        size: 40,
+                    child: Center(
+                      child: SpinKitThreeInOut(
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 28,
                       ),
+                    ),
+                  ),
+              errorWidget:
+                  (context, url, error) => Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Colors.grey[300]!, Colors.grey[200]!],
+                      ),
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.broken_image_rounded,
+                        color: Colors.grey,
+                        size: 44,
+                      ),
+                    ),
+                  ),
+            ),
+
+            // Subtle gradient overlay for elegance
+            if (title != null && title.isNotEmpty)
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withOpacity(0.65),
+                      ],
+                      stops: const [0.6, 1.0],
                     ),
                   ),
                 ),
               ),
-            ),
-            // Pagination dots (only show if there’s more than one image)
-            if (widget.imageUrls.length > 1)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: widget.imageUrls.asMap().entries.map((entry) {
-                  return Container(
-                    width: widget.dotSize,
-                    height: widget.dotSize,
-                    margin:
-                    EdgeInsets.symmetric(vertical: 10, horizontal: 2),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: state.currentBannerIndex == entry.key
-                          ? widget.activeDotColor
-                          : widget.inactiveDotColor,
+
+            // Elegant title with refined styling
+            if (title != null && title.isNotEmpty)
+              Positioned(
+                bottom: 40,
+                left: 20,
+                right: 20,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.15),
+                      width: 0.5,
                     ),
-                  );
-                }).toList(),
+                  ),
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontFamily: FontFamily.fontsPoppinsBold,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.2,
+                      height: 1.3,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ),
           ],
-        );
-      },
+        ),
+      ),
     );
   }
 }
