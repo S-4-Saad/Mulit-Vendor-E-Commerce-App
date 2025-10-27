@@ -110,17 +110,15 @@ class _DynamicProductsScreenState extends State<DynamicProductsScreen> {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             child: SingleChildScrollView(
-              child: Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: List.generate(products.length, (index) {
-                  final product = products[index];
-                  return SizedBox(
-                    width:
-                        MediaQuery.of(context).size.width / 2 - 20, // 2 columns
-                    child: ProductBox(
+              child: Center(
+                child: Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: List.generate(products.length, (index) {
+                    final product = products[index];
+                    return ProductBox(
                       marginPadding: const Padding(padding: EdgeInsets.all(0)),
-                      productWidth: 200,
+                      productWidth: 190,
                       productId: product.id,
                       productPrice: product.productPrice,
                       productOriginalPrice: product.productOriginalPrice,
@@ -137,9 +135,9 @@ class _DynamicProductsScreenState extends State<DynamicProductsScreen> {
                       },
                       productImageUrl: product.productImageUrl,
                       productTitle: product.productTitle,
-                    ),
-                  );
-                }),
+                    );
+                  }),
+                ),
               ),
             ),
           );

@@ -47,103 +47,105 @@ class _LanguageScreenState extends State<LanguageScreen> with SingleTickerProvid
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: CustomAppBar(title: Labels.languages),
-      body: Column(
-        children: [
-          // Header Section
-          Container(
-            margin: const EdgeInsets.all(16),
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.onPrimary,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: theme.colorScheme.onSecondary.withValues(alpha:0.1),
-                width: 1,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header Section
+            Container(
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.onPrimary,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: theme.colorScheme.onSecondary.withValues(alpha:0.1),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha:0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha:0.04),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withValues(alpha:0.1),
-                    borderRadius: BorderRadius.circular(14),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withValues(alpha:0.1),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Icon(
+                      Icons.translate_rounded,
+                      color: theme.colorScheme.primary,
+                      size: 28,
+                    ),
                   ),
-                  child: Icon(
-                    Icons.translate_rounded,
-                    color: theme.colorScheme.primary,
-                    size: 28,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        Labels.appLanguage,
-                        style: TextStyle(
-                          fontSize: context.scaledFont(16),
-                          color: theme.colorScheme.onSecondary,
-                          fontFamily: FontFamily.fontsPoppinsSemiBold,
-                          letterSpacing: 0.2,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          Labels.appLanguage,
+                          style: TextStyle(
+                            fontSize: context.scaledFont(16),
+                            color: theme.colorScheme.onSecondary,
+                            fontFamily: FontFamily.fontsPoppinsSemiBold,
+                            letterSpacing: 0.2,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        Labels.selectYourPreferredLanguage,
-                        style: TextStyle(
-                          fontSize: context.scaledFont(12),
-                          color: theme.colorScheme.onSecondary,
-                          fontFamily: FontFamily.fontsPoppinsRegular,
-                          height: 1.4,
+                        const SizedBox(height: 4),
+                        Text(
+                          Labels.selectYourPreferredLanguage,
+                          style: TextStyle(
+                            fontSize: context.scaledFont(12),
+                            color: theme.colorScheme.onSecondary,
+                            fontFamily: FontFamily.fontsPoppinsRegular,
+                            height: 1.4,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-
-          // Languages List
-          Expanded(
-            child: BlocBuilder<LanguageBloc, LanguageState>(
-              builder: (context, state) {
-                return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: languagesList.languages.length,
-                  itemBuilder: (context, index) {
-                    final lang = languagesList.languages[index];
-
-                    final isSelected =
-                        state.currentLocale.languageCode == lang.locale.languageCode &&
-                            (state.currentLocale.countryCode ?? '') == (lang.locale.countryCode ?? '');
-
-                    return _buildLanguageTile(
-                      context,
-                      lang: lang,
-                      isSelected: isSelected,
-                      index: index,
-                      onTap: () {
-                        context.read<LanguageBloc>().add(
-                          ChangeLanguage(context, lang.locale),
-                        );
-                      },
-                    );
-                  },
-                );
-              },
+        
+            // Languages List
+            Expanded(
+              child: BlocBuilder<LanguageBloc, LanguageState>(
+                builder: (context, state) {
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: languagesList.languages.length,
+                    itemBuilder: (context, index) {
+                      final lang = languagesList.languages[index];
+        
+                      final isSelected =
+                          state.currentLocale.languageCode == lang.locale.languageCode &&
+                              (state.currentLocale.countryCode ?? '') == (lang.locale.countryCode ?? '');
+        
+                      return _buildLanguageTile(
+                        context,
+                        lang: lang,
+                        isSelected: isSelected,
+                        index: index,
+                        onTap: () {
+                          context.read<LanguageBloc>().add(
+                            ChangeLanguage(context, lang.locale),
+                          );
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

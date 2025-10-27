@@ -12,18 +12,11 @@ import 'package:speezu/widgets/error_widget.dart';
 import 'package:speezu/widgets/product_box_widget.dart';
 import '../../core/assets/app_images.dart';
 import '../../models/product_model.dart';
-import '../../paractise.dart';
 import '../../widgets/carousel_slider_widget.dart';
 import '../../widgets/category_box_widget.dart';
-import '../../widgets/dialog_boxes/order_success_dialog.dart';
 import '../../widgets/home_header_tile.dart';
-import '../../widgets/login_required_bottom sheet.dart';
-import '../../widgets/search_animated_container.dart';
 import '../../widgets/home_shimmer_widget.dart';
-import '../favourites/bloc/favourite_bloc.dart';
-import '../favourites/bloc/favourite_event.dart';
 import '../products/bloc/products_event.dart';
-import '../shop_screen/shop_navbar_screen.dart';
 import 'home.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -45,7 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _refreshController.refreshCompleted(); // ✅ must call this!
   }
 
-  // Sample restaurant data - replace with API response
   List<String> imageUrl = [
     'https://t3.ftcdn.net/jpg/04/65/46/52/360_F_465465254_1pN9MGrA831idD6zIBL7q8rnZZpUCQTy.jpg',
     "https://static.vecteezy.com/system/resources/thumbnails/002/006/774/small/paper-art-shopping-online-on-smartphone-and-new-buy-sale-promotion-backgroud-for-banner-market-ecommerce-free-vector.jpg",
@@ -157,284 +149,310 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             }
             return SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.only(left: 15, right: 15),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: context.heightPct(.01)),
+              child: Column(
+                children: [
+                  EcommerceBanner(
+                    imageUrls: imageUrl,
+                    height: context.heightPct(.20),
 
-                    EcommerceBanner(
-                      imageUrls: imageUrl,
-                      height: context.heightPct(.18),
-                      // isImageTap: true,
-                    ),
+                    // isImageTap: true,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: 15, right: 15),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: context.heightPct(.01)),
 
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children:
-                            productCategories.map((category) {
-                              return CategoryBoxWidget(
-                                title: category.name,
-                                imageUrl: category.imageUrl,
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    RouteNames.categoryScreen,
-                                    arguments: {
-                                      'categoryName': category.name,
-                                      'categoryId': category.categoryId,
-                                    },
-                                  );
-                                },
-                              );
-                            }).toList(),
-                      ),
-                    ),
-                    SizedBox(height: context.heightPct(.02)),
+                        SizedBox(height: 10),
 
-                    HomeHeaderTile(
-                      title: Labels.topTrendingFoods,
-                      onViewAllTap:
-                          getApiFoodProducts(state).isNotEmpty
-                              ? () {
-                                context.read<NavBarBloc>().add(SelectTab(0));
-                                context.read<ProductsBloc>().add(
-                                  ChangeTabEvent(0),
-                                );
-                              }
-                              : null,
-                    ),
-                    SizedBox(height: context.heightPct(.01)),
-                    getApiFoodProducts(state).isEmpty
-                        ? Container(
-                          height: 120,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[100],
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Center(
-                            child: Text(
-                              Labels.noFoodProducts,
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        )
-                        : SingleChildScrollView(
+                        SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children:
-                                getApiFoodProducts(state).map((product) {
-                                  return ProductBox(
-                                    productId: product.id,
-                                    productPrice: product.productPrice,
-                                    productOriginalPrice:
-                                        product.productOriginalPrice,
-                                    productCategory: product.productCategory,
-                                    productRating: product.productRating,
-
-                                    // isProductFavourite:
-                                    // product.isProductFavourite,
-                                    onProductTap: () {
+                                productCategories.map((category) {
+                                  return CategoryBoxWidget(
+                                    title: category.name,
+                                    imageUrl: category.imageUrl,
+                                    onTap: () {
                                       Navigator.pushNamed(
                                         context,
-                                        RouteNames.productScreen,
-                                        arguments: product.id,
+                                        RouteNames.categoryScreen,
+                                        arguments: {
+                                          'categoryName': category.name,
+                                          'categoryId': category.categoryId,
+                                        },
                                       );
                                     },
-                                    productImageUrl: product.productImageUrl,
-                                    productTitle: product.productTitle,
                                   );
                                 }).toList(),
                           ),
                         ),
-                    SizedBox(height: context.heightPct(.02)),
-                    HomeHeaderTile(
-                      title: Labels.topSuperMarketProducts,
-                      onViewAllTap:
-                          getApiSupermarketProducts(state).isNotEmpty
-                              ? () {
-                                context.read<NavBarBloc>().add(SelectTab(0));
-                                context.read<ProductsBloc>().add(
-                                  ChangeTabEvent(1),
-                                );
-                              }
-                              : null,
-                    ),
-                    SizedBox(height: context.heightPct(.01)),
-                    getApiSupermarketProducts(state).isEmpty
-                        ? Container(
-                          height: 120,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[100],
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Center(
-                            child: Text(
-                              Labels.noSupermarketProducts,
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        )
-                        : SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children:
-                                getApiSupermarketProducts(state).map((product) {
-                                  return ProductBox(
-                                    productPrice: product.productPrice,
-                                    productOriginalPrice:
-                                        product.productOriginalPrice,
-                                    productCategory: product.productCategory,
-                                    productRating: product.productRating,
-                                    // isProductFavourite:
-                                    // product.isProductFavourite,
-                                    productId: product.id,
+                        SizedBox(height: context.heightPct(.02)),
 
-                                    onProductTap: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        RouteNames.productScreen,
-                                        arguments: product.id,
-                                      );
-                                    },
-                                    productImageUrl: product.productImageUrl,
-                                    productTitle: product.productTitle,
-                                  );
-                                }).toList(),
-                          ),
+                        HomeHeaderTile(
+                          title: Labels.topTrendingFoods,
+                          onViewAllTap:
+                              getApiFoodProducts(state).isNotEmpty
+                                  ? () {
+                                    context.read<NavBarBloc>().add(
+                                      SelectTab(0),
+                                    );
+                                    context.read<ProductsBloc>().add(
+                                      ChangeTabEvent(0),
+                                    );
+                                  }
+                                  : null,
                         ),
-                    SizedBox(height: context.heightPct(.02)),
-                    HomeHeaderTile(
-                      title: Labels.topRetailProducts,
-                      onViewAllTap:
-                          getApiRetailProducts(state).isNotEmpty
-                              ? () {
-                                context.read<NavBarBloc>().add(SelectTab(0));
-                                context.read<ProductsBloc>().add(
-                                  ChangeTabEvent(2),
-                                );
-                              }
-                              : null,
-                    ),
-                    SizedBox(height: context.heightPct(.01)),
-                    getApiRetailProducts(state).isEmpty
-                        ? Container(
-                          height: 120,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[100],
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Center(
-                            child: Text(
-                              Labels.noRetailProducts,
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 16,
+                        SizedBox(height: context.heightPct(.01)),
+                        getApiFoodProducts(state).isEmpty
+                            ? Container(
+                              height: 120,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  Labels.noFoodProducts,
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            )
+                            : SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children:
+                                    getApiFoodProducts(state).map((product) {
+                                      return ProductBox(
+                                        productId: product.id,
+                                        productPrice: product.productPrice,
+                                        productOriginalPrice:
+                                            product.productOriginalPrice,
+                                        productCategory:
+                                            product.productCategory,
+                                        productRating: product.productRating,
+
+                                        // isProductFavourite:
+                                        // product.isProductFavourite,
+                                        onProductTap: () {
+                                          Navigator.pushNamed(
+                                            context,
+                                            RouteNames.productScreen,
+                                            arguments: product.id,
+                                          );
+                                        },
+                                        productImageUrl:
+                                            product.productImageUrl,
+                                        productTitle: product.productTitle,
+                                      );
+                                    }).toList(),
                               ),
                             ),
-                          ),
-                        )
-                        : SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children:
-                                getApiRetailProducts(state).map((product) {
-                                  return ProductBox(
-                                    productPrice: product.productPrice,
-                                    productOriginalPrice:
-                                        product.productOriginalPrice,
-                                    productCategory: product.productCategory,
-                                    productRating: product.productRating,
-                                    // isProductFavourite:
-                                    // product.isProductFavourite,
-                                    productId: product.id,
-                                    onProductTap: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        RouteNames.productScreen,
-                                        arguments: product.id,
-                                      );
-                                    },
-                                    productImageUrl: product.productImageUrl,
-                                    productTitle: product.productTitle,
-                                  );
-                                }).toList(),
-                          ),
+                        SizedBox(height: context.heightPct(.02)),
+                        HomeHeaderTile(
+                          title: Labels.topSuperMarketProducts,
+                          onViewAllTap:
+                              getApiSupermarketProducts(state).isNotEmpty
+                                  ? () {
+                                    context.read<NavBarBloc>().add(
+                                      SelectTab(0),
+                                    );
+                                    context.read<ProductsBloc>().add(
+                                      ChangeTabEvent(1),
+                                    );
+                                  }
+                                  : null,
                         ),
-                    SizedBox(height: context.heightPct(.02)),
-                    HomeHeaderTile(
-                      title: Labels.medicines,
-                      onViewAllTap:
-                          getApiPharmacyProducts(state).isNotEmpty
-                              ? () {
-                                context.read<NavBarBloc>().add(SelectTab(0));
-                                context.read<ProductsBloc>().add(
-                                  ChangeTabEvent(3),
-                                );
-                              }
-                              : null,
-                    ),
-                    SizedBox(height: context.heightPct(.01)),
-                    getApiPharmacyProducts(state).isEmpty
-                        ? Container(
-                          height: 120,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[100],
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Center(
-                            child: Text(
-                              Labels.noPharmacyProducts,
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 16,
+                        SizedBox(height: context.heightPct(.01)),
+                        getApiSupermarketProducts(state).isEmpty
+                            ? Container(
+                              height: 120,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  Labels.noSupermarketProducts,
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            )
+                            : SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children:
+                                    getApiSupermarketProducts(state).map((
+                                      product,
+                                    ) {
+                                      return ProductBox(
+                                        productPrice: product.productPrice,
+                                        productOriginalPrice:
+                                            product.productOriginalPrice,
+                                        productCategory:
+                                            product.productCategory,
+                                        productRating: product.productRating,
+                                        // isProductFavourite:
+                                        // product.isProductFavourite,
+                                        productId: product.id,
+
+                                        onProductTap: () {
+                                          Navigator.pushNamed(
+                                            context,
+                                            RouteNames.productScreen,
+                                            arguments: product.id,
+                                          );
+                                        },
+                                        productImageUrl:
+                                            product.productImageUrl,
+                                        productTitle: product.productTitle,
+                                      );
+                                    }).toList(),
                               ),
                             ),
-                          ),
-                        )
-                        : SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children:
-                                getApiPharmacyProducts(state).map((product) {
-                                  return ProductBox(
-                                    productPrice: product.productPrice,
-                                    productOriginalPrice:
-                                        product.productOriginalPrice,
-                                    productCategory: product.productCategory,
-                                    productRating: product.productRating,
-                                    // isProductFavourite:
-                                    // product.isProductFavourite,
-                                    productId: product.id,
-                                    onProductTap: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        RouteNames.productScreen,
-                                        arguments: product.id,
-                                      );
-                                    },
-                                    productImageUrl: product.productImageUrl,
-                                    productTitle: product.productTitle,
-                                  );
-                                }).toList(),
-                          ),
+                        SizedBox(height: context.heightPct(.02)),
+                        HomeHeaderTile(
+                          title: Labels.topRetailProducts,
+                          onViewAllTap:
+                              getApiRetailProducts(state).isNotEmpty
+                                  ? () {
+                                    context.read<NavBarBloc>().add(
+                                      SelectTab(0),
+                                    );
+                                    context.read<ProductsBloc>().add(
+                                      ChangeTabEvent(2),
+                                    );
+                                  }
+                                  : null,
                         ),
-                    SizedBox(height: context.heightPct(.02)),
-                  ],
-                ),
+                        SizedBox(height: context.heightPct(.01)),
+                        getApiRetailProducts(state).isEmpty
+                            ? Container(
+                              height: 120,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  Labels.noRetailProducts,
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            )
+                            : SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children:
+                                    getApiRetailProducts(state).map((product) {
+                                      return ProductBox(
+                                        productPrice: product.productPrice,
+                                        productOriginalPrice:
+                                            product.productOriginalPrice,
+                                        productCategory:
+                                            product.productCategory,
+                                        productRating: product.productRating,
+                                        // isProductFavourite:
+                                        // product.isProductFavourite,
+                                        productId: product.id,
+                                        onProductTap: () {
+                                          Navigator.pushNamed(
+                                            context,
+                                            RouteNames.productScreen,
+                                            arguments: product.id,
+                                          );
+                                        },
+                                        productImageUrl:
+                                            product.productImageUrl,
+                                        productTitle: product.productTitle,
+                                      );
+                                    }).toList(),
+                              ),
+                            ),
+                        SizedBox(height: context.heightPct(.02)),
+                        HomeHeaderTile(
+                          title: Labels.medicines,
+                          onViewAllTap:
+                              getApiPharmacyProducts(state).isNotEmpty
+                                  ? () {
+                                    context.read<NavBarBloc>().add(
+                                      SelectTab(0),
+                                    );
+                                    context.read<ProductsBloc>().add(
+                                      ChangeTabEvent(3),
+                                    );
+                                  }
+                                  : null,
+                        ),
+                        SizedBox(height: context.heightPct(.01)),
+                        getApiPharmacyProducts(state).isEmpty
+                            ? Container(
+                              height: 120,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  Labels.noPharmacyProducts,
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            )
+                            : SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children:
+                                    getApiPharmacyProducts(state).map((
+                                      product,
+                                    ) {
+                                      return ProductBox(
+                                        productPrice: product.productPrice,
+                                        productOriginalPrice:
+                                            product.productOriginalPrice,
+                                        productCategory:
+                                            product.productCategory,
+                                        productRating: product.productRating,
+                                        // isProductFavourite:
+                                        // product.isProductFavourite,
+                                        productId: product.id,
+                                        onProductTap: () {
+                                          Navigator.pushNamed(
+                                            context,
+                                            RouteNames.productScreen,
+                                            arguments: product.id,
+                                          );
+                                        },
+                                        productImageUrl:
+                                            product.productImageUrl,
+                                        productTitle: product.productTitle,
+                                      );
+                                    }).toList(),
+                              ),
+                            ),
+                        SizedBox(height: context.heightPct(.02)),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             );
           },
