@@ -4,8 +4,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:paystack_flutter_sdk/paystack_flutter_sdk.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../models/payment_model.dart';
-import '../models/card_details_model.dart';
+import '../../models/payment_model.dart';
+import '../../models/card_details_model.dart';
 
 class PaystackService {
   static final PaystackService _instance = PaystackService._internal();

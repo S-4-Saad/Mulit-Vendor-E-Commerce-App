@@ -17,7 +17,7 @@ import 'bloc/cart_event.dart';
 import '../../models/address_model.dart';
 import '../../models/card_details_model.dart';
 import '../../repositories/user_repository.dart';
-import '../../services/paystack_service.dart';
+import '../../core/services/paystack_service.dart';
 import '../../models/payment_model.dart';
 import 'widgets/saved_card_selection_widget.dart';
 
