@@ -1,6 +1,6 @@
 //---------------API-base url-------------
-// const String baseUrl = "https://speezu.arhamwaheed.com/api";
-const String baseUrl = "http://192.168.192.24:8001/api";
+const String baseUrl = "https://speezu.arhamwaheed.com/api";
+// const String baseUrl = "http://192.168.192.24:8001/api";
 const String imageBaseUrl = "https://speezu.arhamwaheed.com/";
 
 ///-----------Auth Apis-----------------///
