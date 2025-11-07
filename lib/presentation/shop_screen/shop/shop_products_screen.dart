@@ -148,35 +148,51 @@ class ShopProductsScreen extends StatelessWidget {
                               ),
                               child:
                                   products.isEmpty
-                                      ? const Center(
-                                        child: NoProductsWidget(),
-                                      )
-                                      : StaggeredGrid.count(
-                                        crossAxisCount: 2,
+                                      ? const Center(child: NoProductsWidget())
+                                      : LayoutBuilder(
+                                    builder: (context, constraints) {
+                                      final double screenWidth = constraints.maxWidth;
+
+                                      // 🔹 Dynamically decide columns based on screen width
+                                      int crossAxisCount;
+                                      if (screenWidth >= 1200) {
+                                        crossAxisCount =
+                                        4; // Desktop or very large tablet
+                                      } else if (screenWidth >= 700) {
+                                        crossAxisCount =
+                                        3; // Tablet (your 800px screen)
+                                      } else if (screenWidth >= 600) {
+                                        crossAxisCount =
+                                        2; // Large phones / foldables
+                                      } else {
+                                        crossAxisCount =
+                                        2; // Standard mobile (your 411px phone)
+                                      }
+
+                                      print('📱 Width: $screenWidth → Columns: $crossAxisCount');
+
+                                      return StaggeredGrid.count(
+                                        crossAxisCount: crossAxisCount,
                                         mainAxisSpacing: 10,
                                         crossAxisSpacing: 10,
-                                        children: List.generate(products.length, (
-                                          index,
-                                        ) {
-                                          var product = products[index];
+                                        children: List.generate(products.length, (index) {
+                                          final product = products[index];
+
+                                          // Each product box width is calculated dynamically
+                                          final double productWidth = screenWidth / crossAxisCount - 20;
+
                                           return StaggeredGridTile.fit(
                                             crossAxisCellCount: 1,
                                             child: ProductBox(
                                               marginPadding: const Padding(
                                                 padding: EdgeInsets.all(0),
                                               ),
-                                              productWidth: 200,
-                                              productPrice:
-                                                  product.productPrice,
-                                              productOriginalPrice:
-                                                  product.productOriginalPrice,
-                                              productCategory:
-                                                  product.productCategory,
-                                              productRating:
-                                                  product.productRating,
-                                              // isProductFavourite: product.isProductFavourite,
+                                              productWidth: productWidth,
+                                              productPrice: product.productPrice,
+                                              productOriginalPrice: product.productOriginalPrice,
+                                              productCategory: product.productCategory,
+                                              productRating: product.productRating,
                                               productId: product.id,
-                                              // onFavouriteTap: () {},
                                               onProductTap: () {
                                                 Navigator.pushNamed(
                                                   context,
@@ -184,14 +200,14 @@ class ShopProductsScreen extends StatelessWidget {
                                                   arguments: product.id,
                                                 );
                                               },
-                                              productImageUrl:
-                                                  product.productImageUrl,
-                                              productTitle:
-                                                  product.productTitle,
+                                              productImageUrl: product.productImageUrl,
+                                              productTitle: product.productTitle,
                                             ),
                                           );
                                         }),
-                                      ),
+                                      );
+                                    },
+                                  ),
                             ),
                           );
                         },

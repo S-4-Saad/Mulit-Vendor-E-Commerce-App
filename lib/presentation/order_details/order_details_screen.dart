@@ -75,12 +75,10 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   Widget build(BuildContext context) {
     return BlocListener<OrderDetailsBloc, OrderDetailsState>(
       listenWhen: (previous, current) =>
-          previous.addReviewStatus != current.addReviewStatus,
+      previous.addReviewStatus != current.addReviewStatus,
       listener: (context, state) {
         if (state.addReviewStatus == AddReviewStatus.success) {
-          Navigator.pop(context); // Close the review dialog
-          // Refresh order details after review submission
-          // context.read<OrderDetailsBloc>().add(FetchOrderDetails(widget.orderId));
+          Navigator.pop(context);
         }
       },
       child: Scaffold(
@@ -91,527 +89,148 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
             if (state.status == OrderDetailStatus.loading) {
               return const OrderDetailsShimmer();
             }
-            final statusColor = _getStatusColor(
-              context,
-              state.orderDetailModel?.order?.currentStep ?? 0,
-            );
-            final orderDetail = state.orderDetailModel?.order;
 
-            return ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              children: [
-                // Order Status Card
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        statusColor.withValues(alpha: 0.15),
-                        statusColor.withValues(alpha: 0.05),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: statusColor.withValues(alpha: 0.3),
-                      width: 1.5,
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                // Define breakpoints
+                final screenWidth = MediaQuery.of(context).size.width;
+                final bool isMobile = screenWidth < 600;
+                final bool isTablet = screenWidth >= 600 && screenWidth < 1024;
+                final bool isLargeTablet = screenWidth >= 1024;
+
+                // Responsive values
+                final double horizontalPadding = isMobile ? 16 : (isTablet ? 24 : 32);
+                final double verticalPadding = isMobile ? 12 : (isTablet ? 16 : 20);
+                final double cardSpacing = isMobile ? 16 : (isTablet ? 20 : 24);
+                final double maxWidth = isLargeTablet ? 1400 : double.infinity;
+                final double borderRadius = isMobile ? 16 : (isTablet ? 18 : 20);
+
+                final statusColor = _getStatusColor(
+                  context,
+                  state.orderDetailModel?.order?.currentStep ?? 0,
+                );
+                final orderDetail = state.orderDetailModel?.order;
+
+                return Center(
+                  child: Container(
+                    constraints: BoxConstraints(maxWidth: maxWidth),
+                    child: ListView(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: horizontalPadding,
+                        vertical: verticalPadding,
+                      ),
+                      children: [
+                        // Order Status Card - Enhanced
+                        _buildOrderStatusCard(
+                          context,
+                          state,
+                          orderDetail,
+                          statusColor,
+                          borderRadius,
+                          isMobile,
+                          isTablet,
+                          isLargeTablet,
+                        ),
+
+                        SizedBox(height: cardSpacing),
+
+                        // Review Section - Show if order is delivered and not reviewed
+                        // if (orderDetail?.currentStep == 4 && !(state.orderDetailModel?.order?.products?[0].isReviewTaken ?? true))
+                          _buildReviewSection(
+                            context,
+                            state,
+                            borderRadius,
+                            isMobile,
+                            isTablet,
+                            isLargeTablet,
+                          ),
+
+                        // if (orderDetail?.currentStep == 4 && !(state.orderDetailModel?.order?.products?[0].isReviewTaken ?? true))
+                          SizedBox(height: cardSpacing),
+
+                        // Two-column layout for large tablets
+                        if (isLargeTablet) ...[
+                          Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 5,
+                              // Left Column - Products and Summary
+                              Expanded(
+                                flex: 3,
+                                child: Column(
+                                  children: [
+                                    _buildProductsSection(
+                                      context,
+                                      orderDetail,
+                                      state,
+                                      borderRadius,
+                                      isMobile,
+                                      isTablet,
+                                      isLargeTablet,
                                     ),
-                                    decoration: BoxDecoration(
-                                      color: statusColor.withValues(alpha: 0.2),
-                                      borderRadius: BorderRadius.circular(8),
+                                    SizedBox(height: cardSpacing),
+                                    _buildOrderSummarySection(
+                                      context,
+                                      orderDetail,
+                                      borderRadius,
+                                      isMobile,
+                                      isTablet,
+                                      isLargeTablet,
                                     ),
-                                    child: Text(
-                                      _getOrderStatusText(
-                                        state
-                                                .orderDetailModel
-                                                ?.order
-                                                ?.currentStep ??
-                                            0,
-                                      ),
-                                      style: TextStyle(
-                                        fontFamily:
-                                            FontFamily.fontsPoppinsSemiBold,
-                                        color: statusColor,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                '${Labels.orderNumber} ${orderDetail?.id}',
-                                style: TextStyle(
-                                  fontFamily: FontFamily.fontsPoppinsBold,
-                                  color:
-                                      Theme.of(context).colorScheme.onSecondary,
-                                  fontSize: 20,
+                                  ],
                                 ),
                               ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.access_time,
-                                    size: 14,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondary
-                                        .withValues(alpha: 0.6),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    '${Labels.placedOn} ${orderDetail?.placedOn}',
-                                    style: TextStyle(
-                                      fontFamily: FontFamily.fontsPoppinsRegular,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSecondary
-                                          .withValues(alpha: 0.6),
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                Labels.totalAmount,
-                                style: TextStyle(
-                                  fontFamily: FontFamily.fontsPoppinsRegular,
-                                  color: Theme.of(context).colorScheme.onSecondary
-                                      .withValues(alpha: 0.6),
-                                  fontSize: 12,
-                                ),
-                              ),
-                              Text(
-                                "${CurrencyIcon.currencyIcon} ${orderDetail?.totalAmount}",
-                                style: TextStyle(
-                                  fontFamily: FontFamily.fontsPoppinsBold,
-                                  color: Theme.of(context).colorScheme.primary,
-                                  fontSize: 24,
+                              SizedBox(width: cardSpacing),
+                              // Right Column - Shipping Address
+                              Expanded(
+                                flex: 2,
+                                child: _buildShippingSection(
+                                  context,
+                                  orderDetail,
+                                  borderRadius,
+                                  isMobile,
+                                  isTablet,
+                                  isLargeTablet,
                                 ),
                               ),
                             ],
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      OrderProgressTracker(
-                        isFoodOrder: true,
-                        currentStep: orderDetail?.currentStep ?? 0,
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // Section Header - Products
-                Row(
-                  children: [
-                    Container(
-                      width: 4,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      Labels.orderItems,
-                      style: TextStyle(
-                        fontFamily: FontFamily.fontsPoppinsSemiBold,
-                        fontSize: 18,
-                        color: Theme.of(context).colorScheme.onSecondary,
-                      ),
-                    ),
-                    const Spacer(),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        '${orderDetail?.products?.length} ${Labels.item}',
-                        style: TextStyle(
-                          fontFamily: FontFamily.fontsPoppinsMedium,
-                          fontSize: 12,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 12),
-
-                if (orderDetail?.products != null && orderDetail!.products!.isNotEmpty)
-                  ListView.builder(
-                    itemCount: orderDetail.products!.length,
-                    physics: const NeverScrollableScrollPhysics(), // so it won’t conflict with parent scroll
-                    shrinkWrap: true, // important for embedding in other scrollables
-                    itemBuilder: (context, index) {
-                      final product = orderDetail.products![index];
-                      return GestureDetector(
-                        onTap: (){
-                          print('Hello ${product.isReviewTaken }');
-
-
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: OrderDetailsProductTile(
-                            isReviewed: product.isReviewTaken ?? false,
-                            onTrackTap: () {
-                              // Navigator.pushNamed(
-                              //   context,
-                              //   RouteNames.productScreen,
-                              //   arguments: product.id,
-                              // );
-                          },
-                            shopName: product.shopName ?? '',
-                            onReviewTap: () {
-                              OrderDetailDialogBoxes.showReviewDialog(
-                                state.orderDetailModel?.order?.id ?? 0,
-                                context,
-                              );
-                            },
-                            imageUrl: '$imageBaseUrl${product.imageUrl}' ?? '',
-                            productName: product.productName ?? '',
-                            variationParentName: product.variationParentName,
-                            variationParentValue: product.variationChildName,
-                            variationChildName: product.variationParentName,
-                            variationChildValue: product.variationChildName,
-                            price: product.price ?? '0',
-                            originalPrice: product.originalPrice ?? '0',
-                          ),
-                        ),
-                      );
-                    },
-                  )
-                else
-                  const SizedBox.shrink(),
-
-
-                const SizedBox(height: 8),
-
-                // Section Header - Shipping
-                Row(
-                  children: [
-                    Container(
-                      width: 4,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      Labels.deliveryAddress,
-                      style: TextStyle(
-                        fontFamily: FontFamily.fontsPoppinsSemiBold,
-                        fontSize: 18,
-                        color: Theme.of(context).colorScheme.onSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 12),
-
-                /// Shipping address
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.onPrimary,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSecondary.withValues(alpha: 0.1),
-                      width: 1,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSecondary.withValues(alpha: 0.03),
-                        spreadRadius: 1,
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.primary.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Icon(
-                              Icons.location_on,
-                              color: Theme.of(context).colorScheme.primary,
-                              size: 20,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  orderDetail?.shippingAddress?.title ?? '',
-                                  style: TextStyle(
-                                    fontFamily: FontFamily.fontsPoppinsSemiBold,
-                                    fontSize: 14,
-                                    color:
-                                        Theme.of(context).colorScheme.onSecondary,
-                                  ),
-                                ),
-                                Text(
-                                  orderDetail?.shippingAddress?.customerName ?? '',
-                                  style: TextStyle(
-                                    fontFamily: FontFamily.fontsPoppinsRegular,
-                                    fontSize: 13,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondary
-                                        .withValues(alpha: 0.7),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Theme.of(
+                        ] else ...[
+                          // Stacked layout for mobile and tablet
+                          _buildProductsSection(
                             context,
-                          ).colorScheme.onSecondary.withValues(alpha: 0.03),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.phone,
-                                  size: 14,
-                                  color: Theme.of(context).colorScheme.onSecondary
-                                      .withValues(alpha: 0.6),
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  orderDetail?.shippingAddress?.primaryPhone ?? '',
-                                  style: TextStyle(
-                                    fontFamily: FontFamily.fontsPoppinsRegular,
-                                    fontSize: 12,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondary
-                                        .withValues(alpha: 0.8),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            if (orderDetail
-                                    ?.shippingAddress
-                                    ?.secondaryPhone
-                                    ?.isNotEmpty ??
-                                false) ...[
-                              const SizedBox(height: 6),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.phone,
-                                    size: 14,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondary
-                                        .withValues(alpha: 0.6),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    orderDetail?.shippingAddress?.secondaryPhone ??
-                                        '',
-                                    style: TextStyle(
-                                      fontFamily: FontFamily.fontsPoppinsRegular,
-                                      fontSize: 12,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSecondary
-                                          .withValues(alpha: 0.8),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                            const SizedBox(height: 6),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Icon(
-                                  Icons.location_city,
-                                  size: 14,
-                                  color: Theme.of(context).colorScheme.onSecondary
-                                      .withValues(alpha: 0.6),
-                                ),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                  child: Text(
-                                    orderDetail?.shippingAddress?.fullAddress ??
-                                        '',
-                                    style: TextStyle(
-                                      fontFamily: FontFamily.fontsPoppinsRegular,
-                                      fontSize: 12,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSecondary
-                                          .withValues(alpha: 0.8),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                            orderDetail,
+                            state,
+                            borderRadius,
+                            isMobile,
+                            isTablet,
+                            isLargeTablet,
+                          ),
+                          SizedBox(height: cardSpacing),
+                          _buildShippingSection(
+                            context,
+                            orderDetail,
+                            borderRadius,
+                            isMobile,
+                            isTablet,
+                            isLargeTablet,
+                          ),
+                          SizedBox(height: cardSpacing),
+                          _buildOrderSummarySection(
+                            context,
+                            orderDetail,
+                            borderRadius,
+                            isMobile,
+                            isTablet,
+                            isLargeTablet,
+                          ),
+                        ],
 
-                const SizedBox(height: 20),
-
-                // Section Header - Summary
-                Row(
-                  children: [
-                    Container(
-                      width: 4,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
+                        SizedBox(height: cardSpacing * 1.5),
+                      ],
                     ),
-                    const SizedBox(width: 10),
-                    Text(
-                      Labels.orderSummary,
-                      style: TextStyle(
-                        fontFamily: FontFamily.fontsPoppinsSemiBold,
-                        fontSize: 18,
-                        color: Theme.of(context).colorScheme.onSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 12),
-
-                /// Order summary
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.onPrimary,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSecondary.withValues(alpha: 0.1),
-                      width: 1,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSecondary.withValues(alpha: 0.03),
-                        spreadRadius: 1,
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
                   ),
-                  child: Column(
-                    children: [
-                      _buildSummaryRow(
-                        context,
-                        '${Labels.itemsTotal} (${orderDetail?.summary?.itemQty} ${Labels.item})',
-                        '${CurrencyIcon.currencyIcon} ${orderDetail?.summary?.itemTotal}',
-                        false,
-                      ),
-                      const SizedBox(height: 12),
-                      _buildSummaryRow(
-                        context,
-                        Labels.deliveryFee,
-                        '${CurrencyIcon.currencyIcon} ${orderDetail?.summary?.deliveryFee}',
-                        false,
-                      ),
-                      const SizedBox(height: 12),
-                      _buildSummaryRow(
-                        context,
-                        Labels.tax,
-                        '${CurrencyIcon.currencyIcon} ${orderDetail?.summary?.tax}',
-                        false,
-                      ),
-                      const SizedBox(height: 16),
-                      Container(
-                        height: 1,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSecondary.withValues(alpha: 0.1),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildSummaryRow(
-                        context,
-                        Labels.totalAmount,
-                        '${CurrencyIcon.currencyIcon} ${orderDetail?.summary?.total}',
-                        true,
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-              ],
+                );
+              },
             );
           },
         ),
@@ -619,43 +238,982 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
     );
   }
 
-  Widget _buildSummaryRow(
-    BuildContext context,
-    String label,
-    String value,
-    bool isBold,
-  ) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontFamily:
-                isBold
-                    ? FontFamily.fontsPoppinsSemiBold
-                    : FontFamily.fontsPoppinsRegular,
-            fontSize: isBold ? 15 : 13,
-            color: Theme.of(
-              context,
-            ).colorScheme.onSecondary.withValues(alpha: isBold ? 1.0 : 0.7),
-          ),
+  Widget _buildOrderStatusCard(
+      BuildContext context,
+      OrderDetailsState state,
+      dynamic orderDetail,
+      Color statusColor,
+      double borderRadius,
+      bool isMobile,
+      bool isTablet,
+      bool isLargeTablet,
+      ) {
+    final double padding = isMobile ? 20 : (isTablet ? 24 : 28);
+    final double statusFontSize = isMobile ? 12 : (isTablet ? 13 : 14);
+    final double orderIdFontSize = isMobile ? 20 : (isTablet ? 22 : 24);
+    final double amountFontSize = isMobile ? 24 : (isTablet ? 26 : 28);
+
+    return Container(
+      padding: EdgeInsets.all(padding),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            statusColor.withValues(alpha: 0.15),
+            statusColor.withValues(alpha: 0.05),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        Text(
-          value,
-          style: TextStyle(
-            fontFamily:
-                isBold
-                    ? FontFamily.fontsPoppinsBold
-                    : FontFamily.fontsPoppinsMedium,
-            fontSize: isBold ? 18 : 14,
-            color:
-                isBold
-                    ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.onSecondary,
+        borderRadius: BorderRadius.circular(borderRadius),
+        border: Border.all(
+          color: statusColor.withValues(alpha: 0.3),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: statusColor.withValues(alpha: 0.15),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+            spreadRadius: 0,
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isMobile ? 10 : 12,
+                        vertical: isMobile ? 5 : 6,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            statusColor.withValues(alpha: 0.3),
+                            statusColor.withValues(alpha: 0.15),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: statusColor.withValues(alpha: 0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.circle,
+                            size: 8,
+                            color: statusColor,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            _getOrderStatusText(
+                              state.orderDetailModel?.order?.currentStep ?? 0,
+                            ),
+                            style: TextStyle(
+                              fontFamily: FontFamily.fontsPoppinsSemiBold,
+                              color: statusColor,
+                              fontSize: statusFontSize,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: isMobile ? 12 : 14),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.receipt_long_rounded,
+                          size: isMobile ? 20 : 22,
+                          color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.7),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            '${Labels.orderNumber} ${orderDetail?.id}',
+                            style: TextStyle(
+                              fontFamily: FontFamily.fontsPoppinsBold,
+                              color: Theme.of(context).colorScheme.onSecondary,
+                              fontSize: orderIdFontSize,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: isMobile ? 6 : 8),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.access_time_rounded,
+                          size: isMobile ? 14 : 16,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSecondary
+                              .withValues(alpha: 0.6),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '${Labels.placedOn} ${orderDetail?.placedOn}',
+                          style: TextStyle(
+                            fontFamily: FontFamily.fontsPoppinsRegular,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSecondary
+                                .withValues(alpha: 0.6),
+                            fontSize: isMobile ? 12 : 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              Container(
+                padding: EdgeInsets.all(isMobile ? 12 : 16),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                    width: 1,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      Labels.totalAmount,
+                      style: TextStyle(
+                        fontFamily: FontFamily.fontsPoppinsRegular,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSecondary
+                            .withValues(alpha: 0.6),
+                        fontSize: isMobile ? 11 : 12,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "${CurrencyIcon.currencyIcon} ${orderDetail?.totalAmount}",
+                      style: TextStyle(
+                        fontFamily: FontFamily.fontsPoppinsBold,
+                        color: Theme.of(context).colorScheme.primary,
+                        fontSize: amountFontSize,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: isMobile ? 20 : 24),
+          OrderProgressTracker(
+            isFoodOrder: true,
+            currentStep: orderDetail?.currentStep ?? 0,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReviewSection(
+      BuildContext context,
+      OrderDetailsState state,
+      double borderRadius,
+      bool isMobile,
+      bool isTablet,
+      bool isLargeTablet,
+      ) {
+    return Container(
+      padding: EdgeInsets.all(isMobile ? 16 : (isTablet ? 20 : 24)),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.onPrimary,
+        borderRadius: BorderRadius.circular(borderRadius),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(
+          color: Colors.grey.withOpacity(0.1),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // ⭐️ Icon container
+          Container(
+            height: isMobile ? 48 : 56,
+            width: isMobile ? 48 : 56,
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFC107).withOpacity(0.15),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(
+              Icons.star_rounded,
+              color: const Color(0xFFFFC107),
+              size: isMobile ? 26 : (isTablet ? 30 : 34),
+            ),
+          ),
+
+          SizedBox(width: isMobile ? 14 : 18),
+
+          // 📝 Text section
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Rate Your Order',
+                  style: TextStyle(
+                    fontFamily: FontFamily.fontsPoppinsSemiBold,
+                    fontSize: isMobile ? 16 : (isTablet ? 18 : 20),
+                    color: Theme.of(context).colorScheme.onSecondary,
+                    height: 1.3,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Your feedback helps us improve your experience.',
+                  style: TextStyle(
+                    fontFamily: FontFamily.fontsPoppinsRegular,
+                    fontSize: isMobile ? 13 : (isTablet ? 14 : 15),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSecondary
+                        .withOpacity(0.65),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          SizedBox(width: isMobile ? 12 : 16),
+
+          // 💬 Review button
+          IconButton(
+            icon: const Icon(Icons.rate_review_rounded, color: Colors.white),
+
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFFC107),
+              elevation: 0,
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 18 : 22,
+                vertical: isMobile ? 12 : (isTablet ? 14 : 16),
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            onPressed: () {
+              OrderDetailDialogBoxes.showReviewDialog(
+                state.orderDetailModel?.order?.id ?? 0,
+                context,
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProductsSection(
+      BuildContext context,
+      dynamic orderDetail,
+      OrderDetailsState state,
+      double borderRadius,
+      bool isMobile,
+      bool isTablet,
+      bool isLargeTablet,
+      ) {
+    return Column(
+      children: [
+        _buildSectionHeader(
+          context,
+          Labels.orderItems,
+          Icons.shopping_bag_rounded,
+          '${orderDetail?.products?.length} ${Labels.item}',
+          borderRadius,
+          isMobile,
+        ),
+        const SizedBox(height: 12),
+        if (orderDetail?.products != null && orderDetail!.products!.isNotEmpty)
+          ListView.builder(
+            itemCount: orderDetail.products!.length,
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              final product = orderDetail.products![index];
+              return Padding(
+                padding: EdgeInsets.only(bottom: isMobile ? 12 : 14),
+                child: _buildEnhancedProductTile(
+                  context,
+                  product,
+                  state,
+                  borderRadius,
+                  isMobile,
+                  isTablet,
+                ),
+              );
+            },
+          )
+        else
+          const SizedBox.shrink(),
+      ],
+    );
+  }
+
+  Widget _buildEnhancedProductTile(
+      BuildContext context,
+      Products product,
+      OrderDetailsState state,
+      double borderRadius,
+      bool isMobile,
+      bool isTablet,
+      ) {
+    bool isDiscounted = product.price != product.originalPrice;
+    final double imageSize = isMobile ? 80 : (isTablet ? 90 : 100);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.onPrimary,
+        borderRadius: BorderRadius.circular(borderRadius),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.15),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 15,
+            offset: const Offset(0, 4),
+            spreadRadius: 0,
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Shop Header
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobile ? 12 : 16,
+              vertical: isMobile ? 10 : 12,
+            ),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.02),
+                ],
+              ),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(borderRadius),
+                topRight: Radius.circular(borderRadius),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.store_mall_directory_outlined,
+                    color: Theme.of(context).colorScheme.primary,
+                    size: isMobile ? 18 : 20,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    product.shopName ?? '',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontFamily: FontFamily.fontsPoppinsSemiBold,
+                      fontSize: isMobile ? 14 : 15,
+                      color: Theme.of(context).colorScheme.onSecondary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Product Details
+          Padding(
+            padding: EdgeInsets.all(isMobile ? 12 : 16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Product Image with overlay
+                Stack(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                          width: 1,
+                        ),
+                      ),
+                      child: AppCacheImage(
+                        imageUrl: '$imageBaseUrl${product.imageUrl}',
+                        height: imageSize,
+                        width: imageSize,
+                        round: 12,
+                      ),
+                    ),
+                    if (isDiscounted)
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Colors.red, Colors.redAccent],
+                            ),
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              bottomRight: Radius.circular(12),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.red.withValues(alpha: 0.4),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            '-${_calculatePercentage(product.originalPrice, product.price)}%',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: isMobile ? 11 : 12,
+                              fontFamily: FontFamily.fontsPoppinsBold,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+
+                SizedBox(width: isMobile ? 12 : 16),
+
+                // Product Info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        product.productName ?? '',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontFamily: FontFamily.fontsPoppinsSemiBold,
+                          fontSize: isMobile ? 14 : 15,
+                          color: Theme.of(context).colorScheme.onSecondary,
+                          height: 1.3,
+                        ),
+                      ),
+                      if (product.variationParentName != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .primary
+                                  .withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              "${product.variationParentName}: ${product.variationChildName}",
+                              style: TextStyle(
+                                fontFamily: FontFamily.fontsPoppinsRegular,
+                                fontSize: isMobile ? 11 : 12,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Text(
+                            "${CurrencyIcon.currencyIcon}${product.price}",
+                            style: TextStyle(
+                              fontFamily: FontFamily.fontsPoppinsBold,
+                              fontSize: isMobile ? 16 : 18,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                          if (isDiscounted) ...[
+                            const SizedBox(width: 8),
+                            Text(
+                              "${CurrencyIcon.currencyIcon}${product.originalPrice}",
+                              style: TextStyle(
+                                fontFamily: FontFamily.fontsPoppinsRegular,
+                                fontSize: isMobile ? 12 : 13,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSecondary
+                                    .withValues(alpha: 0.5),
+                                decoration: TextDecoration.lineThrough,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: isMobile ? 18 : 20,
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShippingSection(
+      BuildContext context,
+      dynamic orderDetail,
+      double borderRadius,
+      bool isMobile,
+      bool isTablet,
+      bool isLargeTablet,
+      ) {
+    return Column(
+      children: [
+        _buildSectionHeader(
+          context,
+          Labels.deliveryAddress,
+          Icons.location_on_rounded,
+          null,
+          borderRadius,
+          isMobile,
+        ),
+        const SizedBox(height: 12),
+        Container(
+          padding: EdgeInsets.all(isMobile ? 16 : 20),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.onPrimary,
+            borderRadius: BorderRadius.circular(borderRadius),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.15),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 15,
+                offset: const Offset(0, 4),
+                spreadRadius: 0,
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(isMobile ? 10 : 12),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
+                          Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.location_on,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: isMobile ? 20 : 22,
+                    ),
+                  ),
+                  SizedBox(width: isMobile ? 12 : 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          orderDetail?.shippingAddress?.title ?? '',
+                          style: TextStyle(
+                            fontFamily: FontFamily.fontsPoppinsSemiBold,
+                            fontSize: isMobile ? 14 : 15,
+                            color: Theme.of(context).colorScheme.onSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          orderDetail?.shippingAddress?.customerName ?? '',
+                          style: TextStyle(
+                            fontFamily: FontFamily.fontsPoppinsRegular,
+                            fontSize: isMobile ? 13 : 14,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSecondary
+                                .withValues(alpha: 0.7),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: isMobile ? 14 : 16),
+              Container(
+                padding: EdgeInsets.all(isMobile ? 12 : 14),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.03),
+                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.01),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                    width: 1,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildAddressRow(
+                      context,
+                      Icons.phone_rounded,
+                      orderDetail?.shippingAddress?.primaryPhone ?? '',
+                      isMobile,
+                    ),
+                    if (orderDetail?.shippingAddress?.secondaryPhone?.isNotEmpty ?? false) ...[
+                      SizedBox(height: isMobile ? 8 : 10),
+                      _buildAddressRow(
+                        context,
+                        Icons.phone_rounded,
+                        orderDetail?.shippingAddress?.secondaryPhone ?? '',
+                        isMobile,
+                      ),
+                    ],
+                    SizedBox(height: isMobile ? 8 : 10),
+                    _buildAddressRow(
+                      context,
+                      Icons.home_rounded,
+                      orderDetail?.shippingAddress?.fullAddress ?? '',
+                      isMobile,
+                      isAddress: true,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ],
     );
+  }
+
+  Widget _buildAddressRow(
+      BuildContext context,
+      IconData icon,
+      String text,
+      bool isMobile, {
+        bool isAddress = false,
+      }) {
+    return Row(
+      crossAxisAlignment: isAddress ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+      children: [
+        Icon(
+          icon,
+          size: isMobile ? 14 : 16,
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontFamily: FontFamily.fontsPoppinsRegular,
+              fontSize: isMobile ? 12 : 13,
+              color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.8),
+              height: isAddress ? 1.4 : 1.2,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOrderSummarySection(
+      BuildContext context,
+      dynamic orderDetail,
+      double borderRadius,
+      bool isMobile,
+      bool isTablet,
+      bool isLargeTablet,
+      ) {
+    return Column(
+      children: [
+        _buildSectionHeader(
+          context,
+          Labels.orderSummary,
+          Icons.receipt_long_rounded,
+          null,
+          borderRadius,
+          isMobile,
+        ),
+        const SizedBox(height: 12),
+        Container(
+          padding: EdgeInsets.all(isMobile ? 16 : 20),
+          decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.onPrimary,
+            borderRadius: BorderRadius.circular(borderRadius),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.15),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 15,
+                offset: const Offset(0, 4),
+                spreadRadius: 0,
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              _buildSummaryRow(
+                context,
+                '${Labels.itemsTotal} (${orderDetail?.summary?.itemQty} ${Labels.item})',
+                '${CurrencyIcon.currencyIcon} ${orderDetail?.summary?.itemTotal}',
+                false,
+                isMobile,
+              ),
+              SizedBox(height: isMobile ? 12 : 14),
+              _buildSummaryRow(
+                context,
+                Labels.deliveryFee,
+                '${CurrencyIcon.currencyIcon} ${orderDetail?.summary?.deliveryFee}',
+                false,
+                isMobile,
+              ),
+              SizedBox(height: isMobile ? 12 : 14),
+              _buildSummaryRow(
+                context,
+                Labels.tax,
+                '${CurrencyIcon.currencyIcon} ${orderDetail?.summary?.tax}',
+                false,
+                isMobile,
+              ),
+              SizedBox(height: isMobile ? 16 : 18),
+              Container(
+                height: 1,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.transparent,
+                      Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: isMobile ? 16 : 18),
+              Container(
+                padding: EdgeInsets.all(isMobile ? 12 : 14),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                    width: 1,
+                  ),
+                ),
+                child: _buildSummaryRow(
+                  context,
+                  Labels.totalAmount,
+                  '${CurrencyIcon.currencyIcon} ${orderDetail?.summary?.total}',
+                  true,
+                  isMobile,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionHeader(
+      BuildContext context,
+      String title,
+      IconData icon,
+      String? badge,
+      double borderRadius,
+      bool isMobile,
+      ) {
+    return Row(
+      children: [
+        Container(
+          padding: EdgeInsets.all(isMobile ? 8 : 10),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
+                Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(
+            icon,
+            color: Theme.of(context).colorScheme.primary,
+            size: isMobile ? 18 : 20,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          title,
+          style: TextStyle(
+            fontFamily: FontFamily.fontsPoppinsSemiBold,
+            fontSize: isMobile ? 16 : 18,
+            color: Theme.of(context).colorScheme.onSecondary,
+            letterSpacing: 0.2,
+          ),
+        ),
+        const Spacer(),
+        if (badge != null)
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobile ? 10 : 12,
+              vertical: isMobile ? 5 : 6,
+            ),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                width: 1,
+              ),
+            ),
+            child: Text(
+              badge,
+              style: TextStyle(
+                fontFamily: FontFamily.fontsPoppinsSemiBold,
+                fontSize: isMobile ? 11 : 12,
+                color: Theme.of(context).colorScheme.primary,
+                letterSpacing: 0.3,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildSummaryRow(
+      BuildContext context,
+      String label,
+      String value,
+      bool isBold,
+      bool isMobile,
+      ) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontFamily: isBold
+                  ? FontFamily.fontsPoppinsSemiBold
+                  : FontFamily.fontsPoppinsRegular,
+              fontSize: isBold ? (isMobile ? 15 : 16) : (isMobile ? 13 : 14),
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSecondary
+                  .withValues(alpha: isBold ? 1.0 : 0.7),
+              letterSpacing: 0.2,
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          value,
+          style: TextStyle(
+            fontFamily: isBold
+                ? FontFamily.fontsPoppinsBold
+                : FontFamily.fontsPoppinsMedium,
+            fontSize: isBold ? (isMobile ? 18 : 20) : (isMobile ? 14 : 15),
+            color: isBold
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.onSecondary,
+            letterSpacing: 0.3,
+          ),
+        ),
+      ],
+    );
+  }
+
+  int _calculatePercentage(String? originalPrice, String? discountedPrice) {
+    final original = double.tryParse(originalPrice ?? '0') ?? 0;
+    final discounted = double.tryParse(discountedPrice ?? '0') ?? 0;
+    if (original == 0) return 0;
+    return ((original - discounted) / original * 100).round();
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:speezu/presentation/products/bloc/products_bloc.dart';
 import 'package:speezu/presentation/products/bloc/products_event.dart';
@@ -107,40 +108,66 @@ class _DynamicProductsScreenState extends State<DynamicProductsScreen> {
           }
 
           // --- Success ---
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: SingleChildScrollView(
-              child: Center(
-                child: Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: List.generate(products.length, (index) {
-                    final product = products[index];
-                    return ProductBox(
-                      marginPadding: const Padding(padding: EdgeInsets.all(0)),
-                      productWidth: 190,
-                      productId: product.id,
-                      productPrice: product.productPrice,
-                      productOriginalPrice: product.productOriginalPrice,
-                      productCategory: product.productCategory,
-                      productRating: product.productRating,
 
-                      // isProductFavourite: product.isProductFavourite,
-                      onProductTap: () {
-                        Navigator.pushNamed(
-                          context,
-                          RouteNames.productScreen,
-                          arguments: product.id,
-                        );
-                      },
-                      productImageUrl: product.productImageUrl,
-                      productTitle: product.productTitle,
-                    );
-                  }),
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              double screenWidth = constraints.maxWidth;
+
+              // 🔹 Dynamically decide number of columns based on device width
+              int crossAxisCount;
+              if (screenWidth >= 1200) {
+                crossAxisCount =
+                4; // Desktop or very large tablet
+              } else if (screenWidth >= 700) {
+                crossAxisCount =
+                3; // Tablet (your 800px screen)
+              } else if (screenWidth >= 600) {
+                crossAxisCount =
+                2; // Large phones / foldables
+              } else {
+                crossAxisCount =
+                2; // Standard mobile (your 411px phone)
+              }
+              print('📱 Screen width: $screenWidth → Columns: $crossAxisCount');
+
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: SingleChildScrollView(
+                  child: StaggeredGrid.count(
+                    crossAxisCount: crossAxisCount,
+                    mainAxisSpacing: 10,
+                    crossAxisSpacing: 10,
+                    children: List.generate(products.length, (index) {
+                      final product = products[index];
+                      return StaggeredGridTile.fit(
+                        crossAxisCellCount: 1,
+                        child: ProductBox(
+                          marginPadding: const Padding(padding: EdgeInsets.all(0)),
+                          productWidth: screenWidth / crossAxisCount - 20,
+                          productId: product.id,
+                          productPrice: product.productPrice,
+                          productOriginalPrice: product.productOriginalPrice,
+                          productCategory: product.productCategory,
+                          productRating: product.productRating,
+                          onProductTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              RouteNames.productScreen,
+                              arguments: product.id,
+                            );
+                          },
+                          productImageUrl: product.productImageUrl,
+                          productTitle: product.productTitle,
+                        ),
+                      );
+                    }),
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           );
+
+
         },
       ),
     );

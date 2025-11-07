@@ -109,7 +109,7 @@ class OrdersDialogBoxes {
                                 if (formKey.currentState!.validate()) {
                                   context.read<OrdersBloc>().add(
                                     CancelOrderEvent(
-context: context,
+                                      context: context,
                                       orderId: orderId.toString(),
                                       reason: reasonController.text,
                                     ),
@@ -138,7 +138,6 @@ context: context,
                         ],
                       );
                     },
-                    
                   ),
                 ],
               ),

@@ -165,7 +165,7 @@ class ShopNavbarScreen extends StatelessWidget {
               style: TextStyle(
                 color: Colors.white,
                 fontFamily: FontFamily.fontsPoppinsSemiBold,
-                fontSize: context.scaledFont(19),
+                fontSize: 22,
                 letterSpacing: 0.3,
                 fontWeight: FontWeight.w600,
               ),

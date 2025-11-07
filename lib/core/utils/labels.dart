@@ -390,6 +390,20 @@ class Labels {
   static String get differentStore => 'differentStore'.tr();
   static String get noAddressesFoundPleaseAddAnAddress => 'noAddressesFoundPleaseAddAnAddress'.tr();
   static String get somethingWentWrongPleaseTryAgain => 'somethingWentWrongPleaseTryAgain'.tr();
+  static String get welcomeBackPleaseLoginToContinue => 'welcomeBackPleaseLoginToContinue'.tr();
+  static String get signIn => 'signIn'.tr();
+  static String get enterYourCredentialsToAccessYourAccount => 'enterYourCredentialsToAccessYourAccount'.tr();
+  static String get donHaveAnAccount => 'donHaveAnAccount'.tr();
+  static String get signUp => 'signUp'.tr();
+  static String get enterYourEmailToResetYourPassword => 'enterYourEmailToResetYourPassword'.tr();
+  static String get resetPassword => 'resetPassword'.tr();
+  static String get weSendYouALinkToResetYourPassword => 'weSendYouALinkToResetYourPassword'.tr();
+  static String get enterYourEmailToReceiveAPasswordResetLink => 'enterYourEmailToReceiveAPasswordResetLink'.tr();
+  static String get rememberYourPassword => 'rememberYourPassword'.tr();
+  static String get createYourAccountToGetStarted => 'createYourAccountToGetStarted'.tr();
+  static String get fillInYourDetailsToRegister => 'fillInYourDetailsToRegister'.tr();
+  static String get createAccount => 'createAccount'.tr();
+  static String get createAnAccountToGetStarted => 'createAnAccountToGetStarted'.tr();
 
 
 
