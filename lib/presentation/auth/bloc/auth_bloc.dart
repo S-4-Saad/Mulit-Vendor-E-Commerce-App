@@ -5,6 +5,7 @@ import '../../../../models/user_model.dart';
 import '../../../core/services/api_services.dart';
 import '../../../core/services/localStorage/my-local-controller.dart';
 import '../../../core/utils/constants.dart';
+import '../../../core/services/notification_service.dart';
 import '../../../repositories/user_repository.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
@@ -52,6 +53,18 @@ class AuthBloc extends Bloc<AuthEvents, AuthState> {
               );
 
               log('User name: ${userModel.userData?.name ?? "No name"}');
+
+              // Save FCM token to server after successful login
+              try {
+                final notificationService = NotificationService();
+                final fcmToken = await notificationService.getDeviceToken();
+                if (fcmToken.isNotEmpty) {
+                  await UserRepository().saveFcmTokenToServer(fcmToken);
+                  log('FCM token saved to server after login');
+                }
+              } catch (e) {
+                log('Error saving FCM token after login: $e');
+              }
             } catch (e) {
               print('Error: $e');
               emit(
@@ -240,6 +253,20 @@ class AuthBloc extends Bloc<AuthEvents, AuthState> {
   void _logOutUser(LogOutUserEvent event, Emitter<AuthState> emit) async {
     emit(state.copyWith(logoutStatus: LogoutStatus.loading));
     try {
+      UserRepository()
+          .clearFcmTokenFromServer()
+          .timeout(
+            const Duration(seconds: 3),
+            onTimeout: () {
+              log('FCM token clear timed out, proceeding with logout');
+              return false;
+            },
+          )
+          .catchError((e) {
+            log('Error clearing FCM token on logout: $e');
+            return false;
+          });
+
       await LocalStorage.removeData(key: AppKeys.authToken);
       await UserRepository().clearUser(); // This will clear both user and cart data
 

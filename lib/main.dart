@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speezu/core/theme/theme_bloc/theme_state.dart';
 import 'package:speezu/presentation/auth/bloc/auth_bloc.dart';
 import 'package:speezu/presentation/category/bloc/category_bloc.dart';
@@ -62,11 +63,34 @@ void main() async {
   notificationService.requestNotificationPermission();
   notificationService.firebaseInit();
   notificationService.setupInteractMessage();
-  notificationService.getDeviceToken();
+  
+  // Get FCM token and save to server if user is logged in
+  final fcmToken = await notificationService.getDeviceToken();
+  
+  // Check if user is logged in and save FCM token to server
+  final isAuthenticated = await userRepository.isUserAuthenticated();
+  if (isAuthenticated && fcmToken.isNotEmpty) {
+    // Check if token has changed by comparing with stored token
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final storedToken = prefs.getString("fcm");
+    
+    // Save token if it's different from stored token or if no token is stored
+    if (storedToken != fcmToken) {
+      try {
+        await userRepository.saveFcmTokenToServer(fcmToken);
+      } catch (e) {
+        debugPrint("Error saving FCM token on app restart: $e");
+      }
+    }
+  }
+
+  // Set up token refresh listener to handle token updates automatically
+  notificationService.setupTokenRefreshListener();
 
   // GetServerKey getServerKey = GetServerKey();
   // String serverKey = await getServerKey.getServerKeyToken();
-  // printWrapped("Server Key: $serverKey");
+  // debugPrint("Server Key: $serverKey");
+
   runApp(
     EasyLocalization(
       supportedLocales: const [

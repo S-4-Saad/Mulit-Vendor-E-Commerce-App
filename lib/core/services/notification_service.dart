@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../repositories/user_repository.dart';
 
 // Global navigator key for accessing navigation from anywhere in the app
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -389,6 +390,33 @@ class NotificationService {
     } catch (e) {
       debugPrint('Error opening app settings: $e');
     }
+  }
+
+  // Set up token refresh listener to automatically save updated tokens to server
+  void setupTokenRefreshListener() {
+    messaging.onTokenRefresh.listen((String newToken) async {
+      debugPrint('FCM Token refreshed: $newToken');
+      
+      // Update stored token
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString("fcm", newToken);
+      
+      // Check if user is logged in before saving to server
+      final userRepository = UserRepository();
+      final isAuthenticated = await userRepository.isUserAuthenticated();
+      
+      if (isAuthenticated && newToken.isNotEmpty) {
+        try {
+          await userRepository.saveFcmTokenToServer(newToken);
+        } catch (e) {
+          debugPrint('Error saving refreshed FCM token to server: $e');
+        }
+      } else {
+        debugPrint('FCM token refreshed but user not logged in, skipping server update');
+      }
+    });
+    
+    debugPrint('FCM token refresh listener set up');
   }
 
 }

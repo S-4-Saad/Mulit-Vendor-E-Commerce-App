@@ -400,4 +400,71 @@ await _getCurrentLocation();  // Fetch location on initialization
   AddressModel? get defaultAddress =>
       _currentUser?.userData?.userDetails?.getDefaultAddress();
   CardDetailsModel? get card => _currentUser?.userData?.userDetails?.getCard();
+
+
+  Future<bool> saveFcmTokenToServer(String fcmToken) async {
+    if (_currentUser?.userData == null) {
+      return false;
+    }
+
+    try {
+      final requestData = {
+        'fcm_token': fcmToken,
+      };
+
+      bool apiSuccess = false;
+
+      await ApiService.postMethod(
+        apiUrl: fcmTokenUrl,
+        postData: requestData,
+        authHeader: true,
+        executionMethod: (bool success, dynamic responseData) {
+          if (success && responseData['success'] == true) {
+            apiSuccess = true;
+          } else {
+            apiSuccess = false;
+          }
+        },
+      );
+
+      return apiSuccess;
+    } catch (e) {
+      log("Error saving FCM token to server: $e");
+      return false;
+    }
+  }
+
+
+  Future<bool> clearFcmTokenFromServer() async {
+    final token = await LocalStorage.getData(key: AppKeys.authToken);
+    if (token == null) {
+      return false;
+    }
+
+    try {
+      final requestData = {
+        'fcm_token': '',
+      };
+
+      bool apiSuccess = false;
+
+      await ApiService.postMethod(
+        apiUrl: fcmTokenUrl,
+        postData: requestData,
+        authHeader: true,
+        executionMethod: (bool success, dynamic responseData) {
+          if (success && responseData['success'] == true) {
+            apiSuccess = true;
+          } else {
+            apiSuccess = false;
+          }
+        },
+      );
+
+      return apiSuccess;
+    } catch (e) {
+      log("Error clearing FCM token from server: $e");
+      return false;
+    }
+  }
 }
