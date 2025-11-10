@@ -181,6 +181,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                               ),
                               SizedBox(width: cardSpacing),
                               // Right Column - Shipping Address
+                              if(orderDetail?.shippingAddress != null)
                               Expanded(
                                 flex: 2,
                                 child: _buildShippingSection(
@@ -206,6 +207,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                             isLargeTablet,
                           ),
                           SizedBox(height: cardSpacing),
+                          if(orderDetail?.shippingAddress != null)
                           _buildShippingSection(
                             context,
                             orderDetail,
