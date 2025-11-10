@@ -41,11 +41,13 @@ class _CartScreenState extends State<CartScreen> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    SizedBox(height: 10),
-                    Expanded(
-                      child: ListView.builder(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                  
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics:NeverScrollableScrollPhysics(),
                         itemCount: state.items.length,
                         itemBuilder: (context, index) {
                           final cartItem = state.items[index];
@@ -87,8 +89,9 @@ class _CartScreenState extends State<CartScreen> {
                           );
                         },
                       ),
-                    ),
-                  ],
+                      SizedBox(height: 300,)
+                    ],
+                  ),
                 ),
               ),
               Align(

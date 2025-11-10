@@ -367,7 +367,20 @@
   "differentStore": "Different Store",
   "youHaveItemsInYourCartFromAnotherStore": "You have items in your cart from another store. Do you want to clear the cart and switch to ",
   "noAddressesFoundPleaseAddAnAddress": "No addresses found.\nPlease add an address to continue.",
-  "somethingWentWrongPleaseTryAgain": "Something went wrong. Please try again."
-
+  "somethingWentWrongPleaseTryAgain": "Something went wrong. Please try again.",
+  "welcomeBackPleaseLoginToContinue": "Welcome back! Please login to continue",
+  "signIn": "Sign In",
+  "enterYourCredentialsToAccessYourAccount": "Enter your credentials to access your account",
+  "donHaveAnAccount": "Don't have an account?",
+  "signUp": "Sign Up",
+  "enterYourEmailToResetYourPassword": "Enter your email to reset your password",
+  "resetPassword": "Reset Password",
+  "weSendYouALinkToResetYourPassword": "We'll send you a link to reset your password",
+  "enterYourEmailToReceiveAPasswordResetLink": "Enter your email to receive a password reset link",
+  "rememberYourPassword": "Remember your password?",
+  "createYourAccountToGetStarted": "Create your account to get started",
+  "fillInYourDetailsToRegister": "Fill in your details to register",
+  "createAccount": "Create Account",
+  "createAnAccountToGetStarted": "Create your account to get started"
 
 }

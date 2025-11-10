@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:speezu/core/services/urls.dart';
 import 'package:speezu/presentation/favourites/bloc/favourite_event.dart';
@@ -66,89 +67,76 @@ class _FavouriteProductsScreenState extends State<FavouriteProductsScreen> {
                 state.favouriteListModel!.data!.isEmpty) {
               return const Center(child: EmptyFavouritesWidget());
             }
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: SingleChildScrollView(
-                child: Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: List.generate(
-                    state.favouriteListModel?.data?.length ?? 0,
-                    (index) {
-                      return SizedBox(
-                        width:
-                            MediaQuery.of(context).size.width / 2 -
-                            20, // 2 columns
-                        child: ProductBox(
-                          marginPadding: const Padding(
-                            padding: EdgeInsets.all(0),
-                          ),
-                          productWidth: 200,
-                          productId:
-                              state.favouriteListModel?.data![index].id
-                                  .toString() ??
-                              '',
-                          productPrice:
-                              double.tryParse(
-                                state
-                                        .favouriteListModel
-                                        ?.data![index]
-                                        .product!
-                                        .productDiscountedPrice ??
-                                    '0',
-                              ) ??
-                              0,
-                          productOriginalPrice:
-                              double.tryParse(
-                                state
-                                        .favouriteListModel
-                                        ?.data![index]
-                                        .product!
-                                        .productPrice ??
-                                    '0',
-                              ) ??
-                              0,
-                          productCategory: 'Test',
-                          productRating:
-                              double.tryParse(
-                                state
-                                        .favouriteListModel
-                                        ?.data?[index]
-                                        .product
-                                        ?.productRating
-                                        ?.toString() ??
-                                    '0.0',
-                              ) ??
-                              0.0,
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                double screenWidth = constraints.maxWidth;
 
-                          onProductTap: () {
-                            Navigator.pushNamed(
-                              context,
-                              RouteNames.productScreen,
-                              arguments:
-                                  state
-                                      .favouriteListModel
-                                      ?.data![index]
-                                      .product!
-                                      .id
-                                      .toString(),
-                            );
-                          },
-                          productImageUrl:
-                              '$imageBaseUrl${state.favouriteListModel?.data![index].product!.productImage}',
-                          productTitle:
-                              state
-                                  .favouriteListModel
-                                  ?.data![index]
-                                  .product!
-                                  .productName ??
-                              '',
-                        ),
-                      );
-                    },
+                // 🔹 Dynamically decide number of columns based on screen width
+                int crossAxisCount;
+                if (screenWidth >= 1200) {
+                  crossAxisCount = 4; // Desktop / large tablet
+                } else if (screenWidth >= 800) {
+                  crossAxisCount = 3; // Tablet (like 800px width)
+                } else if (screenWidth >= 600) {
+                  crossAxisCount = 2; // Large mobile / foldable
+                } else {
+                  crossAxisCount = 2; // Standard mobile (like 411px width)
+                }
+
+                print('📱 Screen width: $screenWidth → Columns: $crossAxisCount');
+
+                final favorites = state.favouriteListModel?.data ?? [];
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: SingleChildScrollView(
+                    child: StaggeredGrid.count(
+                      crossAxisCount: crossAxisCount,
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10,
+                      children: List.generate(favorites.length, (index) {
+                        final favItem = favorites[index];
+                        final product = favItem.product;
+
+                        if (product == null) return const SizedBox();
+
+                        final productId = product.id?.toString() ?? '';
+                        final imageUrl = '$imageBaseUrl${product.productImage}';
+                        final productName = product.productName ?? '';
+                        final productPrice =
+                            double.tryParse(product.productDiscountedPrice ?? '0') ?? 0;
+                        final productOriginalPrice =
+                            double.tryParse(product.productPrice ?? '0') ?? 0;
+                        final productRating =
+                            double.tryParse(product.productRating?.toString() ?? '0.0') ??
+                                0.0;
+
+                        return StaggeredGridTile.fit(
+                          crossAxisCellCount: 1,
+                          child: ProductBox(
+                            marginPadding: const Padding(padding: EdgeInsets.all(0)),
+                            productWidth: screenWidth / crossAxisCount - 20,
+                            productId: productId,
+                            productPrice: productPrice,
+                            productOriginalPrice: productOriginalPrice,
+                            productCategory: 'Test',
+                            productRating: productRating,
+                            onProductTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                RouteNames.productScreen,
+                                arguments: productId,
+                              );
+                            },
+                            productImageUrl: imageUrl,
+                            productTitle: productName,
+                          ),
+                        );
+                      }),
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             );
           },
         ),

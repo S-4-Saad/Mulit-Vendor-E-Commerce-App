@@ -554,53 +554,72 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                             const SizedBox(height: 12),
 
                             // Always use grid layout for products
-                            Wrap(
-                              spacing: 12,
-                              runSpacing: 12,
-                              children: List.generate(products.length, (index) {
-                                final product = products[index];
-                                return SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width / 2 -
-                                      25, // 2 columns
-                                  child: ProductBox(
-                                    marginPadding: const Padding(
-                                      padding: EdgeInsets.all(0),
-                                    ),
-                                    productWidth: double.infinity,
-                                    productId: product.id.toString(),
-                                    onProductTap: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        RouteNames.productScreen,
-                                        arguments: product.id.toString(),
-                                      );
-                                    },
-                                    productCategory:
-                                        product.category?.name ?? '',
-                                    productTitle: product.productName ?? '',
-                                    productPrice:
-                                        double.tryParse(
-                                          product.productDiscountedPrice ?? '',
-                                        ) ??
-                                        0.0,
-                                    productImageUrl:
-                                        '$imageBaseUrl/${product.productImage}',
-                                    productOriginalPrice:
-                                        double.tryParse(
-                                          product.productPrice ?? '',
-                                        ) ??
-                                        0.0,
-                                    productRating:
-                                        double.tryParse(
-                                          product.productRating ?? '',
-                                        ) ??
-                                        0.0,
-                                  ),
-                                );
-                              }),
-                            ),
-                          ],
+                   LayoutBuilder(
+                  builder: (context, constraints) {
+                  double screenWidth = constraints.maxWidth;
+
+                  // 🔹 Dynamically decide number of columns based on screen width
+                  int crossAxisCount;
+                  if (screenWidth >= 1200) {
+                  crossAxisCount = 4; // Desktop / large tablet
+                  } else if (screenWidth >= 700) {
+                  crossAxisCount = 3; // Tablet (your 800px screen)
+                  } else if (screenWidth >= 600) {
+                  crossAxisCount = 2; // Large phones / foldables
+                  } else {
+                  crossAxisCount = 2; // Standard mobile
+                  }
+
+                  print('📱 Screen width: $screenWidth → Columns: $crossAxisCount');
+
+                  return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: SingleChildScrollView(
+                  child: StaggeredGrid.count(
+                  crossAxisCount: crossAxisCount,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  children: List.generate(products.length, (index) {
+                  final product = products[index];
+                  final productWidth = screenWidth / crossAxisCount - 20;
+
+                  return StaggeredGridTile.fit(
+                  crossAxisCellCount: 1,
+                  child: ProductBox(
+                  marginPadding: const Padding(padding: EdgeInsets.all(0)),
+                  productWidth: productWidth,
+                  productId: product.id.toString(),
+                  onProductTap: () {
+                  Navigator.pushNamed(
+                  context,
+                  RouteNames.productScreen,
+                  arguments: product.id.toString(),
+                  );
+                  },
+                  productCategory: product.category?.name ?? '',
+                  productTitle: product.productName ?? '',
+                  productPrice: double.tryParse(
+                  product.productDiscountedPrice ?? '',
+                  ) ??
+                  0.0,
+                  productImageUrl: '$imageBaseUrl/${product.productImage}',
+                  productOriginalPrice: double.tryParse(
+                  product.productPrice ?? '',
+                  ) ??
+                  0.0,
+                  productRating: double.tryParse(
+                  product.productRating ?? '',
+                  ) ??
+                  0.0,
+                  ),
+                  );
+                  }),
+                  ),
+                  ),
+                  );
+                  },
+                  ),
+                  ],
                         ],
                       ),
                     );

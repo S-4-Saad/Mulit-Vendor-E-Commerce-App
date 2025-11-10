@@ -26,6 +26,7 @@ import '../../widgets/image_gallery_viewer_widget.dart';
 import '../../widgets/image_type_extention.dart';
 import '../../widgets/option_selector_widget.dart';
 import '../../widgets/product_box_widget.dart';
+import '../../widgets/shimmer/product_detail_shimmar.dart';
 import '../../widgets/shop_product_box.dart';
 import 'bloc/product_detail_event.dart';
 import 'bloc/product_detail_state.dart';
@@ -87,7 +88,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
     // Find the selected parent variation
     final selectedParentVariation = product.variations.firstWhere(
-      (v) => v.parentName == selectedParent,
+          (v) => v.parentName == selectedParent,
       orElse: () => product.variations.first,
     );
 
@@ -96,8 +97,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       final selectedChildVariation = selectedParentVariation.children
           .firstWhere(
             (child) => child.name == selectedChild,
-            orElse: () => selectedParentVariation.children.first,
-          );
+        orElse: () => selectedParentVariation.children.first,
+      );
       return selectedChildVariation.price;
     }
 
@@ -119,7 +120,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
     // Find the selected parent variation
     final selectedParentVariation = product.variations.firstWhere(
-      (v) => v.parentName == selectedParent,
+          (v) => v.parentName == selectedParent,
       orElse: () => product.variations.first,
     );
 
@@ -128,8 +129,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       final selectedChildVariation = selectedParentVariation.children
           .firstWhere(
             (child) => child.name == selectedChild,
-            orElse: () => selectedParentVariation.children.first,
-          );
+        orElse: () => selectedParentVariation.children.first,
+      );
       return selectedChildVariation.originalPrice;
     }
 
@@ -151,7 +152,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
     // Find the selected parent variation
     final selectedParentVariation = product.variations.firstWhere(
-      (v) => v.parentName == selectedParent,
+          (v) => v.parentName == selectedParent,
       orElse: () => product.variations.first,
     );
 
@@ -160,8 +161,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       final selectedChildVariation = selectedParentVariation.children
           .firstWhere(
             (child) => child.name == selectedChild,
-            orElse: () => selectedParentVariation.children.first,
-          );
+        orElse: () => selectedParentVariation.children.first,
+      );
       return selectedChildVariation.discountPercentage;
     }
 
@@ -180,59 +181,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     return token != null && token.isNotEmpty;
   }
 
-  // Show login required dialog
-  // void _showLoginRequiredDialog(BuildContext context) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: Text(
-  //           'Login Required',
-  //           style: TextStyle(
-  //             fontFamily: FontFamily.fontsPoppinsSemiBold,
-  //             fontSize: 18,
-  //           ),
-  //         ),
-  //         content: Text(
-  //           'You need to be logged in to add items to your cart. Please login to continue.',
-  //           style: TextStyle(
-  //             fontFamily: FontFamily.fontsPoppinsRegular,
-  //             fontSize: 14,
-  //           ),
-  //         ),
-  //         actions: [
-  //           TextButton(
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //             },
-  //             child: Text(
-  //               'Cancel',
-  //               style: TextStyle(
-  //                 fontFamily: FontFamily.fontsPoppinsRegular,
-  //                 color: Theme.of(context).colorScheme.onSecondary,
-  //               ),
-  //             ),
-  //           ),
-  //           TextButton(
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //               // Navigate to login screen
-  //               Navigator.pushNamed(context, RouteNames.login);
-  //             },
-  //             child: Text(
-  //               'Login',
-  //               style: TextStyle(
-  //                 fontFamily: FontFamily.fontsPoppinsSemiBold,
-  //                 color: Theme.of(context).colorScheme.primary,
-  //               ),
-  //             ),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
-
   // Validate if required variations are selected
   bool _areVariationsValid(ProductDetail product) {
     // If no variations, always valid
@@ -247,7 +195,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
     // Find the selected parent variation
     final selectedParentVariation = product.variations.firstWhere(
-      (v) => v.parentName == selectedParent,
+          (v) => v.parentName == selectedParent,
       orElse: () => product.variations.first,
     );
 
@@ -271,7 +219,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
 
     final selectedParentVariation = product.variations.firstWhere(
-      (v) => v.parentName == selectedParent,
+          (v) => v.parentName == selectedParent,
       orElse: () => product.variations.first,
     );
 
@@ -284,10 +232,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   void _handleAddToCart(
-    BuildContext context,
-    ProductDetail product,
-    int quantity,
-  ) async {
+      BuildContext context,
+      ProductDetail product,
+      int quantity,
+      ) async {
     // Check if user is authenticated
     final isAuthenticated = await _isUserAuthenticated();
     if (!isAuthenticated) {
@@ -335,7 +283,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
     // Find the selected parent variation
     final selectedParentVariation = product.variations.firstWhere(
-      (v) => v.parentName == selectedParent,
+          (v) => v.parentName == selectedParent,
       orElse: () => product.variations.first,
     );
 
@@ -343,7 +291,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     ProductSubVariation? selectedChildVariation;
     if (selectedChild != null && selectedParentVariation.children.isNotEmpty) {
       selectedChildVariation = selectedParentVariation.children.firstWhere(
-        (child) => child.name == selectedChild,
+            (child) => child.name == selectedChild,
         orElse: () => selectedParentVariation.children.first,
       );
     }
@@ -361,7 +309,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         variationChildId: selectedChildVariation?.id,
       ),
     );
-  }void _showStoreConflictDialog(
+  }
+
+  void _showStoreConflictDialog(
       BuildContext context,
       String errorMessage,
       ProductDetail product,
@@ -379,7 +329,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           child: Padding(
             padding: EdgeInsets.all(24),
             child: Column(
@@ -461,7 +413,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           Navigator.pushNamed(context, RouteNames.cartScreen);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          backgroundColor:
+                          Theme.of(context).colorScheme.primary,
                           padding: EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -512,16 +465,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           return;
                         }
 
-                        final selectedParentVariation = product.variations.firstWhere(
+                        final selectedParentVariation = product.variations
+                            .firstWhere(
                               (v) => v.parentName == selectedParent,
                           orElse: () => product.variations.first,
                         );
 
                         ProductSubVariation? selectedChildVariation;
-                        if (selectedChild != null && selectedParentVariation.children.isNotEmpty) {
-                          selectedChildVariation = selectedParentVariation.children.firstWhere(
+                        if (selectedChild != null &&
+                            selectedParentVariation.children.isNotEmpty) {
+                          selectedChildVariation = selectedParentVariation
+                              .children
+                              .firstWhere(
                                 (child) => child.name == selectedChild,
-                            orElse: () => selectedParentVariation.children.first,
+                            orElse:
+                                () =>
+                            selectedParentVariation.children.first,
                           );
                         }
 
@@ -561,50 +520,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   void _showVariationRequiredSnackBar(
-    BuildContext context,
-    ProductDetail product,
-  ) {
+      BuildContext context,
+      ProductDetail product,
+      ) {
     final missingMessage = _getMissingVariationMessage(product);
 
     SnackBarHelper.showError(context, missingMessage);
 
-    // showDialog(
-    //   context: context,
-    //   builder: (BuildContext context) {
-    //     return AlertDialog(
-    //       title: Text(
-    //         'Selection Required',
-    //         style: TextStyle(
-    //           fontFamily: FontFamily.fontsPoppinsSemiBold,
-    //           fontSize: 18,
-    //         ),
-    //       ),
-    //       content: Text(
-    //         missingMessage.isEmpty
-    //             ? 'Please select your preferences before adding to cart.'
-    //             : missingMessage,
-    //         style: TextStyle(
-    //           fontFamily: FontFamily.fontsPoppinsRegular,
-    //           fontSize: 14,
-    //         ),
-    //       ),
-    //       actions: [
-    //         TextButton(
-    //           onPressed: () {
-    //             Navigator.of(context).pop();
-    //           },
-    //           child: Text(
-    //             'OK',
-    //             style: TextStyle(
-    //               fontFamily: FontFamily.fontsPoppinsSemiBold,
-    //               color: Theme.of(context).colorScheme.primary,
-    //             ),
-    //           ),
-    //         ),
-    //       ],
-    //     );
-    //   },
-    // );
   }
 
   @override
@@ -636,9 +558,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         // Handle different variation scenarios
         final hasVariations = product.variations.isNotEmpty;
         final parentNames =
-            hasVariations
-                ? product.variations.map((e) => e.parentName).toList()
-                : [];
+        hasVariations
+            ? product.variations.map((e) => e.parentName).toList()
+            : [];
 
         ProductVariation selectedParentVariation = ProductVariation(
           id: '',
@@ -652,494 +574,645 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
         if (hasVariations) {
           selectedParentVariation = product.variations.firstWhere(
-            (v) => v.parentName == selectedParent,
+                (v) => v.parentName == selectedParent,
             orElse: () => product.variations.first,
           );
         }
 
         final childOptions =
-            selectedParent == null ? [] : selectedParentVariation.children;
+        selectedParent == null ? [] : selectedParentVariation.children;
         final hasChildVariations = childOptions.isNotEmpty;
 
-        return Scaffold(
-          body: Stack(
-            children: [
-              CustomScrollView(
-                controller: _scrollController,
-                slivers: [
-                  SliverAppBar(
-                    backgroundColor: Theme.of(
-                      context,
-                    ).colorScheme.primary,
-                    expandedHeight: 300,
-                    pinned: true,
-                    elevation: 0,
-                    automaticallyImplyLeading: false,
-                    leading: IconButton(
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                          Theme.of(
-                            context,
-                          ).colorScheme.primary.withValues(alpha: 0.5),
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final screenWidth = constraints.maxWidth;
+            final screenHeight = constraints.maxHeight;
+            final isTablet = screenWidth >= 600;
+            final isLargeTablet = screenWidth >= 900;
+
+            // Responsive values
+            final horizontalPadding = isTablet ? 40.0 : 20.0;
+            final sliverAppBarHeight = isTablet ? 400.0 : 300.0;
+            final backButtonSize = isTablet ? 28.0 : 24.0;
+            final shopNameFontSize = isTablet ? 15.0 : 13.0;
+            final productNameFontSize = isTablet ? 22.0 : context.scaledFont(18);
+            final priceFontSize = isTablet ? 26.0 : 22.0;
+            final discountFontSize = isTablet ? 15.0 : 13.0;
+            final imageHeight = isTablet ? 250.0 : 200.0;
+            final imageWidth = isTablet ? context.widthPct(.45) : context.widthPct(.55);
+            final fabSize = isTablet ? 60.0 : 56.0;
+            final fabIconSize = isTablet ? 28.0 : 25.0;
+            final fabTopPosition = isTablet ? 55.0 : 45.0;
+            final fabRightPosition = isTablet ? 30.0 : 20.0;
+
+            return Scaffold(
+              body: Stack(
+                children: [
+                  CustomScrollView(
+                    controller: _scrollController,
+                    slivers: [
+                      SliverAppBar(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        expandedHeight: sliverAppBarHeight,
+                        pinned: true,
+                        elevation: 0,
+                        automaticallyImplyLeading: false,
+                        leading: IconButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                              Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+                            ),
+                          ),
+                          icon: Icon(
+                            Icons.arrow_back,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            size: backButtonSize,
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                        flexibleSpace: FlexibleSpaceBar(
+                          collapseMode: CollapseMode.parallax,
+                          background: CustomImageView(
+                            fit: BoxFit.cover,
+                            imagePath: product.thumbnail,
+                          ),
                         ),
                       ),
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Theme.of(context).colorScheme.onPrimary,
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                    flexibleSpace: FlexibleSpaceBar(
-                      collapseMode: CollapseMode.parallax,
-                      background: CustomImageView(
-                        fit: BoxFit.cover,
-                        imagePath: product.thumbnail,
-                      ),
-                    ),
-                  ),
-                  SliverToBoxAdapter(
-                    child: Wrap(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Name + Rating
-                              SizedBox(height: context.heightPct(.01)),
-                              Text(
-                                product.shopName,
-                                style: TextStyle(
-                                  fontFamily: FontFamily.fontsPoppinsRegular,
-                                  color:
-                                      Theme.of(context).colorScheme.onSecondary,
-                                  fontSize: 13,
-                                ),
-                              ),
-                              SizedBox(height: context.heightPct(.01)),
-                              Row(
+                      SliverToBoxAdapter(
+                        child: Wrap(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                              child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Expanded(
-                                    child: Text(
-                                      product.name,
-                                      style: TextStyle(
-                                        fontFamily:
-                                            FontFamily.fontsPoppinsSemiBold,
-                                        color:
-                                            Theme.of(
-                                              context,
-                                            ).colorScheme.onSecondary,
-                                        fontSize: context.scaledFont(18),
-                                      ),
+                                  // Name + Rating
+                                  SizedBox(height: context.heightPct(.01)),
+                                  Text(
+                                    product.shopName,
+                                    style: TextStyle(
+                                      fontFamily: FontFamily.fontsPoppinsRegular,
+                                      color: Theme.of(context).colorScheme.onSecondary,
+                                      fontSize: shopNameFontSize,
                                     ),
                                   ),
-                                  const SizedBox(width: 10),
-                                  if (getCurrentDiscountPercentage(product) > 0)
-                                    Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 2,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.red,
-                                        borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(10),
-                                          bottomRight: Radius.circular(10),
-                                        ),
-                                      ),
-                                      child: Text(
-                                        '${getCurrentDiscountPercentage(product).toStringAsFixed(0)}% off',
-                                        style: TextStyle(
-                                          fontFamily:
-                                              FontFamily.fontsPoppinsSemiBold,
-                                          fontSize: 13,
-                                          color: Colors.white.withValues(
-                                            alpha: 0.8,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                              SizedBox(height: context.heightPct(.01)),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
+                                  SizedBox(height: context.heightPct(.01)),
                                   Row(
-                                    children: [
-                                      Text(
-                                        "${CurrencyIcon.currencyIcon}${getCurrentPrice(product).toStringAsFixed(2)}",
-                                        style: TextStyle(
-                                          fontFamily:
-                                              FontFamily.fontsPoppinsSemiBold,
-                                          color:
-                                              Theme.of(
-                                                context,
-                                              ).colorScheme.primary,
-                                          fontSize: 22,
-                                        ),
-                                      ),
-                                      SizedBox(width: context.widthPct(.02)),
-                                      if (getCurrentOriginalPrice(product) !=
-                                          getCurrentPrice(product))
-                                        Text(
-                                          "${CurrencyIcon.currencyIcon}${getCurrentOriginalPrice(product).toStringAsFixed(2)}",
-                                          style: TextStyle(
-                                            fontFamily:
-                                                FontFamily.fontsPoppinsLight,
-                                            decoration:
-                                                TextDecoration.lineThrough,
-                                            color:
-                                                Theme.of(
-                                                  context,
-                                                ).colorScheme.onSecondary,
-                                            fontSize: context.scaledFont(12),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: context.heightPct(.02)),
-
-                              // Show parent variation selector only if variations exist
-                              if (hasVariations) ...[
-                                // Parent variation selector with required indicator
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: OptionSelectorWidget(
-                                        name:
-                                            product
-                                                .variations
-                                                .first
-                                                .parentOptionName,
-                                        options: parentNames,
-                                        selectedOption: selectedParent,
-                                        onSelect: (value) {
-                                          setState(() {
-                                            selectedParent = value;
-                                            selectedChild =
-                                                null; // reset child when parent changes
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                    if (selectedParent == null) ...[
-                                      SizedBox(width: 8),
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 4,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.red.withValues(
-                                            alpha: 0.1,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          border: Border.all(
-                                            color: Colors.red.withValues(
-                                              alpha: 0.3,
-                                            ),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          Labels.required,
-                                          style: TextStyle(
-                                            color: Colors.red,
-                                            fontSize: 10,
-                                            fontFamily:
-                                                FontFamily.fontsPoppinsSemiBold,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                                SizedBox(height: context.heightPct(.01)),
-
-                                // Show child variation selector only if parent is selected and has children
-                                if (selectedParent != null &&
-                                    hasChildVariations) ...[
-                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Expanded(
-                                        child: OptionSelectorWidget(
-                                          name:
-                                              selectedParentVariation
-                                                  .children
-                                                  .first
-                                                  .childOptionName,
-                                          options:
-                                              childOptions
-                                                  .map((e) => e.name)
-                                                  .toList(),
-                                          selectedOption: selectedChild,
-                                          onSelect: (value) {
-                                            setState(() {
-                                              selectedChild = value;
-                                            });
-                                          },
+                                        child: Text(
+                                          product.name,
+                                          style: TextStyle(
+                                            fontFamily: FontFamily.fontsPoppinsSemiBold,
+                                            color: Theme.of(context).colorScheme.onSecondary,
+                                            fontSize: productNameFontSize,
+                                          ),
                                         ),
                                       ),
-                                      if (selectedChild == null) ...[
-                                        SizedBox(width: 8),
+                                      SizedBox(width: isTablet ? 15 : 10),
+                                      if (getCurrentDiscountPercentage(product) > 0)
                                         Container(
                                           padding: EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 4,
+                                            horizontal: isTablet ? 12 : 10,
+                                            vertical: isTablet ? 4 : 2,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: Colors.red.withValues(
-                                              alpha: 0.1,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ),
-                                            border: Border.all(
-                                              color: Colors.red.withValues(
-                                                alpha: 0.3,
-                                              ),
+                                            color: Colors.red,
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(10),
+                                              bottomRight: Radius.circular(10),
                                             ),
                                           ),
                                           child: Text(
-                                            'Required',
+                                            '${getCurrentDiscountPercentage(product).toStringAsFixed(0)}% off',
                                             style: TextStyle(
-                                              color: Colors.red,
-                                              fontSize: 10,
-                                              fontFamily:
-                                                  FontFamily
-                                                      .fontsPoppinsSemiBold,
+                                              fontFamily: FontFamily.fontsPoppinsSemiBold,
+                                              fontSize: discountFontSize,
+                                              color: Colors.white.withValues(alpha: 0.8),
                                             ),
                                           ),
                                         ),
-                                      ],
                                     ],
                                   ),
-                                ],
-                              ],
+                                  SizedBox(height: context.heightPct(.01)),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "${CurrencyIcon.currencyIcon}${getCurrentPrice(product).toStringAsFixed(2)}",
+                                            style: TextStyle(
+                                              fontFamily: FontFamily.fontsPoppinsSemiBold,
+                                              color: Theme.of(context).colorScheme.primary,
+                                              fontSize: priceFontSize,
+                                            ),
+                                          ),
+                                          SizedBox(width: context.widthPct(.02)),
+                                          if (getCurrentOriginalPrice(product) != getCurrentPrice(product))
+                                            Text(
+                                              "${CurrencyIcon.currencyIcon}${getCurrentOriginalPrice(product).toStringAsFixed(2)}",
+                                              style: TextStyle(
+                                                fontFamily: FontFamily.fontsPoppinsLight,
+                                                decoration: TextDecoration.lineThrough,
+                                                color: Theme.of(context).colorScheme.onSecondary,
+                                                fontSize: isTablet ? 14.0 : context.scaledFont(12),
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: context.heightPct(.02)),
 
-                              SizedBox(height: 10),
+                                  // Show parent variation selector only if variations exist
+                                  // Replace your variation selection code with this improved version
 
-                              SizedBox(
-                                height: 200,
-                                child: ListView.separated(
-                                  scrollDirection: Axis.horizontal,
-                                  padding: const EdgeInsets.all(12),
-                                  itemCount: product.images.length,
-                                  separatorBuilder:
-                                      (_, __) => const SizedBox(width: 10),
-                                  itemBuilder: (context, index) {
-                                    return CustomImageView(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder:
-                                                (context) => ImageGalleryViewer(
+                                  if (hasVariations) ...[
+                                    // Parent variation selector with required indicator
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              product.variations.first.parentOptionName,
+                                              style: TextStyle(
+                                                fontSize: isTablet ? 16 : 15,
+                                                fontFamily: FontFamily.fontsPoppinsSemiBold,
+                                                color: Theme.of(context).colorScheme.onSecondary,
+                                                letterSpacing: 0.3,
+                                              ),
+                                            ),
+                                            if (selectedParent == null)
+                                              Container(
+                                                padding: EdgeInsets.symmetric(
+                                                  horizontal: isTablet ? 10 : 8,
+                                                  vertical: isTablet ? 5 : 4,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.red.withValues(alpha: 0.1),
+                                                  borderRadius: BorderRadius.circular(12),
+                                                  border: Border.all(
+                                                    color: Colors.red.withValues(alpha: 0.3),
+                                                  ),
+                                                ),
+                                                child: Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    Icon(
+                                                      Icons.info_outline,
+                                                      size: isTablet ? 14 : 12,
+                                                      color: Colors.red,
+                                                    ),
+                                                    SizedBox(width: 4),
+                                                    Text(
+                                                      Labels.required,
+                                                      style: TextStyle(
+                                                        color: Colors.red,
+                                                        fontSize: isTablet ? 11 : 10,
+                                                        fontFamily: FontFamily.fontsPoppinsSemiBold,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                        SizedBox(height: isTablet ? 12 : 10),
+                                        Wrap(
+                                          spacing: isTablet ? 12 : 10,
+                                          runSpacing: isTablet ? 12 : 10,
+                                          children: parentNames.map((option) {
+                                            final isSelected = selectedParent == option;
+
+                                            return GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  selectedParent = option;
+                                                  selectedChild = null;
+                                                });
+                                              },
+                                              child: AnimatedContainer(
+                                                duration: const Duration(milliseconds: 250),
+                                                curve: Curves.easeInOutCubic,
+                                                padding: EdgeInsets.symmetric(
+                                                  horizontal: isTablet ? 18 : 14,
+                                                  vertical: isTablet ? 10 : 8,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  gradient: isSelected
+                                                      ? LinearGradient(
+                                                    colors: [
+                                                      Theme.of(context).colorScheme.primary,
+                                                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.85),
+                                                    ],
+                                                    begin: Alignment.topLeft,
+                                                    end: Alignment.bottomRight,
+                                                  )
+                                                      : null,
+                                                  color: isSelected ? null : Theme.of(context).colorScheme.onPrimary,
+                                                  borderRadius: BorderRadius.circular(isTablet ? 12 : 10),
+                                                  border: Border.all(
+                                                    color: isSelected
+                                                        ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.8)
+                                                        : Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.2),
+                                                    width: isSelected ? 2.0 : 1.5,
+                                                  ),
+                                                  boxShadow: [
+                                                    if (isSelected)
+                                                      BoxShadow(
+                                                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
+                                                        blurRadius: isTablet ? 12 : 10,
+                                                        offset: const Offset(0, 4),
+                                                        spreadRadius: 0,
+                                                      ),
+                                                    if (!isSelected)
+                                                      BoxShadow(
+                                                        color: Colors.black.withValues(alpha: 0.05),
+                                                        blurRadius: isTablet ? 6 : 4,
+                                                        offset: const Offset(0, 2),
+                                                        spreadRadius: 0,
+                                                      ),
+                                                  ],
+                                                ),
+                                                child: Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    if (isSelected) ...[
+                                                      Icon(
+                                                        Icons.check_circle,
+                                                        size: isTablet ? 16 : 14,
+                                                        color: Theme.of(context).colorScheme.onPrimary,
+                                                      ),
+                                                      SizedBox(width: isTablet ? 6 : 5),
+                                                    ],
+                                                    Text(
+                                                      option,
+                                                      style: TextStyle(
+                                                        fontSize: isTablet ? 15 : 13,
+                                                        fontFamily: isSelected
+                                                            ? FontFamily.fontsPoppinsSemiBold
+                                                            : FontFamily.fontsPoppinsRegular,
+                                                        color: isSelected
+                                                            ? Theme.of(context).colorScheme.onPrimary
+                                                            : Theme.of(context).colorScheme.onSecondary.withValues(alpha: .7),
+                                                        letterSpacing: 0.2,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: context.heightPct(.015)),
+
+                                    // Show child variation selector only if parent is selected and has children
+                                    if (selectedParent != null && hasChildVariations) ...[
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                selectedParentVariation.children.first.childOptionName,
+                                                style: TextStyle(
+                                                  fontSize: isTablet ? 16 : 15,
+                                                  fontFamily: FontFamily.fontsPoppinsSemiBold,
+                                                  color: Theme.of(context).colorScheme.onSecondary,
+                                                  letterSpacing: 0.3,
+                                                ),
+                                              ),
+                                              if (selectedChild == null)
+                                                Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                    horizontal: isTablet ? 10 : 8,
+                                                    vertical: isTablet ? 5 : 4,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.red.withValues(alpha: 0.1),
+                                                    borderRadius: BorderRadius.circular(12),
+                                                    border: Border.all(
+                                                      color: Colors.red.withValues(alpha: 0.3),
+                                                    ),
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: [
+                                                      Icon(
+                                                        Icons.info_outline,
+                                                        size: isTablet ? 14 : 12,
+                                                        color: Colors.red,
+                                                      ),
+                                                      SizedBox(width: 4),
+                                                      Text(
+                                                        Labels.required,
+                                                        style: TextStyle(
+                                                          color: Colors.red,
+                                                          fontSize: isTablet ? 11 : 10,
+                                                          fontFamily: FontFamily.fontsPoppinsSemiBold,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                          SizedBox(height: isTablet ? 12 : 10),
+                                          Wrap(
+                                            spacing: isTablet ? 12 : 10,
+                                            runSpacing: isTablet ? 12 : 10,
+                                            children: childOptions.map((childOption) {
+                                              final isSelected = selectedChild == childOption.name;
+
+                                              return GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    selectedChild = childOption.name;
+                                                  });
+                                                },
+                                                child: AnimatedContainer(
+                                                  duration: const Duration(milliseconds: 250),
+                                                  curve: Curves.easeInOutCubic,
+                                                  padding: EdgeInsets.symmetric(
+                                                    horizontal: isTablet ? 18 : 14,
+                                                    vertical: isTablet ? 10 : 8,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    gradient: isSelected
+                                                        ? LinearGradient(
+                                                      colors: [
+                                                        Theme.of(context).colorScheme.primary,
+                                                        Theme.of(context).colorScheme.primary.withValues(alpha: 0.85),
+                                                      ],
+                                                      begin: Alignment.topLeft,
+                                                      end: Alignment.bottomRight,
+                                                    )
+                                                        : null,
+                                                    color: isSelected ? null : Theme.of(context).colorScheme.onPrimary,
+                                                    borderRadius: BorderRadius.circular(isTablet ? 12 : 10),
+                                                    border: Border.all(
+                                                      color: isSelected
+                                                          ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.8)
+                                                          : Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.2),
+                                                      width: isSelected ? 2.0 : 1.5,
+                                                    ),
+                                                    boxShadow: [
+                                                      if (isSelected)
+                                                        BoxShadow(
+                                                          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
+                                                          blurRadius: isTablet ? 12 : 10,
+                                                          offset: const Offset(0, 4),
+                                                          spreadRadius: 0,
+                                                        ),
+                                                      if (!isSelected)
+                                                        BoxShadow(
+                                                          color: Colors.black.withValues(alpha: 0.05),
+                                                          blurRadius: isTablet ? 6 : 4,
+                                                          offset: const Offset(0, 2),
+                                                          spreadRadius: 0,
+                                                        ),
+                                                    ],
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: [
+                                                      if (isSelected) ...[
+                                                        Icon(
+                                                          Icons.check_circle,
+                                                          size: isTablet ? 16 : 14,
+                                                          color: Theme.of(context).colorScheme.onPrimary,
+                                                        ),
+                                                        SizedBox(width: isTablet ? 6 : 5),
+                                                      ],
+                                                      Text(
+                                                        childOption.name,
+                                                        style: TextStyle(
+                                                          fontSize: isTablet ? 15 : 13,
+                                                          fontFamily: isSelected
+                                                              ? FontFamily.fontsPoppinsSemiBold
+                                                              : FontFamily.fontsPoppinsRegular,
+                                                          color: isSelected
+                                                              ? Theme.of(context).colorScheme.onPrimary
+                                                              : Theme.of(context).colorScheme.onSecondary.withValues(alpha: .7),
+                                                          letterSpacing: 0.2,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
+                                            }).toList(),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ],
+
+                                  SizedBox(height: isTablet ? 15 : 10),
+
+                                  SizedBox(
+                                    height: imageHeight,
+                                    child: ListView.separated(
+                                      scrollDirection: Axis.horizontal,
+                                      padding: EdgeInsets.all(isTablet ? 15 : 12),
+                                      itemCount: product.images.length,
+                                      separatorBuilder: (_, __) => SizedBox(width: isTablet ? 15 : 10),
+                                      itemBuilder: (context, index) {
+                                        return CustomImageView(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => ImageGalleryViewer(
                                                   imageUrls: product.images,
                                                   initialIndex: index,
                                                 ),
-                                          ),
+                                              ),
+                                            );
+                                          },
+                                          radius: BorderRadius.circular(isTablet ? 12 : 10),
+                                          imagePath: product.images[index],
+                                          width: imageWidth,
+                                          fit: BoxFit.cover,
                                         );
-                                        print(index);
                                       },
-                                      radius: BorderRadius.circular(10),
-
-                                      imagePath: product.images[index],
-                                      width: context.widthPct(.55),
-                                      fit: BoxFit.cover,
-                                    );
-                                  },
-                                ),
-                              ),
-                              SizedBox(height: 10),
-                              Container(
-                                // padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color:
-                                      Theme.of(context).colorScheme.onPrimary,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.outline.withValues(alpha: .3),
+                                    ),
                                   ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withValues(alpha: 0.1),
-                                      spreadRadius: 1,
-                                      blurRadius: 4,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(height: 10),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10.0,
+                                  SizedBox(height: isTablet ? 15 : 10),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).colorScheme.onPrimary,
+                                      borderRadius: BorderRadius.circular(isTablet ? 16 : 12),
+                                      border: Border.all(
+                                        color: Theme.of(context).colorScheme.outline.withValues(alpha: .3),
                                       ),
-                                      child: Text(
-                                        Labels.description,
-                                        style: TextStyle(
-                                          fontFamily:
-                                              FontFamily.fontsPoppinsSemiBold,
-                                          color:
-                                              Theme.of(
-                                                context,
-                                              ).colorScheme.onSecondary,
-                                          fontSize: 14,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withValues(alpha: 0.1),
+                                          spreadRadius: 1,
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
                                         ),
-                                      ),
+                                      ],
                                     ),
-                                    Divider(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .outline
-                                          .withValues(alpha: .3),
-                                    ),
-
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10.0,
-                                      ),
-                                      child: Text(
-                                        product.description,
-                                        style: TextStyle(
-                                          fontFamily:
-                                              FontFamily.fontsPoppinsLight,
-
-                                          color:
-                                              Theme.of(
-                                                context,
-                                              ).colorScheme.onSecondary,
-                                          fontSize: context.scaledFont(12),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(height: isTablet ? 12 : 10),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(horizontal: isTablet ? 15.0 : 10.0),
+                                          child: Text(
+                                            Labels.description,
+                                            style: TextStyle(
+                                              fontFamily: FontFamily.fontsPoppinsSemiBold,
+                                              color: Theme.of(context).colorScheme.onSecondary,
+                                              fontSize: isTablet ? 16 : 14,
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                    ),
-                                    SizedBox(height: 10),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(height: 10),
-                              ShopProductBox(
-                                categoryName: product.shop.categoryName,
-                                shopImageUrl: product.shop.imageUrl,
-                                rating: product.shop.rating * 20,
-                                shopName: product.shop.name,
-                                onViewStoreTap: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    RouteNames.shopNavBarScreen,
-                                    arguments: product.shop.id,
-                                  );
-                                  // Navigate to shop page
-                                },
-                              ),
-
-                              SizedBox(height: 15),
-
-                              Text(
-                                Labels.youMightAlsoLike,
-                                style: TextStyle(
-                                  fontFamily: FontFamily.fontsPoppinsSemiBold,
-                                  color:
-                                      Theme.of(context).colorScheme.onSecondary,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              SizedBox(height: 15),
-                              StaggeredGrid.count(
-                                crossAxisCount: 2, // Defines 2 columns
-                                mainAxisSpacing: 10,
-                                crossAxisSpacing: 10,
-                                children: List.generate(
-                                  product.relatedProducts.length,
-                                  (index) {
-                                    var relatedProduct =
-                                        product.relatedProducts[index];
-                                    return StaggeredGridTile.fit(
-                                      crossAxisCellCount:
-                                          1, // Each item takes 1 column space
-                                      child: ProductBox(
-                                        marginPadding: const Padding(
-                                          padding: EdgeInsets.all(0),
+                                        Divider(
+                                          color: Theme.of(context).colorScheme.outline.withValues(alpha: .3),
                                         ),
-                                        productWidth: 200,
-                                        productPrice: relatedProduct.price,
-                                        productOriginalPrice:
-                                            relatedProduct.originalPrice,
-                                        productCategory:
-                                            relatedProduct.categoryName,
-                                        productRating:
-                                            4.0, // Default rating since not provided in API
-                                        productId: relatedProduct.id,
-                                        // isProductFavourite:
-                                        //     relatedProduct.isProductFavourite, // Default since not provided in API
-                                        // onFavouriteTap: () {},
-                                        onProductTap: () {
-                                          Navigator.pushReplacementNamed(
-                                            context,
-                                            RouteNames.productScreen,
-                                            arguments: relatedProduct.id,
-                                          );
-                                        },
-                                        productImageUrl:
-                                            relatedProduct.imageUrl,
-                                        productTitle: relatedProduct.name,
-                                      ),
-                                    );
-                                  },
-                                ),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(horizontal: isTablet ? 15.0 : 10.0),
+                                          child: Text(
+                                            product.description,
+                                            style: TextStyle(
+                                              fontFamily: FontFamily.fontsPoppinsLight,
+                                              color: Theme.of(context).colorScheme.onSecondary,
+                                              fontSize: isTablet ? 14 : context.scaledFont(12),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: isTablet ? 12 : 10),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(height: isTablet ? 15 : 10),
+                                  ShopProductBox(
+                                    categoryName: product.shop.categoryName,
+                                    shopImageUrl: product.shop.imageUrl,
+                                    rating: product.shop.rating * 20,
+                                    shopName: product.shop.name,
+                                    onViewStoreTap: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        RouteNames.shopNavBarScreen,
+                                        arguments: product.shop.id,
+                                      );
+                                    },
+                                  ),
+
+                                  SizedBox(height: isTablet ? 20 : 15),
+
+                                  Text(
+                                    Labels.youMightAlsoLike,
+                                    style: TextStyle(
+                                      fontFamily: FontFamily.fontsPoppinsSemiBold,
+                                      color: Theme.of(context).colorScheme.onSecondary,
+                                      fontSize: isTablet ? 16 : 14,
+                                    ),
+                                  ),
+                                  SizedBox(height: isTablet ? 20 : 15),
+                                  LayoutBuilder(
+                                    builder: (context, innerConstraints) {
+                                      double availableWidth = innerConstraints.maxWidth;
+
+                                      int crossAxisCount;
+                                      if (availableWidth >= 1200) {
+                                        crossAxisCount = 4;
+                                      } else if (availableWidth >= 900) {
+                                        crossAxisCount = 3;
+                                      } else if (availableWidth >= 600) {
+                                        crossAxisCount = 3;
+                                      } else {
+                                        crossAxisCount = 2;
+                                      }
+
+                                      final spacing = isTablet ? 12.0 : 10.0;
+
+                                      return Padding(
+                                        padding: EdgeInsets.all(isTablet ? 12 : 0),
+                                        child: StaggeredGrid.count(
+                                          crossAxisCount: crossAxisCount,
+                                          mainAxisSpacing: spacing,
+                                          crossAxisSpacing: spacing,
+                                          children: List.generate(
+                                            product.relatedProducts.length,
+                                                (index) {
+                                              final relatedProduct = product.relatedProducts[index];
+                                              return StaggeredGridTile.fit(
+                                                crossAxisCellCount: 1,
+                                                child: ProductBox(
+                                                  marginPadding: const Padding(
+                                                    padding: EdgeInsets.all(0),
+                                                  ),
+                                                  productWidth: (availableWidth - (spacing * (crossAxisCount - 1))) / crossAxisCount - 20,
+                                                  productPrice: relatedProduct.price,
+                                                  productOriginalPrice: relatedProduct.originalPrice,
+                                                  productCategory: relatedProduct.categoryName,
+                                                  productRating: 4.0,
+                                                  productId: relatedProduct.id,
+                                                  onProductTap: () {
+                                                    Navigator.pushReplacementNamed(
+                                                      context,
+                                                      RouteNames.productScreen,
+                                                      arguments: relatedProduct.id,
+                                                    );
+                                                  },
+                                                  productImageUrl: relatedProduct.imageUrl,
+                                                  productTitle: relatedProduct.name,
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+
+                                  SizedBox(height: isTablet ? 20 : 15),
+                                ],
                               ),
-                              SizedBox(height: 15),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              BlocBuilder<ProductDetailBloc, ProductDetailState>(
-                builder:
-                    (context, state) => SafeArea(
+                  BlocBuilder<ProductDetailBloc, ProductDetailState>(
+                    builder: (context, state) => SafeArea(
                       child: Align(
                         alignment: Alignment.bottomCenter,
                         child: AnimatedSlide(
                           duration: const Duration(milliseconds: 400),
                           curve: Curves.easeInOut,
-                          offset:
-                              state.isBottomSheetVisible
-                                  ? Offset(0, 0)
-                                  : Offset(0, 1),
+                          offset: state.isBottomSheetVisible ? Offset(0, 0) : Offset(0, 1),
                           child: AnimatedOpacity(
                             duration: const Duration(milliseconds: 300),
                             opacity: state.isBottomSheetVisible ? 1 : 0,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 15.0,
-                                vertical: 8.0,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: isTablet ? 20.0 : 15.0,
+                                vertical: isTablet ? 12.0 : 8.0,
                               ),
                               decoration: BoxDecoration(
                                 color: Theme.of(context).colorScheme.onPrimary,
                                 borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(30),
-                                  topRight: Radius.circular(30),
+                                  topLeft: Radius.circular(isTablet ? 35 : 30),
+                                  topRight: Radius.circular(isTablet ? 35 : 30),
                                 ),
                                 border: Border.all(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.primary.withValues(alpha: .3),
+                                  color: Theme.of(context).colorScheme.primary.withValues(alpha: .3),
                                 ),
                                 boxShadow: [
                                   BoxShadow(
@@ -1154,123 +1227,85 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         Labels.quantity,
                                         style: TextStyle(
-                                          fontFamily:
-                                              FontFamily.fontsPoppinsSemiBold,
-                                          color:
-                                              Theme.of(
-                                                context,
-                                              ).colorScheme.onSecondary,
-                                          fontSize: 16,
+                                          fontFamily: FontFamily.fontsPoppinsSemiBold,
+                                          color: Theme.of(context).colorScheme.onSecondary,
+                                          fontSize: isTablet ? 18 : 16,
                                         ),
                                       ),
                                       Row(
                                         children: [
                                           IconButton(
                                             onPressed: () {
-                                              context
-                                                  .read<ProductDetailBloc>()
-                                                  .add(DecrementQuantity());
+                                              context.read<ProductDetailBloc>().add(DecrementQuantity());
                                             },
                                             icon: Icon(
                                               Icons.remove_circle_outline,
-                                              color:
-                                                  Theme.of(
-                                                    context,
-                                                  ).colorScheme.primary,
+                                              color: Theme.of(context).colorScheme.primary,
+                                              size: isTablet ? 28 : 24,
                                             ),
                                           ),
-                                          SizedBox(width: 10),
+                                          SizedBox(width: isTablet ? 12 : 10),
                                           Text(
                                             "${state.quantity}",
                                             style: TextStyle(
-                                              fontFamily:
-                                                  FontFamily
-                                                      .fontsPoppinsSemiBold,
-                                              color:
-                                                  Theme.of(
-                                                    context,
-                                                  ).colorScheme.onSecondary,
-                                              fontSize: 16,
+                                              fontFamily: FontFamily.fontsPoppinsSemiBold,
+                                              color: Theme.of(context).colorScheme.onSecondary,
+                                              fontSize: isTablet ? 18 : 16,
                                             ),
                                           ),
-                                          SizedBox(width: 10),
+                                          SizedBox(width: isTablet ? 12 : 10),
                                           IconButton(
                                             onPressed: () {
-                                              context
-                                                  .read<ProductDetailBloc>()
-                                                  .add(IncrementQuantity());
+                                              context.read<ProductDetailBloc>().add(IncrementQuantity());
                                             },
                                             icon: Icon(
                                               Icons.add_circle_outline,
-                                              color:
-                                                  Theme.of(
-                                                    context,
-                                                  ).colorScheme.primary,
+                                              color: Theme.of(context).colorScheme.primary,
+                                              size: isTablet ? 28 : 24,
                                             ),
                                           ),
                                         ],
                                       ),
                                     ],
                                   ),
-                                  SizedBox(height: 10),
+                                  SizedBox(height: isTablet ? 12 : 10),
                                   Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       IconButton(
                                         style: ButtonStyle(
-                                          backgroundColor:
-                                              MaterialStateProperty.all(
-                                                state.productDetail!.isFavourite
-                                                    ? Theme.of(
-                                                      context,
-                                                    ).colorScheme.primary
-                                                    : Theme.of(context)
-                                                        .colorScheme
-                                                        .onSecondary
-                                                        .withValues(alpha: .3),
-                                              ),
-                                          minimumSize:
-                                              MaterialStateProperty.all(
-                                                Size(60, 50),
-                                              ),
+                                          backgroundColor: MaterialStateProperty.all(
+                                            state.productDetail!.isFavourite
+                                                ? Theme.of(context).colorScheme.primary
+                                                : Theme.of(context).colorScheme.onSecondary.withValues(alpha: .3),
+                                          ),
+                                          minimumSize: MaterialStateProperty.all(
+                                            Size(isTablet ? 70 : 60, isTablet ? 55 : 50),
+                                          ),
                                           shape: MaterialStateProperty.all(
                                             RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
+                                              borderRadius: BorderRadius.circular(50),
                                             ),
                                           ),
                                         ),
                                         onPressed: () async {
-                                          final isLoggedIn =
-                                              await UserRepository()
-                                                  .isUserAuthenticated();
+                                          final isLoggedIn = await UserRepository().isUserAuthenticated();
 
                                           if (!isLoggedIn) {
-                                            // 🔸 If not logged in, show login sheet and stop here
-                                            await LoginRequiredBottomSheet.show(
-                                              context,
-                                            );
-
+                                            await LoginRequiredBottomSheet.show(context);
                                             return;
                                           }
-                                          final productDetailBloc =
-                                              context.read<ProductDetailBloc>();
-                                          final favouriteBloc =
-                                              context.read<FavouriteBloc>();
+                                          final productDetailBloc = context.read<ProductDetailBloc>();
+                                          final favouriteBloc = context.read<FavouriteBloc>();
 
-                                          final currentFav =
-                                              state.productDetail!.isFavourite;
-                                          final productId =
-                                              state.productDetail!.id ?? '';
+                                          final currentFav = state.productDetail!.isFavourite;
+                                          final productId = state.productDetail!.id ?? '';
 
-                                          // 1️⃣ Update UI instantly
                                           productDetailBloc.add(
                                             UpdateFavouriteStatusEvent(
                                               productId: productId,
@@ -1278,7 +1313,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                             ),
                                           );
 
-                                          // 2️⃣ Call API quietly
                                           favouriteBloc.add(
                                             ToggleFavouriteEvent(
                                               productId: productId,
@@ -1288,71 +1322,59 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                         icon: Icon(
                                           Icons.favorite,
                                           color: Colors.white,
+                                          size: isTablet ? 28 : 24,
                                         ),
                                       ),
 
-                                      SizedBox(width: 10),
+                                      SizedBox(width: isTablet ? 12 : 10),
                                       Expanded(
                                         child: ElevatedButton(
                                           style: ButtonStyle(
-                                            backgroundColor:
-                                                MaterialStateProperty.all(
-                                                  _areVariationsValid(product)
-                                                      ? Theme.of(
-                                                        context,
-                                                      ).colorScheme.primary
-                                                      : Colors.grey.withValues(
-                                                        alpha: 0.6,
-                                                      ),
-                                                ),
-                                            minimumSize:
-                                                MaterialStateProperty.all(
-                                                  Size(250, 50),
-                                                ),
+                                            backgroundColor: MaterialStateProperty.all(
+                                              _areVariationsValid(product)
+                                                  ? Theme.of(context).colorScheme.primary
+                                                  : Colors.grey.withValues(alpha: 0.6),
+                                            ),
+                                            minimumSize: MaterialStateProperty.all(
+                                              Size(250, isTablet ? 55 : 50),
+                                            ),
                                             shape: MaterialStateProperty.all(
                                               RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(50),
+                                                borderRadius: BorderRadius.circular(50),
                                               ),
                                             ),
                                           ),
-                                          onPressed:
-                                              _areVariationsValid(product)
-                                                  ? () {
-                                                    _handleAddToCart(
-                                                      context,
-                                                      product,
-                                                      state.quantity,
-                                                    );
-                                                  }
-                                                  : () {
-                                                    _showVariationRequiredSnackBar(
-                                                      context,
-                                                      product,
-                                                    );
-                                                  },
+                                          onPressed: _areVariationsValid(product)
+                                              ? () {
+                                            _handleAddToCart(
+                                              context,
+                                              product,
+                                              state.quantity,
+                                            );
+                                          }
+                                              : () {
+                                            _showVariationRequiredSnackBar(
+                                              context,
+                                              product,
+                                            );
+                                          },
                                           child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
                                                 Labels.addToCart,
                                                 style: TextStyle(
-                                                  fontFamily:
-                                                      FontFamily
-                                                          .fontsPoppinsSemiBold,
+                                                  fontFamily: FontFamily.fontsPoppinsSemiBold,
                                                   color: Colors.white,
-                                                  fontSize: 15,
+                                                  fontSize: isTablet ? 17 : 15,
                                                 ),
                                               ),
                                               Text(
                                                 '${calculateTotalPrice(product, state.quantity).toStringAsFixed(2)}\$',
                                                 style: TextStyle(
-                                                  fontFamily:
-                                                      FontFamily
-                                                          .fontsPoppinsSemiBold,
+                                                  fontFamily: FontFamily.fontsPoppinsSemiBold,
                                                   color: Colors.white,
-                                                  fontSize: 16,
+                                                  fontSize: isTablet ? 18 : 16,
                                                 ),
                                               ),
                                             ],
@@ -1368,344 +1390,71 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
                       ),
                     ),
-              ),
-              Positioned(
-                top: 45,
-                right: 20,
-                child: BlocBuilder<CartBloc, CartState>(
-                  builder: (context, cartState) {
-                    final cartCount = cartState.totalItems;
-                    return Stack(
-                      children: [
-                        FloatingActionButton(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(100),
-                          ),
-                          onPressed: () async {
-                            final isLoggedIn =
-                                await UserRepository().isUserAuthenticated();
-                            if (!isLoggedIn) {
-                              await LoginRequiredBottomSheet.show(context);
-                              return;
-                            }
-                            Navigator.pushNamed(context, RouteNames.cartScreen);
-                          },
-                          child: Icon(
-                            Icons.shopping_cart_rounded,
-                            color: Colors.white,
-                            size: 25,
-                          ),
-                        ),
-                        if (cartCount > 0)
-                          Positioned(
-                            right: 0,
-                            top: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(10),
+                  ),
+                  Positioned(
+                    top: fabTopPosition,
+                    right: fabRightPosition,
+                    child: BlocBuilder<CartBloc, CartState>(
+                      builder: (context, cartState) {
+                        final cartCount = cartState.totalItems;
+                        return Stack(
+                          children: [
+                            FloatingActionButton(
+                              backgroundColor: Theme.of(context).colorScheme.primary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(100),
                               ),
-                              constraints: const BoxConstraints(
-                                minWidth: 20,
-                                minHeight: 20,
-                              ),
-                              child: Text(
-                                cartCount.toString(),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.center,
+                              mini: !isTablet,
+                              onPressed: () async {
+                                final isLoggedIn = await UserRepository().isUserAuthenticated();
+                                if (!isLoggedIn) {
+                                  await LoginRequiredBottomSheet.show(context);
+                                  return;
+                                }
+                                Navigator.pushNamed(context, RouteNames.cartScreen);
+                              },
+                              child: Icon(
+                                Icons.shopping_cart_rounded,
+                                color: Colors.white,
+                                size: fabIconSize,
                               ),
                             ),
-                          ),
-                      ],
-                    );
-                  },
-                ),
+                            if (cartCount > 0)
+                              Positioned(
+                                right: 0,
+                                top: 0,
+                                child: Container(
+                                  padding: EdgeInsets.all(isTablet ? 3 : 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(isTablet ? 12 : 10),
+                                  ),
+                                  constraints: BoxConstraints(
+                                    minWidth: isTablet ? 24 : 20,
+                                    minHeight: isTablet ? 24 : 20,
+                                  ),
+                                  child: Text(
+                                    cartCount.toString(),
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: isTablet ? 13 : 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
-    );
-  }
-}
-
-class ProductDetailShimmer extends StatelessWidget {
-  const ProductDetailShimmer({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          CustomScrollView(
-            slivers: [
-              // Shimmer for app bar with image
-              SliverAppBar(
-                expandedHeight: 300,
-                pinned: true,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Shimmer.fromColors(
-                    baseColor: Colors.grey[300]!,
-                    highlightColor: Colors.grey[100]!,
-                    child: Container(
-                      width: double.infinity,
-                      height: 300,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                leading: Container(
-                  margin: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                actions: [
-                  Container(
-                    margin: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      shape: BoxShape.circle,
-                    ),
-                    width: 40,
-                    height: 40,
-                  ),
-                ],
-              ),
-              // Shimmer for content
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Shop name shimmer
-                      Shimmer.fromColors(
-                        baseColor: Colors.grey[300]!,
-                        highlightColor: Colors.grey[100]!,
-                        child: Container(
-                          width: 150,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      // Product name shimmer
-                      Shimmer.fromColors(
-                        baseColor: Colors.grey[300]!,
-                        highlightColor: Colors.grey[100]!,
-                        child: Container(
-                          width: double.infinity,
-                          height: 24,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      // Price shimmer
-                      Shimmer.fromColors(
-                        baseColor: Colors.grey[300]!,
-                        highlightColor: Colors.grey[100]!,
-                        child: Container(
-                          width: 100,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      // Options shimmer
-                      Shimmer.fromColors(
-                        baseColor: Colors.grey[300]!,
-                        highlightColor: Colors.grey[100]!,
-                        child: Container(
-                          width: 80,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        children: List.generate(
-                          3,
-                          (index) => Container(
-                            margin: const EdgeInsets.only(right: 10),
-                            child: Shimmer.fromColors(
-                              baseColor: Colors.grey[300]!,
-                              highlightColor: Colors.grey[100]!,
-                              child: Container(
-                                width: 60,
-                                height: 30,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      // Images shimmer
-                      Shimmer.fromColors(
-                        baseColor: Colors.grey[300]!,
-                        highlightColor: Colors.grey[100]!,
-                        child: Container(
-                          width: double.infinity,
-                          height: 120,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      // Description shimmer
-                      Shimmer.fromColors(
-                        baseColor: Colors.grey[300]!,
-                        highlightColor: Colors.grey[100]!,
-                        child: Container(
-                          width: double.infinity,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      // Shop info shimmer
-                      Shimmer.fromColors(
-                        baseColor: Colors.grey[300]!,
-                        highlightColor: Colors.grey[100]!,
-                        child: Container(
-                          width: double.infinity,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      // Related products title shimmer
-                      Shimmer.fromColors(
-                        baseColor: Colors.grey[300]!,
-                        highlightColor: Colors.grey[100]!,
-                        child: Container(
-                          width: 200,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      // Related products grid shimmer
-                      StaggeredGrid.count(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 10,
-                        crossAxisSpacing: 10,
-                        children: List.generate(
-                          4,
-                          (index) => StaggeredGridTile.fit(
-                            crossAxisCellCount: 1,
-                            child: Shimmer.fromColors(
-                              baseColor: Colors.grey[300]!,
-                              highlightColor: Colors.grey[100]!,
-                              child: Container(
-                                height: 200,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 100,
-                      ), // Space for bottom navigation
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          // Bottom navigation shimmer
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withValues(alpha: 0.3),
-                    spreadRadius: 1,
-                    blurRadius: 5,
-                    offset: const Offset(0, -2),
-                  ),
-                ],
-              ),
-              child: SafeArea(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Shimmer.fromColors(
-                        baseColor: Colors.grey[300]!,
-                        highlightColor: Colors.grey[100]!,
-                        child: Container(
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Shimmer.fromColors(
-                      baseColor: Colors.grey[300]!,
-                      highlightColor: Colors.grey[100]!,
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

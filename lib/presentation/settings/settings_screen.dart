@@ -27,47 +27,111 @@ class SettingsScreen extends StatelessWidget {
         builder: (context, snapshot) {
           final userData = snapshot.data?.userData;
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Column(
-              children: [
-                // Profile Header Card
-                _buildProfileCard(context, userData),
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              // Define breakpoints
+              final screenWidth = MediaQuery.of(context).size.width;
+              final bool isMobile = screenWidth < 600;
+              final bool isTablet = screenWidth >= 600 && screenWidth < 1024;
+              final bool isLargeTablet = screenWidth >= 1024;
 
-                const SizedBox(height: 16),
+              // Responsive values
+              final double horizontalPadding = isMobile ? 16 : (isTablet ? 32 : 48);
+              final double verticalPadding = isMobile ? 12 : (isTablet ? 20 : 24);
+              final double cardSpacing = isMobile ? 16 : (isTablet ? 20 : 24);
+              final double maxWidth = isLargeTablet ? 1200 : double.infinity;
 
-                // Profile Details Section
-                _buildProfileDetailsSection(context, userData),
-
-                const SizedBox(height: 16),
-
-                // App Settings Section
-                _buildAppSettingsSection(context),
-
-                const SizedBox(height: 24),
-              ],
-            ),
+              return Center(
+                child: Container(
+                  constraints: BoxConstraints(maxWidth: maxWidth),
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: horizontalPadding,
+                      vertical: verticalPadding,
+                    ),
+                    child: isLargeTablet
+                        ? _buildLargeTabletLayout(context, userData, cardSpacing)
+                        : _buildMobileTabletLayout(context, userData, cardSpacing),
+                  ),
+                ),
+              );
+            },
           );
         },
       ),
     );
   }
 
-  Widget _buildProfileCard(BuildContext context, dynamic userData) {
+  // Layout for large tablets (side-by-side)
+  Widget _buildLargeTabletLayout(BuildContext context, dynamic userData, double spacing) {
+    return Column(
+      children: [
+        // Profile Header Card - Full width with gradient
+        _buildEnhancedProfileCard(context, userData, true),
+        SizedBox(height: spacing),
+
+        // Two column layout
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Left column - Profile Details
+            Expanded(
+              child: _buildProfileDetailsSection(context, userData, true),
+            ),
+            SizedBox(width: spacing),
+
+            // Right column - App Settings
+            Expanded(
+              child: _buildAppSettingsSection(context, true),
+            ),
+          ],
+        ),
+        SizedBox(height: spacing),
+      ],
+    );
+  }
+
+  // Layout for mobile and tablet (stacked)
+  Widget _buildMobileTabletLayout(BuildContext context, dynamic userData, double spacing) {
+    return Column(
+      children: [
+        _buildEnhancedProfileCard(context, userData, false),
+        SizedBox(height: spacing),
+        _buildProfileDetailsSection(context, userData, false),
+        SizedBox(height: spacing),
+        _buildAppSettingsSection(context, false),
+        SizedBox(height: spacing * 1.5),
+      ],
+    );
+  }
+
+  Widget _buildEnhancedProfileCard(BuildContext context, dynamic userData, bool isLarge) {
     final theme = Theme.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 600;
+
+    final double imageSize = isMobile ? 70 : (isLarge ? 90 : 80);
+    final double titleSize = isMobile ? 17 : (isLarge ? 20 : 18);
+    final double subtitleSize = isMobile ? 13 : (isLarge ? 15 : 14);
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(isMobile ? 20 : (isLarge ? 28 : 24)),
       decoration: BoxDecoration(
         color: theme.colorScheme.onPrimary,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(isMobile ? 20 : 24),
         border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.1),
-          width: 1,
+          color: theme.colorScheme.primary.withOpacity(0.1),
+          width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: theme.colorScheme.primary.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+            spreadRadius: 0,
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -75,27 +139,29 @@ class SettingsScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Profile Image with gradient border
+          // Profile Image with enhanced gradient border
           Container(
-            padding: const EdgeInsets.all(3),
+            padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  theme.colorScheme.primary.withOpacity(0.3),
-                  theme.colorScheme.primary.withOpacity(0.1),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(50),
+             color: Theme.of(context).colorScheme.onPrimary,
+              borderRadius: BorderRadius.circular(100),
+              boxShadow: [
+                BoxShadow(
+                  color: theme.colorScheme.primary.withOpacity(0.3),
+                  blurRadius: 15,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Container(
               decoration: BoxDecoration(
                 color: theme.colorScheme.onPrimary,
-                borderRadius: BorderRadius.circular(50),
+                borderRadius: BorderRadius.circular(100),
               ),
-              padding: const EdgeInsets.all(2),
+              padding: const EdgeInsets.all(3),
               child: AppCacheImage(
-                height: 70,
-                width: 70,
+                height: imageSize,
+                width: imageSize,
                 boxFit: BoxFit.cover,
                 round: 500,
                 imageUrl: '$imageBaseUrl${userData?.profileImage}',
@@ -103,7 +169,7 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(width: 16),
+          SizedBox(width: isMobile ? 16 : 20),
 
           // User Info
           Expanded(
@@ -113,19 +179,224 @@ class SettingsScreen extends StatelessWidget {
                 Text(
                   userData?.name ?? '',
                   style: TextStyle(
-                    fontSize: context.scaledFont(17),
+                    fontSize: titleSize,
                     fontFamily: FontFamily.fontsPoppinsSemiBold,
                     color: theme.colorScheme.onSecondary,
-                    letterSpacing: 0.2,
+                    letterSpacing: 0.3,
+                    height: 1.2,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: isMobile ? 4 : 6),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.email_outlined,
+                      size: isMobile ? 14 : 16,
+                      color: theme.colorScheme.primary.withOpacity(0.7),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        userData?.email ?? '',
+                        style: TextStyle(
+                          fontSize: subtitleSize,
+                          color: theme.colorScheme.outline,
+                          fontFamily: FontFamily.fontsPoppinsRegular,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileDetailsSection(BuildContext context, dynamic userData, bool isLarge) {
+    final theme = Theme.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 600;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.onPrimary,
+        borderRadius: BorderRadius.circular(isMobile ? 20 : 24),
+        border: Border.all(
+          color: theme.colorScheme.outline.withOpacity(0.1),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 15,
+            offset: const Offset(0, 6),
+            spreadRadius: 0,
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Section Header
+          Padding(
+            padding: EdgeInsets.all(isMobile ? 18 : 22),
+            child: Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(isMobile ? 8 : 10),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        theme.colorScheme.primary.withOpacity(0.15),
+                        theme.colorScheme.primary.withOpacity(0.08),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.person_outline,
+                    color: theme.colorScheme.primary,
+                    size: isMobile ? 20 : 22,
+                  ),
+                ),
+                SizedBox(width: isMobile ? 12 : 14),
                 Text(
-                  userData?.email ?? '',
+                  Labels.profileSettings,
                   style: TextStyle(
-                    fontSize: context.scaledFont(13),
-                    color: theme.colorScheme.outline,
+                    fontSize: context.scaledFont(isMobile ? 15 : 16),
+                    fontFamily: FontFamily.fontsPoppinsSemiBold,
+                    color: theme.colorScheme.onSecondary,
+                  ),
+                ),
+                const Spacer(),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(context, RouteNames.editProfileScreen);
+                    },
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: EdgeInsets.all(isMobile ? 8 : 10),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            theme.colorScheme.primary.withOpacity(0.15),
+                            theme.colorScheme.primary.withOpacity(0.08),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.edit_outlined,
+                        color: theme.colorScheme.primary,
+                        size: isMobile ? 18 : 20,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Divider with gradient
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: isMobile ? 18 : 22),
+            height: 1,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.transparent,
+                  theme.colorScheme.outline.withOpacity(0.1),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+
+          // Profile Details
+          Padding(
+            padding: EdgeInsets.all(isMobile ? 18 : 22),
+            child: Column(
+              children: [
+                _buildInfoRow(
+                  context,
+                  Labels.fullName,
+                  userData?.name ?? '',
+                  Icons.person_outline,
+                  isLarge,
+                ),
+                SizedBox(height: isMobile ? 14 : 16),
+                _buildInfoRow(
+                  context,
+                  Labels.email,
+                  userData?.email ?? '',
+                  Icons.email_outlined,
+                  isLarge,
+                ),
+                SizedBox(height: isMobile ? 14 : 16),
+                _buildInfoRow(
+                  context,
+                  'PHONE',
+                  userData?.phoneNo ?? 'No Phone',
+                  Icons.phone_outlined,
+                  isLarge,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(BuildContext context, String label, String value, IconData icon, bool isLarge) {
+    final theme = Theme.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 600;
+
+    return Container(
+      padding: EdgeInsets.all(isMobile ? 12 : 14),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primary.withOpacity(0.03),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.primary.withOpacity(0.08),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: isMobile ? 18 : 20,
+            color: theme.colorScheme.primary.withOpacity(0.7),
+          ),
+          SizedBox(width: isMobile ? 10 : 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: context.scaledFont(isMobile ? 11 : 12),
+                    color: theme.colorScheme.onSecondary.withOpacity(0.6),
                     fontFamily: FontFamily.fontsPoppinsRegular,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: context.scaledFont(isMobile ? 13 : 14),
+                    color: theme.colorScheme.onSecondary,
+                    fontFamily: FontFamily.fontsPoppinsMedium,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -138,13 +409,15 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileDetailsSection(BuildContext context, dynamic userData) {
+  Widget _buildAppSettingsSection(BuildContext context, bool isLarge) {
     final theme = Theme.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 600;
 
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.onPrimary,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(isMobile ? 20 : 24),
         border: Border.all(
           color: theme.colorScheme.outline.withOpacity(0.1),
           width: 1,
@@ -152,8 +425,9 @@ class SettingsScreen extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            blurRadius: 15,
+            offset: const Offset(0, 6),
+            spreadRadius: 0,
           ),
         ],
       ),
@@ -161,167 +435,31 @@ class SettingsScreen extends StatelessWidget {
         children: [
           // Section Header
           Padding(
-            padding: const EdgeInsets.all(18),
+            padding: EdgeInsets.all(isMobile ? 18 : 22),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: EdgeInsets.all(isMobile ? 8 : 10),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    Icons.person_outline,
-                    color: theme.colorScheme.primary,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  Labels.profileSettings,
-                  style: TextStyle(
-                    fontSize: context.scaledFont(15),
-                    fontFamily: FontFamily.fontsPoppinsSemiBold,
-                    color: theme.colorScheme.onSecondary,
-                  ),
-                ),
-                const Spacer(),
-                Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.pushNamed(context, RouteNames.editProfileScreen);
-                    },
-                    borderRadius: BorderRadius.circular(10),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primary.withOpacity(0.08),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(
-                        Icons.edit_outlined,
-                        color: theme.colorScheme.primary,
-                        size: 18,
-                      ),
+                    gradient: LinearGradient(
+                      colors: [
+                        theme.colorScheme.primary.withOpacity(0.15),
+                        theme.colorScheme.primary.withOpacity(0.08),
+                      ],
                     ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Divider
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 18),
-            height: 1,
-            color: theme.colorScheme.outline.withOpacity(0.08),
-          ),
-
-          // Profile Details
-          Padding(
-            padding: const EdgeInsets.all(18),
-            child: Column(
-              children: [
-                _buildInfoRow(
-                  context,
-                  Labels.fullName,
-                  userData?.name ?? '',
-                ),
-                const SizedBox(height: 14),
-                _buildInfoRow(
-                  context,
-                  Labels.email,
-                  userData?.email ?? '',
-                ),
-                const SizedBox(height: 14),
-                _buildInfoRow(
-                  context,
-                  'PHONE',
-                  userData?.phoneNo ?? 'No Phone',
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(BuildContext context, String label, String value) {
-    final theme = Theme.of(context);
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: context.scaledFont(13),
-            color: theme.colorScheme.onSecondary.withOpacity(0.7),
-            fontFamily: FontFamily.fontsPoppinsRegular,
-          ),
-        ),
-        Flexible(
-          child: Text(
-            value,
-            style: TextStyle(
-              fontSize: context.scaledFont(13),
-              color: theme.colorScheme.onSecondary,
-              fontFamily: FontFamily.fontsPoppinsMedium,
-            ),
-            textAlign: TextAlign.end,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAppSettingsSection(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.colorScheme.onPrimary,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.1),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // Section Header
-          Padding(
-            padding: const EdgeInsets.all(18),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
                     Icons.settings_outlined,
                     color: theme.colorScheme.primary,
-                    size: 20,
+                    size: isMobile ? 20 : 22,
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: isMobile ? 12 : 14),
                 Text(
                   Labels.applicationSettings,
                   style: TextStyle(
-                    fontSize: context.scaledFont(15),
+                    fontSize: context.scaledFont(isMobile ? 15 : 16),
                     fontFamily: FontFamily.fontsPoppinsSemiBold,
                     color: theme.colorScheme.onSecondary,
                   ),
@@ -330,11 +468,19 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
 
-          // Divider
+          // Divider with gradient
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 18),
+            margin: EdgeInsets.symmetric(horizontal: isMobile ? 18 : 22),
             height: 1,
-            color: theme.colorScheme.outline.withOpacity(0.08),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.transparent,
+                  theme.colorScheme.outline.withOpacity(0.1),
+                  Colors.transparent,
+                ],
+              ),
+            ),
           ),
 
           // Settings Items
@@ -343,6 +489,7 @@ class SettingsScreen extends StatelessWidget {
             icon: Icons.translate_outlined,
             title: Labels.languages,
             onTap: () => Navigator.pushNamed(context, RouteNames.languagesScreen),
+            isLarge: isLarge,
           ),
           _buildDivider(context),
           _buildSettingsTile(
@@ -350,6 +497,7 @@ class SettingsScreen extends StatelessWidget {
             icon: Icons.location_on_outlined,
             title: Labels.deliveryAddresses,
             onTap: () => Navigator.pushNamed(context, RouteNames.addressBookScreen),
+            isLarge: isLarge,
           ),
           _buildDivider(context),
           _buildSettingsTile(
@@ -360,6 +508,7 @@ class SettingsScreen extends StatelessWidget {
               context,
               MaterialPageRoute(builder: (context) => CardInfoAddScreen()),
             ),
+            isLarge: isLarge,
           ),
           _buildDivider(context),
           _buildSettingsTile(
@@ -367,6 +516,7 @@ class SettingsScreen extends StatelessWidget {
             icon: Icons.help_outline,
             title: Labels.helpAndSupport,
             onTap: () => Navigator.pushNamed(context, RouteNames.faqsScreen),
+            isLarge: isLarge,
           ),
           _buildDivider(context),
           _buildSettingsTile(
@@ -377,6 +527,7 @@ class SettingsScreen extends StatelessWidget {
               context,
               MaterialPageRoute(builder: (context) => ChangePasswordScreen()),
             ),
+            isLarge: isLarge,
           ),
         ],
       ),
@@ -388,46 +539,59 @@ class SettingsScreen extends StatelessWidget {
         required IconData icon,
         required String title,
         required VoidCallback onTap,
+        required bool isLarge,
       }) {
     final theme = Theme.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 600;
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(0),
+        splashColor: theme.colorScheme.primary.withOpacity(0.08),
+        highlightColor: theme.colorScheme.primary.withOpacity(0.05),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          padding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 18 : 22,
+            vertical: isMobile ? 16 : 18,
+          ),
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: EdgeInsets.all(isMobile ? 10 : 12),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.06),
-                  borderRadius: BorderRadius.circular(10),
+                  gradient: LinearGradient(
+                    colors: [
+                      theme.colorScheme.primary.withOpacity(0.1),
+                      theme.colorScheme.primary.withOpacity(0.05),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   icon,
-                  color: theme.colorScheme.primary.withOpacity(0.8),
-                  size: 20,
+                  color: theme.colorScheme.primary,
+                  size: isMobile ? 20 : 22,
                 ),
               ),
-              const SizedBox(width: 14),
+              SizedBox(width: isMobile ? 14 : 16),
               Expanded(
                 child: Text(
                   title,
                   style: TextStyle(
-                    fontSize: context.scaledFont(14),
+                    fontSize: context.scaledFont(isMobile ? 14 : 15),
                     color: theme.colorScheme.onSecondary,
                     fontFamily: FontFamily.fontsPoppinsRegular,
-                    letterSpacing: 0.1,
+                    letterSpacing: 0.2,
                   ),
                 ),
               ),
               Icon(
                 Icons.arrow_forward_ios_rounded,
-                size: 16,
-                color: theme.colorScheme.outline.withOpacity(0.5),
+                size: isMobile ? 16 : 18,
+                color: theme.colorScheme.primary.withOpacity(0.4),
               ),
             ],
           ),
@@ -437,10 +601,21 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Widget _buildDivider(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 600;
+
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 18),
+      margin: EdgeInsets.symmetric(horizontal: isMobile ? 18 : 22),
       height: 1,
-      color: Theme.of(context).colorScheme.outline.withOpacity(0.06),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.transparent,
+            Theme.of(context).colorScheme.outline.withOpacity(0.08),
+            Colors.transparent,
+          ],
+        ),
+      ),
     );
   }
 }
