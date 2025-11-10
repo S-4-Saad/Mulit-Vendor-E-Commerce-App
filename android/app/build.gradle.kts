@@ -14,14 +14,14 @@ android {
     ndkVersion = "27.0.12077973"
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
         // Enable core library desugaring
         isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
     defaultConfig {
@@ -34,18 +34,31 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
-
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = true
+            // Add proguard rules
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
+
+    // Add these rules directly in the gradle file
+    dependencyLocking {
+        ignoredDependencies.add("org.bouncycastle:*")
+        ignoredDependencies.add("org.conscrypt:*")
+        ignoredDependencies.add("org.openjsse:*")
+        ignoredDependencies.add("org.slf4j:*")
+    }
 }
+
 dependencies {
-    // Use the latest compatible version (2.1.4 or above)
+    // Update desugaring version to 2.1.4
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs_configuration:2.1.4")
 
     // Other dependencies
     implementation("androidx.core:core-ktx:1.12.0")
@@ -53,6 +66,22 @@ dependencies {
     
     // Google Play Services Maps
     implementation("com.google.android.gms:play-services-maps:18.2.0")
+
+    // Security providers
+    implementation("org.bouncycastle:bcprov-jdk18on:1.77")
+    implementation("org.bouncycastle:bcpkix-jdk18on:1.77")
+    implementation("org.bouncycastle:bctls-jdk18on:1.77")
+    implementation("org.conscrypt:conscrypt-android:2.5.2")
+    implementation("org.openjsse:openjsse:1.1.13")
+
+    // JNDI and Activation dependencies - Using only the API versions
+    implementation("javax.activation:javax.activation-api:1.2.0")
+    implementation("javax.annotation:javax.annotation-api:1.3.2")
+    implementation("javax.xml.bind:jaxb-api:2.3.1")
+
+    // Logging
+    implementation("org.slf4j:slf4j-api:2.0.9")
+    implementation("org.slf4j:slf4j-simple:2.0.9")
 }
 
 flutter {

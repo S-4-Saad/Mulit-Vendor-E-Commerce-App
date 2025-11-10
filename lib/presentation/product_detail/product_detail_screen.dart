@@ -88,7 +88,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
     // Find the selected parent variation
     final selectedParentVariation = product.variations.firstWhere(
-      (v) => v.parentName == selectedParent,
+          (v) => v.parentName == selectedParent,
       orElse: () => product.variations.first,
     );
 
@@ -97,8 +97,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       final selectedChildVariation = selectedParentVariation.children
           .firstWhere(
             (child) => child.name == selectedChild,
-            orElse: () => selectedParentVariation.children.first,
-          );
+        orElse: () => selectedParentVariation.children.first,
+      );
       return selectedChildVariation.price;
     }
 
@@ -120,7 +120,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
     // Find the selected parent variation
     final selectedParentVariation = product.variations.firstWhere(
-      (v) => v.parentName == selectedParent,
+          (v) => v.parentName == selectedParent,
       orElse: () => product.variations.first,
     );
 
@@ -129,8 +129,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       final selectedChildVariation = selectedParentVariation.children
           .firstWhere(
             (child) => child.name == selectedChild,
-            orElse: () => selectedParentVariation.children.first,
-          );
+        orElse: () => selectedParentVariation.children.first,
+      );
       return selectedChildVariation.originalPrice;
     }
 
@@ -152,7 +152,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
     // Find the selected parent variation
     final selectedParentVariation = product.variations.firstWhere(
-      (v) => v.parentName == selectedParent,
+          (v) => v.parentName == selectedParent,
       orElse: () => product.variations.first,
     );
 
@@ -161,8 +161,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       final selectedChildVariation = selectedParentVariation.children
           .firstWhere(
             (child) => child.name == selectedChild,
-            orElse: () => selectedParentVariation.children.first,
-          );
+        orElse: () => selectedParentVariation.children.first,
+      );
       return selectedChildVariation.discountPercentage;
     }
 
@@ -195,7 +195,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
     // Find the selected parent variation
     final selectedParentVariation = product.variations.firstWhere(
-      (v) => v.parentName == selectedParent,
+          (v) => v.parentName == selectedParent,
       orElse: () => product.variations.first,
     );
 
@@ -219,7 +219,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
 
     final selectedParentVariation = product.variations.firstWhere(
-      (v) => v.parentName == selectedParent,
+          (v) => v.parentName == selectedParent,
       orElse: () => product.variations.first,
     );
 
@@ -232,10 +232,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   void _handleAddToCart(
-    BuildContext context,
-    ProductDetail product,
-    int quantity,
-  ) async {
+      BuildContext context,
+      ProductDetail product,
+      int quantity,
+      ) async {
     // Check if user is authenticated
     final isAuthenticated = await _isUserAuthenticated();
     if (!isAuthenticated) {
@@ -283,7 +283,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
     // Find the selected parent variation
     final selectedParentVariation = product.variations.firstWhere(
-      (v) => v.parentName == selectedParent,
+          (v) => v.parentName == selectedParent,
       orElse: () => product.variations.first,
     );
 
@@ -291,7 +291,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     ProductSubVariation? selectedChildVariation;
     if (selectedChild != null && selectedParentVariation.children.isNotEmpty) {
       selectedChildVariation = selectedParentVariation.children.firstWhere(
-        (child) => child.name == selectedChild,
+            (child) => child.name == selectedChild,
         orElse: () => selectedParentVariation.children.first,
       );
     }
@@ -312,10 +312,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   void _showStoreConflictDialog(
-    BuildContext context,
-    String errorMessage,
-    ProductDetail product,
-  ) {
+      BuildContext context,
+      String errorMessage,
+      ProductDetail product,
+      ) {
     if (!mounted) return;
 
     final parts = errorMessage.split(':');
@@ -414,7 +414,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor:
-                              Theme.of(context).colorScheme.primary,
+                          Theme.of(context).colorScheme.primary,
                           padding: EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -468,8 +468,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         final selectedParentVariation = product.variations
                             .firstWhere(
                               (v) => v.parentName == selectedParent,
-                              orElse: () => product.variations.first,
-                            );
+                          orElse: () => product.variations.first,
+                        );
 
                         ProductSubVariation? selectedChildVariation;
                         if (selectedChild != null &&
@@ -478,10 +478,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               .children
                               .firstWhere(
                                 (child) => child.name == selectedChild,
-                                orElse:
-                                    () =>
-                                        selectedParentVariation.children.first,
-                              );
+                            orElse:
+                                () =>
+                            selectedParentVariation.children.first,
+                          );
                         }
 
                         context.read<CartBloc>().add(
@@ -520,9 +520,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   void _showVariationRequiredSnackBar(
-    BuildContext context,
-    ProductDetail product,
-  ) {
+      BuildContext context,
+      ProductDetail product,
+      ) {
     final missingMessage = _getMissingVariationMessage(product);
 
     SnackBarHelper.showError(context, missingMessage);
@@ -558,9 +558,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         // Handle different variation scenarios
         final hasVariations = product.variations.isNotEmpty;
         final parentNames =
-            hasVariations
-                ? product.variations.map((e) => e.parentName).toList()
-                : [];
+        hasVariations
+            ? product.variations.map((e) => e.parentName).toList()
+            : [];
 
         ProductVariation selectedParentVariation = ProductVariation(
           id: '',
@@ -574,13 +574,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
         if (hasVariations) {
           selectedParentVariation = product.variations.firstWhere(
-            (v) => v.parentName == selectedParent,
+                (v) => v.parentName == selectedParent,
             orElse: () => product.variations.first,
           );
         }
 
         final childOptions =
-            selectedParent == null ? [] : selectedParentVariation.children;
+        selectedParent == null ? [] : selectedParentVariation.children;
         final hasChildVariations = childOptions.isNotEmpty;
 
         return LayoutBuilder(

@@ -1,7 +1,19 @@
-allprojects {
+buildscript {
     repositories {
         google()
         mavenCentral()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle:8.1.0")  // Update this if needed
+    }
+}
+
+allprojects {
+    configurations.all {
+        resolutionStrategy {
+            force("com.android.tools:desugar_jdk_libs:2.1.4")
+            force("com.android.tools:desugar_jdk_libs_configuration:2.1.4")
+        }
     }
 }
 
