@@ -36,7 +36,7 @@ class OptionSelectorWidget extends StatelessWidget {
         final checkIconSize = isTablet ? 16.0 : 14.0;
 
         return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(

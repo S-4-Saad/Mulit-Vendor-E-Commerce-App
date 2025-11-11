@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:speezu/core/utils/currency_icon.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
 import 'package:speezu/core/utils/snackbar_helper.dart';
@@ -41,13 +40,17 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
-  String? selectedParent;
-  // e.g. "Fajita"
-  String? selectedChild;
+  final Map<String, Map<String, String?>> selectedVariationsByType = {};
   final ScrollController _scrollController = ScrollController();
   StreamSubscription<CartState>? _cartSubscription;
-
-  // e.g. "Medium"
+  
+  Map<String, String?> get selectedVariations {
+    final Map<String, String?> flatMap = {};
+    for (final typeMap in selectedVariationsByType.values) {
+      flatMap.addAll(typeMap);
+    }
+    return flatMap;
+  }
   @override
   void initState() {
     super.initState();
@@ -81,22 +84,24 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       return product.price;
     }
 
-    // If no parent selected, return base price
-    if (selectedParent == null) {
+    // If no variations selected, return base price
+    if (selectedVariations.isEmpty) {
       return product.price;
     }
 
-    // Find the selected parent variation
+    // Use the first selected parent's price
+    final firstSelectedParent = selectedVariations.keys.first;
     final selectedParentVariation = product.variations.firstWhere(
-          (v) => v.parentName == selectedParent,
+          (v) => v.parentName == firstSelectedParent,
       orElse: () => product.variations.first,
     );
 
     // If parent has children and child is selected, use child price
-    if (selectedParentVariation.children.isNotEmpty && selectedChild != null) {
+    final selectedChildName = selectedVariations[firstSelectedParent];
+    if (selectedParentVariation.children.isNotEmpty && selectedChildName != null) {
       final selectedChildVariation = selectedParentVariation.children
           .firstWhere(
-            (child) => child.name == selectedChild,
+            (child) => child.name == selectedChildName,
         orElse: () => selectedParentVariation.children.first,
       );
       return selectedChildVariation.price;
@@ -113,22 +118,24 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       return product.originalPrice;
     }
 
-    // If no parent selected, return base original price
-    if (selectedParent == null) {
+    // If no variations selected, return base original price
+    if (selectedVariations.isEmpty) {
       return product.originalPrice;
     }
 
-    // Find the selected parent variation
+    // Use the first selected parent's original price
+    final firstSelectedParent = selectedVariations.keys.first;
     final selectedParentVariation = product.variations.firstWhere(
-          (v) => v.parentName == selectedParent,
+          (v) => v.parentName == firstSelectedParent,
       orElse: () => product.variations.first,
     );
 
     // If parent has children and child is selected, use child original price
-    if (selectedParentVariation.children.isNotEmpty && selectedChild != null) {
+    final selectedChildName = selectedVariations[firstSelectedParent];
+    if (selectedParentVariation.children.isNotEmpty && selectedChildName != null) {
       final selectedChildVariation = selectedParentVariation.children
           .firstWhere(
-            (child) => child.name == selectedChild,
+            (child) => child.name == selectedChildName,
         orElse: () => selectedParentVariation.children.first,
       );
       return selectedChildVariation.originalPrice;
@@ -145,22 +152,24 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       return product.productDiscountPercentage;
     }
 
-    // If no parent selected, return base discount percentage
-    if (selectedParent == null) {
+    // If no variations selected, return base discount percentage
+    if (selectedVariations.isEmpty) {
       return product.productDiscountPercentage;
     }
 
-    // Find the selected parent variation
+    // Use the first selected parent's discount percentage
+    final firstSelectedParent = selectedVariations.keys.first;
     final selectedParentVariation = product.variations.firstWhere(
-          (v) => v.parentName == selectedParent,
+          (v) => v.parentName == firstSelectedParent,
       orElse: () => product.variations.first,
     );
 
     // If parent has children and child is selected, use child discount percentage
-    if (selectedParentVariation.children.isNotEmpty && selectedChild != null) {
+    final selectedChildName = selectedVariations[firstSelectedParent];
+    if (selectedParentVariation.children.isNotEmpty && selectedChildName != null) {
       final selectedChildVariation = selectedParentVariation.children
           .firstWhere(
-            (child) => child.name == selectedChild,
+            (child) => child.name == selectedChildName,
         orElse: () => selectedParentVariation.children.first,
       );
       return selectedChildVariation.discountPercentage;
@@ -188,20 +197,38 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       return true;
     }
 
-    // If variations exist, check if parent is selected
-    if (selectedParent == null) {
-      return false;
-    }
-
-    // Find the selected parent variation
-    final selectedParentVariation = product.variations.firstWhere(
-          (v) => v.parentName == selectedParent,
-      orElse: () => product.variations.first,
-    );
-
-    // If parent variation has children, child must be selected
-    if (selectedParentVariation.children.isNotEmpty && selectedChild == null) {
-      return false;
+    // Check all selected parent types - if a parent type has variations with children, a child must be selected
+    for (final parentTypeEntry in selectedVariationsByType.entries) {
+      final parentType = parentTypeEntry.key;
+      final typeMap = parentTypeEntry.value;
+      
+      // Get all variations of this parent type
+      final variationsOfType = product.variations.where((v) => v.parentOptionName == parentType).toList();
+      
+      // Check if any variation in this type has children
+      final hasChildren = variationsOfType.any((v) => v.children.isNotEmpty);
+      
+      if (hasChildren && typeMap.isEmpty) {
+        // This parent type has variations with children but no selection - invalid
+        return false;
+      }
+      
+      // Check if selected parents have children and if children are selected
+      for (final parentName in typeMap.keys) {
+        final variation = variationsOfType.firstWhere(
+          (v) => v.parentName == parentName,
+          orElse: () => variationsOfType.first,
+        );
+        
+        if (variation.children.isNotEmpty) {
+          // If this parent has children, check if a child is selected
+          final selectedChild = typeMap[parentName];
+          if (selectedChild == null) {
+            // Parent has children but no child selected - invalid
+            return false;
+          }
+        }
+      }
     }
 
     return true;
@@ -213,19 +240,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       return '';
     }
 
-    if (selectedParent == null) {
-      final parentName = product.variations.first.parentOptionName;
-      return '${Labels.pleaseSelectA} $parentName';
-    }
-
-    final selectedParentVariation = product.variations.firstWhere(
-          (v) => v.parentName == selectedParent,
-      orElse: () => product.variations.first,
-    );
-
-    if (selectedParentVariation.children.isNotEmpty && selectedChild == null) {
-      final childName = selectedParentVariation.children.first.childOptionName;
-      return '${Labels.pleaseSelectA} $childName';
+    // Find the first variation that has children but no child selected
+    for (final variation in product.variations) {
+      if (variation.children.isNotEmpty) {
+        final selectedChild = selectedVariations[variation.parentName];
+        if (selectedChild == null) {
+          final childName = variation.children.first.childOptionName;
+          return '${Labels.pleaseSelectA} $childName';
+        }
+      }
     }
 
     return '';
@@ -281,32 +304,85 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       return;
     }
 
-    // Find the selected parent variation
-    final selectedParentVariation = product.variations.firstWhere(
-          (v) => v.parentName == selectedParent,
-      orElse: () => product.variations.first,
+    // Safety check: validation should have ensured at least one variation is selected
+    if (selectedVariationsByType.isEmpty) {
+      // This shouldn't happen if validation is correct, but add safety check
+      _showVariationRequiredSnackBar(context, product);
+      return;
+    }
+
+    // Get all selected parent types
+    final parentTypes = selectedVariationsByType.keys.toList();
+    
+    // First parent type: use variationParentName and variationParentValue
+    final firstParentType = parentTypes.first;
+    final firstTypeMap = selectedVariationsByType[firstParentType]!;
+    
+    if (firstTypeMap.isEmpty) {
+      _showVariationRequiredSnackBar(context, product);
+      return;
+    }
+    
+    final firstSelectedParentName = firstTypeMap.keys.first;
+    final firstSelectedChild = firstTypeMap[firstSelectedParentName];
+    
+    // Find the first parent variation for IDs
+    final firstParentVariation = product.variations.firstWhere(
+          (v) => v.parentName == firstSelectedParentName && v.parentOptionName == firstParentType,
+      orElse: () => product.variations.firstWhere(
+        (v) => v.parentOptionName == firstParentType,
+        orElse: () => product.variations.first,
+      ),
     );
 
-    // Find the selected child variation if child is selected and parent has children
-    ProductSubVariation? selectedChildVariation;
-    if (selectedChild != null && selectedParentVariation.children.isNotEmpty) {
-      selectedChildVariation = selectedParentVariation.children.firstWhere(
-            (child) => child.name == selectedChild,
-        orElse: () => selectedParentVariation.children.first,
-      );
+    // Second parent type (if exists): use variationChildName and variationChildValue
+    String? secondParentType;
+    String? secondSelectedChild;
+    String? secondChildVariationId;
+    
+    if (parentTypes.length > 1) {
+      secondParentType = parentTypes[1];
+      final secondTypeMap = selectedVariationsByType[secondParentType]!;
+      if (secondTypeMap.isNotEmpty) {
+        final secondSelectedParentName = secondTypeMap.keys.first;
+        secondSelectedChild = secondTypeMap[secondSelectedParentName];
+        
+        // Find the second parent variation for IDs
+        final secondParentVariation = product.variations.firstWhere(
+              (v) => v.parentName == secondSelectedParentName && v.parentOptionName == secondParentType,
+          orElse: () => product.variations.firstWhere(
+            (v) => v.parentOptionName == secondParentType,
+            orElse: () => product.variations.first,
+          ),
+        );
+        
+        // Find child variation ID if child is selected
+        if (secondSelectedChild != null && secondParentVariation.children.isNotEmpty) {
+          final secondChildVariation = secondParentVariation.children.firstWhere(
+                (child) => child.name == secondSelectedChild,
+            orElse: () => secondParentVariation.children.first,
+          );
+          secondChildVariationId = secondChildVariation.id;
+        }
+      }
     }
 
     // Add product to cart with selected variations
+    // For display: "Parent Type: Selected Child"
+    // variationParentName = first parent type (e.g., "Size")
+    // variationParentValue = selected child of first parent (e.g., "Small")
+    // variationChildName = second parent type (e.g., "Crust") if exists
+    // variationChildValue = selected child of second parent (e.g., "Thin Crust") if exists
     context.read<CartBloc>().add(
       AddToCart(
         product: product,
         quantity: quantity,
-        variationParentName: selectedParent,
-        variationParentValue: selectedParent,
-        variationChildName: selectedChild,
-        variationChildValue: selectedChild,
-        variationParentId: selectedParentVariation.id,
-        variationChildId: selectedChildVariation?.id,
+        variationParentName: firstParentType, // Label like "Size"
+        variationParentValue: firstSelectedChild ?? firstSelectedParentName, // Selected child like "Small"
+        variationChildName: secondParentType, // Second parent type like "Crust"
+        variationChildValue: secondSelectedChild, // Selected child of second parent like "Thin Crust"
+        variationParentId: firstParentVariation.id,
+        variationChildId: secondChildVariationId,
       ),
     );
   }
@@ -465,35 +541,76 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           return;
                         }
 
-                        final selectedParentVariation = product.variations
-                            .firstWhere(
-                              (v) => v.parentName == selectedParent,
-                          orElse: () => product.variations.first,
+                        // Safety check
+                        if (selectedVariationsByType.isEmpty) {
+                          return;
+                        }
+
+                        // Get all selected parent types
+                        final parentTypes = selectedVariationsByType.keys.toList();
+                        
+                        // First parent type: use variationParentName and variationParentValue
+                        final firstParentType = parentTypes.first;
+                        final firstTypeMap = selectedVariationsByType[firstParentType]!;
+                        
+                        if (firstTypeMap.isEmpty) {
+                          return;
+                        }
+                        
+                        final firstSelectedParentName = firstTypeMap.keys.first;
+                        final firstSelectedChild = firstTypeMap[firstSelectedParentName];
+                        
+                        // Find the first parent variation for IDs
+                        final firstParentVariation = product.variations.firstWhere(
+                              (v) => v.parentName == firstSelectedParentName && v.parentOptionName == firstParentType,
+                          orElse: () => product.variations.firstWhere(
+                            (v) => v.parentOptionName == firstParentType,
+                            orElse: () => product.variations.first,
+                          ),
                         );
 
-                        ProductSubVariation? selectedChildVariation;
-                        if (selectedChild != null &&
-                            selectedParentVariation.children.isNotEmpty) {
-                          selectedChildVariation = selectedParentVariation
-                              .children
-                              .firstWhere(
-                                (child) => child.name == selectedChild,
-                            orElse:
-                                () =>
-                            selectedParentVariation.children.first,
-                          );
+                        // Second parent type (if exists): use variationChildName and variationChildValue
+                        String? secondParentType;
+                        String? secondSelectedChild;
+                        String? secondChildVariationId;
+                        
+                        if (parentTypes.length > 1) {
+                          secondParentType = parentTypes[1];
+                          final secondTypeMap = selectedVariationsByType[secondParentType]!;
+                          if (secondTypeMap.isNotEmpty) {
+                            final secondSelectedParentName = secondTypeMap.keys.first;
+                            secondSelectedChild = secondTypeMap[secondSelectedParentName];
+                            
+                            // Find the second parent variation for IDs
+                            final secondParentVariation = product.variations.firstWhere(
+                                  (v) => v.parentName == secondSelectedParentName && v.parentOptionName == secondParentType,
+                              orElse: () => product.variations.firstWhere(
+                                (v) => v.parentOptionName == secondParentType,
+                                orElse: () => product.variations.first,
+                              ),
+                            );
+                            
+                            // Find child variation ID if child is selected
+                            if (secondSelectedChild != null && secondParentVariation.children.isNotEmpty) {
+                              final secondChildVariation = secondParentVariation.children.firstWhere(
+                                    (child) => child.name == secondSelectedChild,
+                                orElse: () => secondParentVariation.children.first,
+                              );
+                              secondChildVariationId = secondChildVariation.id;
+                            }
+                          }
                         }
 
                         context.read<CartBloc>().add(
                           AddToCart(
                             product: product,
                             quantity: currentQuantity,
-                            variationParentName: selectedParent,
-                            variationParentValue: selectedParent,
-                            variationChildName: selectedChild,
-                            variationChildValue: selectedChild,
-                            variationParentId: selectedParentVariation.id,
-                            variationChildId: selectedChildVariation?.id,
+                            variationParentName: firstParentType,
+                            variationParentValue: firstSelectedChild ?? firstSelectedParentName,
+                            variationChildName: secondParentType,
+                            variationChildValue: secondSelectedChild,
+                            variationParentId: firstParentVariation.id,
+                            variationChildId: secondChildVariationId,
                           ),
                         );
                       });
@@ -557,31 +674,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
         // Handle different variation scenarios
         final hasVariations = product.variations.isNotEmpty;
-        final parentNames =
-        hasVariations
-            ? product.variations.map((e) => e.parentName).toList()
-            : [];
 
-        ProductVariation selectedParentVariation = ProductVariation(
-          id: '',
-          parentName: '',
-          parentOptionName: '',
-          parentPrice: 0,
-          parentOriginalPrice: 0,
-          parentDiscountPercentage: 0,
-          children: [],
-        );
-
+        // Group variations by parentOptionName to show each parent type separately
+        final Map<String, List<ProductVariation>> variationsByParentType = {};
         if (hasVariations) {
-          selectedParentVariation = product.variations.firstWhere(
-                (v) => v.parentName == selectedParent,
-            orElse: () => product.variations.first,
-          );
+          for (final variation in product.variations) {
+            final parentType = variation.parentOptionName;
+            if (!variationsByParentType.containsKey(parentType)) {
+              variationsByParentType[parentType] = [];
+            }
+            variationsByParentType[parentType]!.add(variation);
+          }
         }
-
-        final childOptions =
-        selectedParent == null ? [] : selectedParentVariation.children;
-        final hasChildVariations = childOptions.isNotEmpty;
 
         return LayoutBuilder(
           builder: (context, constraints) {
@@ -728,296 +832,72 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   ),
                                   SizedBox(height: context.heightPct(.02)),
 
-                                  // Show parent variation selector only if variations exist
-                                  // Replace your variation selection code with this improved version
-
                                   if (hasVariations) ...[
-                                    // Parent variation selector with required indicator
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              product.variations.first.parentOptionName,
-                                              style: TextStyle(
-                                                fontSize: isTablet ? 16 : 15,
-                                                fontFamily: FontFamily.fontsPoppinsSemiBold,
-                                                color: Theme.of(context).colorScheme.onSecondary,
-                                                letterSpacing: 0.3,
-                                              ),
-                                            ),
-                                            if (selectedParent == null)
-                                              Container(
-                                                padding: EdgeInsets.symmetric(
-                                                  horizontal: isTablet ? 10 : 8,
-                                                  vertical: isTablet ? 5 : 4,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.red.withValues(alpha: 0.1),
-                                                  borderRadius: BorderRadius.circular(12),
-                                                  border: Border.all(
-                                                    color: Colors.red.withValues(alpha: 0.3),
-                                                  ),
-                                                ),
-                                                child: Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    Icon(
-                                                      Icons.info_outline,
-                                                      size: isTablet ? 14 : 12,
-                                                      color: Colors.red,
-                                                    ),
-                                                    SizedBox(width: 4),
-                                                    Text(
-                                                      Labels.required,
-                                                      style: TextStyle(
-                                                        color: Colors.red,
-                                                        fontSize: isTablet ? 11 : 10,
-                                                        fontFamily: FontFamily.fontsPoppinsSemiBold,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                          ],
-                                        ),
-                                        SizedBox(height: isTablet ? 12 : 10),
-                                        Wrap(
-                                          spacing: isTablet ? 12 : 10,
-                                          runSpacing: isTablet ? 12 : 10,
-                                          children: parentNames.map((option) {
-                                            final isSelected = selectedParent == option;
-
-                                            return GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  selectedParent = option;
-                                                  selectedChild = null;
-                                                });
-                                              },
-                                              child: AnimatedContainer(
-                                                duration: const Duration(milliseconds: 250),
-                                                curve: Curves.easeInOutCubic,
-                                                padding: EdgeInsets.symmetric(
-                                                  horizontal: isTablet ? 18 : 14,
-                                                  vertical: isTablet ? 10 : 8,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  gradient: isSelected
-                                                      ? LinearGradient(
-                                                    colors: [
-                                                      Theme.of(context).colorScheme.primary,
-                                                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.85),
-                                                    ],
-                                                    begin: Alignment.topLeft,
-                                                    end: Alignment.bottomRight,
-                                                  )
-                                                      : null,
-                                                  color: isSelected ? null : Theme.of(context).colorScheme.onPrimary,
-                                                  borderRadius: BorderRadius.circular(isTablet ? 12 : 10),
-                                                  border: Border.all(
-                                                    color: isSelected
-                                                        ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.8)
-                                                        : Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.2),
-                                                    width: isSelected ? 2.0 : 1.5,
-                                                  ),
-                                                  boxShadow: [
-                                                    if (isSelected)
-                                                      BoxShadow(
-                                                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
-                                                        blurRadius: isTablet ? 12 : 10,
-                                                        offset: const Offset(0, 4),
-                                                        spreadRadius: 0,
-                                                      ),
-                                                    if (!isSelected)
-                                                      BoxShadow(
-                                                        color: Colors.black.withValues(alpha: 0.05),
-                                                        blurRadius: isTablet ? 6 : 4,
-                                                        offset: const Offset(0, 2),
-                                                        spreadRadius: 0,
-                                                      ),
-                                                  ],
-                                                ),
-                                                child: Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    if (isSelected) ...[
-                                                      Icon(
-                                                        Icons.check_circle,
-                                                        size: isTablet ? 16 : 14,
-                                                        color: Theme.of(context).colorScheme.onPrimary,
-                                                      ),
-                                                      SizedBox(width: isTablet ? 6 : 5),
-                                                    ],
-                                                    Text(
-                                                      option,
-                                                      style: TextStyle(
-                                                        fontSize: isTablet ? 15 : 13,
-                                                        fontFamily: isSelected
-                                                            ? FontFamily.fontsPoppinsSemiBold
-                                                            : FontFamily.fontsPoppinsRegular,
-                                                        color: isSelected
-                                                            ? Theme.of(context).colorScheme.onPrimary
-                                                            : Theme.of(context).colorScheme.onSecondary.withValues(alpha: .7),
-                                                        letterSpacing: 0.2,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            );
-                                          }).toList(),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: context.heightPct(.015)),
-
-                                    // Show child variation selector only if parent is selected and has children
-                                    if (selectedParent != null && hasChildVariations) ...[
-                                      Column(
+                                    ...variationsByParentType.entries.map((entry) {
+                                      final parentType = entry.key;
+                                      final variations = entry.value;
+                                      
+                                      // Collect all children from all variations in this parent type
+                                      final List<String> allChildNames = [];
+                                      final Map<String, String> childToParentMap = {}; // childName -> parentName
+                                      
+                                      for (final variation in variations) {
+                                        for (final child in variation.children) {
+                                          if (!allChildNames.contains(child.name)) {
+                                            allChildNames.add(child.name);
+                                            childToParentMap[child.name] = variation.parentName;
+                                          }
+                                        }
+                                      }
+                                      
+                                      // Find currently selected child for this parent type
+                                      String? selectedChildForThisType;
+                                      if (selectedVariationsByType.containsKey(parentType)) {
+                                        final typeMap = selectedVariationsByType[parentType]!;
+                                        if (typeMap.isNotEmpty) {
+                                          selectedChildForThisType = typeMap.values.first;
+                                        }
+                                      }
+                                      
+                                      // If no children, skip this parent type
+                                      if (allChildNames.isEmpty) {
+                                        return const SizedBox.shrink();
+                                      }
+                                      
+                                      return Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                selectedParentVariation.children.first.childOptionName,
-                                                style: TextStyle(
-                                                  fontSize: isTablet ? 16 : 15,
-                                                  fontFamily: FontFamily.fontsPoppinsSemiBold,
-                                                  color: Theme.of(context).colorScheme.onSecondary,
-                                                  letterSpacing: 0.3,
-                                                ),
-                                              ),
-                                              if (selectedChild == null)
-                                                Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                    horizontal: isTablet ? 10 : 8,
-                                                    vertical: isTablet ? 5 : 4,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.red.withValues(alpha: 0.1),
-                                                    borderRadius: BorderRadius.circular(12),
-                                                    border: Border.all(
-                                                      color: Colors.red.withValues(alpha: 0.3),
-                                                    ),
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisSize: MainAxisSize.min,
-                                                    children: [
-                                                      Icon(
-                                                        Icons.info_outline,
-                                                        size: isTablet ? 14 : 12,
-                                                        color: Colors.red,
-                                                      ),
-                                                      SizedBox(width: 4),
-                                                      Text(
-                                                        Labels.required,
-                                                        style: TextStyle(
-                                                          color: Colors.red,
-                                                          fontSize: isTablet ? 11 : 10,
-                                                          fontFamily: FontFamily.fontsPoppinsSemiBold,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                            ],
-                                          ),
-                                          SizedBox(height: isTablet ? 12 : 10),
-                                          Wrap(
-                                            spacing: isTablet ? 12 : 10,
-                                            runSpacing: isTablet ? 12 : 10,
-                                            children: childOptions.map((childOption) {
-                                              final isSelected = selectedChild == childOption.name;
-
-                                              return GestureDetector(
-                                                onTap: () {
-                                                  setState(() {
-                                                    selectedChild = childOption.name;
-                                                  });
-                                                },
-                                                child: AnimatedContainer(
-                                                  duration: const Duration(milliseconds: 250),
-                                                  curve: Curves.easeInOutCubic,
-                                                  padding: EdgeInsets.symmetric(
-                                                    horizontal: isTablet ? 18 : 14,
-                                                    vertical: isTablet ? 10 : 8,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    gradient: isSelected
-                                                        ? LinearGradient(
-                                                      colors: [
-                                                        Theme.of(context).colorScheme.primary,
-                                                        Theme.of(context).colorScheme.primary.withValues(alpha: 0.85),
-                                                      ],
-                                                      begin: Alignment.topLeft,
-                                                      end: Alignment.bottomRight,
-                                                    )
-                                                        : null,
-                                                    color: isSelected ? null : Theme.of(context).colorScheme.onPrimary,
-                                                    borderRadius: BorderRadius.circular(isTablet ? 12 : 10),
-                                                    border: Border.all(
-                                                      color: isSelected
-                                                          ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.8)
-                                                          : Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.2),
-                                                      width: isSelected ? 2.0 : 1.5,
-                                                    ),
-                                                    boxShadow: [
-                                                      if (isSelected)
-                                                        BoxShadow(
-                                                          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
-                                                          blurRadius: isTablet ? 12 : 10,
-                                                          offset: const Offset(0, 4),
-                                                          spreadRadius: 0,
-                                                        ),
-                                                      if (!isSelected)
-                                                        BoxShadow(
-                                                          color: Colors.black.withValues(alpha: 0.05),
-                                                          blurRadius: isTablet ? 6 : 4,
-                                                          offset: const Offset(0, 2),
-                                                          spreadRadius: 0,
-                                                        ),
-                                                    ],
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisSize: MainAxisSize.min,
-                                                    children: [
-                                                      if (isSelected) ...[
-                                                        Icon(
-                                                          Icons.check_circle,
-                                                          size: isTablet ? 16 : 14,
-                                                          color: Theme.of(context).colorScheme.onPrimary,
-                                                        ),
-                                                        SizedBox(width: isTablet ? 6 : 5),
-                                                      ],
-                                                      Text(
-                                                        childOption.name,
-                                                        style: TextStyle(
-                                                          fontSize: isTablet ? 15 : 13,
-                                                          fontFamily: isSelected
-                                                              ? FontFamily.fontsPoppinsSemiBold
-                                                              : FontFamily.fontsPoppinsRegular,
-                                                          color: isSelected
-                                                              ? Theme.of(context).colorScheme.onPrimary
-                                                              : Theme.of(context).colorScheme.onSecondary.withValues(alpha: .7),
-                                                          letterSpacing: 0.2,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              );
-                                            }).toList(),
+                                          SizedBox(height: context.heightPct(.01)),
+                                          
+                                          // Show child selector directly with parent type (parentOptionName) as label
+                                          OptionSelectorWidget(
+                                            name: parentType,
+                                            options: allChildNames,
+                                            selectedOption: selectedChildForThisType,
+                                            onSelect: (value) {
+                                              setState(() {
+                                                // Initialize map for this parent type if it doesn't exist
+                                                if (!selectedVariationsByType.containsKey(parentType)) {
+                                                  selectedVariationsByType[parentType] = {};
+                                                }
+                                                
+                                                // Clear previous selection for this parent type
+                                                selectedVariationsByType[parentType]!.clear();
+                                                
+                                                // Add new selection if value is not null
+                                                if (value != null && childToParentMap.containsKey(value)) {
+                                                  final parentName = childToParentMap[value]!;
+                                                  selectedVariationsByType[parentType]![parentName] = value;
+                                                }
+                                              });
+                                            },
                                           ),
                                         ],
-                                      ),
-                                    ],
+                                      );
+                                    }).toList(),
+                                    
+                                    SizedBox(height: context.heightPct(.01)),
                                   ],
-
-                                  SizedBox(height: isTablet ? 15 : 10),
 
                                   SizedBox(
                                     height: imageHeight,
