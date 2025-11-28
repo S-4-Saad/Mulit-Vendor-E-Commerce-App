@@ -500,36 +500,36 @@ class _ProductBoxState extends State<ProductBox> with SingleTickerProviderStateM
                           ),
 
                         // Rating
-                        if (widget.productRating > 0)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.amber.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.star_rounded,
-                                  color: Colors.amber.shade700,
-                                  size: 12,
-                                ),
-                                const SizedBox(width: 2),
-                                Text(
-                                  widget.productRating.toStringAsFixed(1),
-                                  style: TextStyle(
-                                    fontFamily: FontFamily.fontsPoppinsSemiBold,
-                                    color: Colors.amber.shade900,
-                                    fontSize: 9,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                        // if (widget.productRating > 0)
+                        //   Container(
+                        //     padding: const EdgeInsets.symmetric(
+                        //       horizontal: 6,
+                        //       vertical: 3,
+                        //     ),
+                        //     decoration: BoxDecoration(
+                        //       color: Colors.amber.withValues(alpha: 0.15),
+                        //       borderRadius: BorderRadius.circular(6),
+                        //     ),
+                        //     child: Row(
+                        //       mainAxisSize: MainAxisSize.min,
+                        //       children: [
+                        //         Icon(
+                        //           Icons.star_rounded,
+                        //           color: Colors.amber.shade700,
+                        //           size: 12,
+                        //         ),
+                        //         const SizedBox(width: 2),
+                        //         Text(
+                        //           widget.productRating.toStringAsFixed(1),
+                        //           style: TextStyle(
+                        //             fontFamily: FontFamily.fontsPoppinsSemiBold,
+                        //             color: Colors.amber.shade900,
+                        //             fontSize: 9,
+                        //           ),
+                        //         ),
+                        //       ],
+                        //     ),
+                        //   ),
                       ],
                     ),
 

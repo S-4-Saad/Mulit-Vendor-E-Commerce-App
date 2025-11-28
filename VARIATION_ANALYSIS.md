@@ -135,3 +135,4 @@ For a product with multiple variation categories (e.g., Size and Color):
 5. **Price calculation**: Use the price from the selected child variation (or combine if needed)
 6. **Cart storage**: Store all selected variations as a structured list
 
+

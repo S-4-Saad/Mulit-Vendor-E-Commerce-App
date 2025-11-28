@@ -24,12 +24,12 @@ class _SearchPromptScreenState extends State<SearchPromptScreen>
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
-  final List<Map<String, dynamic>> categorySuggestions = [
-    {'name': 'Food', 'icon': Icons.restaurant, 'color': Colors.orange},
-    {'name': 'Supermarket', 'icon': Icons.shopping_cart, 'color': Colors.green},
-    {'name': 'Retail Store', 'icon': Icons.store, 'color': Colors.blue},
-    {'name': 'Pharmacy', 'icon': Icons.medical_services, 'color': Colors.red},
-  ];
+  // final List<Map<String, dynamic>> categorySuggestions = [
+  //   {'name': 'Food', 'icon': Icons.restaurant, 'color': Colors.orange},
+  //   {'name': 'Supermarket', 'icon': Icons.shopping_cart, 'color': Colors.green},
+  //   {'name': 'Retail Store', 'icon': Icons.store, 'color': Colors.blue},
+  //   {'name': 'Pharmacy', 'icon': Icons.medical_services, 'color': Colors.red},
+  // ];
 
   @override
   void initState() {
@@ -340,8 +340,8 @@ class _SearchPromptScreenState extends State<SearchPromptScreen>
                 final allSuggestions =
                     [
                       ...?state.productNames,
-                      ...?state.categoryNames,
-                      ...?state.searchTags,
+                      // ...?state.categoryNames,
+                      // ...?state.searchTags,
                     ].toSet().toList();
 
                 return Container(
@@ -640,39 +640,39 @@ class _SearchPromptScreenState extends State<SearchPromptScreen>
               const SizedBox(height: 1),
 
               // Browse Tags Section
-              BlocBuilder<SearchProductsBloc, SearchProductsState>(
-                builder: (context, state) {
-                  if (state.searchTags == null || state.searchTags!.isEmpty) {
-                    return const SizedBox();
-                  }
-
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSectionHeader(Labels.browseTags),
-                      const SizedBox(height: 12),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children:
-                            state.searchTags!
-                                .map(
-                                  (tag) => _buildChipButton(
-                                    text: tag,
-                                    onTap: () {
-                                      _controller.text = tag;
-                                      _handleSearch(tag);
-                                    },
-                                    icon: Icons.local_offer_outlined,
-                                  ),
-                                )
-                                .toList(),
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-                  );
-                },
-              ),
+              // BlocBuilder<SearchProductsBloc, SearchProductsState>(
+              //   builder: (context, state) {
+              //     if (state.searchTags == null || state.searchTags!.isEmpty) {
+              //       return const SizedBox();
+              //     }
+              //
+              //     return Column(
+              //       crossAxisAlignment: CrossAxisAlignment.start,
+              //       children: [
+              //         _buildSectionHeader(Labels.browseTags),
+              //         const SizedBox(height: 12),
+              //         Wrap(
+              //           spacing: 8,
+              //           runSpacing: 8,
+              //           children:
+              //               state.searchTags!
+              //                   .map(
+              //                     (tag) => _buildChipButton(
+              //                       text: tag,
+              //                       onTap: () {
+              //                         _controller.text = tag;
+              //                         _handleSearch(tag);
+              //                       },
+              //                       icon: Icons.local_offer_outlined,
+              //                     ),
+              //                   )
+              //                   .toList(),
+              //         ),
+              //         const SizedBox(height: 16),
+              //       ],
+              //     );
+              //   },
+              // ),
             ],
           ),
         ),

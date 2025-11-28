@@ -35,17 +35,17 @@ class OrdersBloc extends Bloc<OrdersEvent, OrderState> {
           // Separate orders by status
           final activeOrders =
               ordersResponse.orders
-                  .where((order) => order.status.toLowerCase() == 'approved')
+                  .where((order) => order.status.toLowerCase() == 'approved'||order.status.toLowerCase()=="pending"||order.status.toLowerCase()=="pickedup")
                   .toList();
           print('Active Orders $activeOrders}');
 
           final completedOrders =
               ordersResponse.orders
-                  .where((order) => order.status.toLowerCase() == 'completed')
+                  .where((order) => order.status.toLowerCase() == 'completed'|| order.status.toLowerCase()=='delivered')
                   .toList();
           final cancelledOrders =
               ordersResponse.orders
-                  .where((order) => order.status.toLowerCase() == 'cancelled')
+                  .where((order) => order.status.toLowerCase() == 'cancelled'||order.status.toLowerCase()=='rejected')
                   .toList();
 
           emit(

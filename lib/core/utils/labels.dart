@@ -404,6 +404,7 @@ class Labels {
   static String get fillInYourDetailsToRegister => 'fillInYourDetailsToRegister'.tr();
   static String get createAccount => 'createAccount'.tr();
   static String get createAnAccountToGetStarted => 'createAnAccountToGetStarted'.tr();
+  static String get received => 'received'.tr();
 
 
 

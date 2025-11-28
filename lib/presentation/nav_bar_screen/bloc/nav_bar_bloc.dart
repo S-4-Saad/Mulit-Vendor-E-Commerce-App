@@ -104,17 +104,22 @@ class NavBarBloc extends Bloc<NavBarEvent, NavBarState> {
   Widget _shopMapIndexToPage(int index) {
     switch (index) {
       case 0:
-        return ShopDetailScreen(storeId: state.storeId);
+        return
+          state.storeId != null
+              ? ShopProductsScreen(storeId: state.storeId!)
+              : const Center(child: Text('Store ID not available'));
       case 1:
-        return state.storeId != null
-            ? ProductReviewsScreen(storeId: state.storeId!)
-            : const Center(child: Text('Store ID not available'));
+        return ShopDetailScreen(storeId: state.storeId);
       case 2:
         return state.storeId != null
-            ? ShopProductsScreen(storeId: state.storeId!)
-            : const Center(child: Text('Store ID not available'));
+            ? ProductReviewsScreen(storeId: state.storeId!)
+            : const Center(child: Text('Store ID not available'))
+          ;
       default:
-        return ShopDetailScreen(storeId: state.storeId);
+        return
+          state.storeId != null
+              ? ShopProductsScreen(storeId: state.storeId!)
+              : const Center(child: Text('Store ID not available'));
     }
   }
 
