@@ -850,32 +850,32 @@ class _CartScreenState extends State<CartScreen> {
             const SizedBox(height: 30),
 
             // Decorative animated dots
-            TweenAnimationBuilder<double>(
-              duration: const Duration(milliseconds: 1400),
-              tween: Tween(begin: 0.0, end: 1.0),
-              curve: Curves.easeOut,
-              builder: (context, value, child) {
-                return Opacity(opacity: value, child: child);
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(3, (index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.primary.withOpacity(0.3),
-                      ),
-                    ),
-                  );
-                }),
-              ),
-            ),
+            // TweenAnimationBuilder<double>(
+            //   duration: const Duration(milliseconds: 1400),
+            //   tween: Tween(begin: 0.0, end: 1.0),
+            //   curve: Curves.easeOut,
+            //   builder: (context, value, child) {
+            //     return Opacity(opacity: value, child: child);
+            //   },
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.center,
+            //     children: List.generate(3, (index) {
+            //       return Padding(
+            //         padding: const EdgeInsets.symmetric(horizontal: 4),
+            //         child: Container(
+            //           width: 8,
+            //           height: 8,
+            //           decoration: BoxDecoration(
+            //             shape: BoxShape.circle,
+            //             color: Theme.of(
+            //               context,
+            //             ).colorScheme.primary.withOpacity(0.3),
+            //           ),
+            //         ),
+            //       );
+            //     }),
+            //   ),
+            // ),
           ],
         ),
       ),

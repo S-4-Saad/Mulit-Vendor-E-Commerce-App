@@ -19,9 +19,10 @@ class ShopNavbarScreen extends StatelessWidget {
   ShopNavbarScreen({super.key, this.shopCurrentTab, this.storeId});
 
   final List<String> screenTitles = [
+    Labels.shopProducts,
     Labels.shop,
     Labels.reviews,
-    Labels.shopProducts,
+
   ];
 
   // Premium cart badge widget
@@ -221,12 +222,13 @@ class ShopNavbarScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               // Store Tab
+              _buildProductsTab(context, state, bloc),
               _buildNavItem(
                 context: context,
                 icon: Icons.store_rounded,
                 label: Labels.shop,
-                isSelected: state.shopCurrentTab == 0,
-                onTap: () => bloc.add(const ShopSelectTab(0)),
+                isSelected: state.shopCurrentTab == 1,
+                onTap: () => bloc.add(const ShopSelectTab(1)),
               ),
 
               // Reviews Tab
@@ -234,12 +236,12 @@ class ShopNavbarScreen extends StatelessWidget {
                 context: context,
                 icon: Icons.star_rounded,
                 label: Labels.reviews,
-                isSelected: state.shopCurrentTab == 1,
-                onTap: () => bloc.add(const ShopSelectTab(1)),
+                isSelected: state.shopCurrentTab == 2,
+                onTap: () => bloc.add(const ShopSelectTab(2)),
               ),
 
               // Products Tab (Premium Pill Style)
-              _buildProductsTab(context, state, bloc),
+
             ],
           ),
         ),
@@ -286,7 +288,7 @@ class ShopNavbarScreen extends StatelessWidget {
 
   // Premium Products Tab (Pill Style)
   Widget _buildProductsTab(BuildContext context, NavBarState state, NavBarBloc bloc) {
-    final isSelected = state.shopCurrentTab == 2;
+    final isSelected = state.shopCurrentTab == 0;
 
     return Expanded(
       flex: 2,
@@ -296,7 +298,7 @@ class ShopNavbarScreen extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             borderRadius: BorderRadius.circular(10),
-            onTap: () => bloc.add(const ShopSelectTab(2)),
+            onTap: () => bloc.add(const ShopSelectTab(0)),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeOutCubic,
@@ -382,7 +384,7 @@ class ShopNavbarScreen extends StatelessWidget {
               backgroundColor: Theme.of(context).colorScheme.onPrimary,
 
               // Show AppBar for all tabs except tab 0
-              appBar: state.shopCurrentTab == 0
+              appBar: state.shopCurrentTab == 1
                   ? null
                   : _buildPremiumAppBar(context, state),
 

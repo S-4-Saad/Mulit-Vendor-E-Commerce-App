@@ -79,37 +79,37 @@ class NoProductsWidget extends StatelessWidget {
             const SizedBox(height: 28),
 
             // Decorative wave pattern
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(5, (index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3),
-                  child: TweenAnimationBuilder<double>(
-                    duration: Duration(milliseconds: 800 + (index * 100)),
-                    tween: Tween(begin: 0.0, end: 1.0),
-                    curve: Curves.easeInOut,
-                    builder: (context, value, child) {
-                      return Opacity(
-                        opacity: value,
-                        child: Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: LinearGradient(
-                              colors: [
-                                Theme.of(context).colorScheme.primary,
-                                Theme.of(context).colorScheme.primary.withValues(alpha: .2),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                );
-              }),
-            ),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.center,
+            //   children: List.generate(5, (index) {
+            //     return Padding(
+            //       padding: const EdgeInsets.symmetric(horizontal: 3),
+            //       child: TweenAnimationBuilder<double>(
+            //         duration: Duration(milliseconds: 800 + (index * 100)),
+            //         tween: Tween(begin: 0.0, end: 1.0),
+            //         curve: Curves.easeInOut,
+            //         builder: (context, value, child) {
+            //           return Opacity(
+            //             opacity: value,
+            //             child: Container(
+            //               width: 8,
+            //               height: 8,
+            //               decoration: BoxDecoration(
+            //                 shape: BoxShape.circle,
+            //                 gradient: LinearGradient(
+            //                   colors: [
+            //                     Theme.of(context).colorScheme.primary,
+            //                     Theme.of(context).colorScheme.primary.withValues(alpha: .2),
+            //                   ],
+            //                 ),
+            //               ),
+            //             ),
+            //           );
+            //         },
+            //       ),
+            //     );
+            //   }),
+            // ),
           ],
         ),
       ),

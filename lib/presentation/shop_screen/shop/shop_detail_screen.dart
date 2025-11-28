@@ -200,32 +200,32 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
 
                     // Status & Distance
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         OpenStatusContainer(
                           isOpened: storeModel.store?.isOpen ?? false,
                           isDelivering: storeModel.store?.isDelivery ?? false,
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.onSecondary.withValues(
-                              alpha: .4,
-                            ),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            '${state.shopDistance} ${Labels.km}',
-                            style: TextStyle(
-                              color: theme.colorScheme.onPrimary,
-                              fontFamily: FontFamily.fontsPoppinsSemiBold,
-                              fontSize: context.scaledFont(12),
-                            ),
-                          ),
-                        ),
+                        // Container(
+                        //   padding: const EdgeInsets.symmetric(
+                        //     horizontal: 12,
+                        //     vertical: 4,
+                        //   ),
+                        //   decoration: BoxDecoration(
+                        //     color: theme.colorScheme.onSecondary.withValues(
+                        //       alpha: .4,
+                        //     ),
+                        //     borderRadius: BorderRadius.circular(8),
+                        //   ),
+                        //   child: Text(
+                        //     '${state.shopDistance} ${Labels.km}',
+                        //     style: TextStyle(
+                        //       color: theme.colorScheme.onPrimary,
+                        //       fontFamily: FontFamily.fontsPoppinsSemiBold,
+                        //       fontSize: context.scaledFont(12),
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
 
