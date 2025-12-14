@@ -106,7 +106,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
             (Route<dynamic> route) => false,
           );
           _showOrderSuccessDialog(context);
-        }else if(state.status == CartStatus.error){
+        } else if (state.status == CartStatus.error) {
           SnackBarHelper.showError(
             context,
             state.errorMessage ?? Labels.somethingWentWrongPleaseTryAgain,
@@ -114,6 +114,32 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         }
       },
       builder: (context, state) {
+        // Check if delivery is allowed based on cart contents
+        final isDeliveryAllowed = state.cart.currentDeliveryStatus ?? true;
+
+        // Auto-select pickup if cart has non-deliverable products and no method is selected
+        if (!isDeliveryAllowed && state.selectedMethod == null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              context.read<CartBloc>().add(
+                SetCheckoutMethod(method: CheckoutMethod.pickup),
+              );
+            }
+          });
+        }
+
+        // Force pickup if non-deliverable and delivery was somehow selected
+        if (!isDeliveryAllowed &&
+            state.selectedMethod == CheckoutMethod.delivery) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              context.read<CartBloc>().add(
+                SetCheckoutMethod(method: CheckoutMethod.pickup),
+              );
+            }
+          });
+        }
+
         return Scaffold(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: CustomAppBar(title: Labels.checkout),
@@ -143,69 +169,118 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                     context,
                     icon: Icons.local_shipping_rounded,
                     title: Labels.delivery,
-                    subtitle: Labels.itemDeliverToYourAddress,
-                    trailing: IconButton(
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder:
-                              (context) => DeliveryAddressBottomSheet(
-                                onAddressSelected: (address) {
-                                  context.read<CartBloc>().add(
-                                    SetSelectedAddress(address: address),
-                                  );
-                                },
-                                currentAddress: state.selectedAddress,
-                                addresses: state.addresses,
+                    subtitle:
+                        isDeliveryAllowed
+                            ? Labels.itemDeliverToYourAddress
+                            : Labels.notDeliverable,
+                    trailing:
+                        isDeliveryAllowed
+                            ? IconButton(
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.transparent,
+                                  builder:
+                                      (context) => DeliveryAddressBottomSheet(
+                                        onAddressSelected: (address) {
+                                          context.read<CartBloc>().add(
+                                            SetSelectedAddress(
+                                              address: address,
+                                            ),
+                                          );
+                                        },
+                                        currentAddress: state.selectedAddress,
+                                        addresses: state.addresses,
+                                      ),
+                                );
+                              },
+                              icon: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(
+                                  Icons.edit_rounded,
+                                  size: 18,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
                               ),
-                        );
-                      },
-                      icon: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.edit_rounded,
-                          size: 18,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                    ),
+                            )
+                            : null,
                   ),
 
                   const SizedBox(height: 12),
+
+                  // Show disabled message for non-deliverable products
+                  if (!isDeliveryAllowed)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12.0),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.shade50,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.orange.shade200),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.info_outline_rounded,
+                              size: 20,
+                              color: Colors.orange.shade700,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'These products are only available for pickup',
+                                style: TextStyle(
+                                  fontFamily: FontFamily.fontsPoppinsRegular,
+                                  color: Colors.orange.shade900,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
                   state.addressLoadStatus == AddressLoadStatus.loading
                       ? const Center(child: AddressShimmerTile())
                       : state.addresses.isEmpty
                       ? Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10.0),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.red),
+                        padding: const EdgeInsets.symmetric(vertical: 10.0),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 15,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.red),
+                            ),
+                            child: Text(
+                              Labels.noAddressesFoundPleaseAddAnAddress,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.red),
+                            ),
+                          ),
                         ),
-                        child: Text(
-                          Labels.noAddressesFoundPleaseAddAnAddress,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.red),
-                        ),
-                      ),
-                    ),
-                  )
-                      : _buildDeliveryCard(context, state),
-
+                      )
+                      : _buildDeliveryCard(context, state, isDeliveryAllowed),
 
                   // Delivery Instructions Field
-                  if (state.selectedMethod == CheckoutMethod.delivery) ...[
+                  if (state.selectedMethod == CheckoutMethod.delivery &&
+                      isDeliveryAllowed) ...[
                     const SizedBox(height: 20),
                     _buildDeliveryInstructions(context),
                   ],
@@ -290,14 +365,18 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         decoration: BoxDecoration(
           color:
               isSelected
-                  ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.08)
+                  ? Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.08)
                   : Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color:
                 isSelected
                     ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                    : Theme.of(
+                      context,
+                    ).colorScheme.outline.withValues(alpha: 0.2),
             width: isSelected ? 2 : 1.5,
           ),
           boxShadow:
@@ -314,7 +393,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                   ]
                   : [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha:0.04),
+                      color: Colors.black.withValues(alpha: 0.04),
                       spreadRadius: 0,
                       blurRadius: 8,
                       offset: const Offset(0, 2),
@@ -378,142 +457,177 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
   }
 
   // Enhanced Delivery Card
-  Widget _buildDeliveryCard(BuildContext context, CartState state) {
+  Widget _buildDeliveryCard(
+    BuildContext context,
+    CartState state,
+    bool isDeliveryAllowed,
+  ) {
     final isSelected = state.selectedMethod == CheckoutMethod.delivery;
 
-    return InkWell(
-      onTap: () {
-        context.read<CartBloc>().add(
-          SetCheckoutMethod(method: CheckoutMethod.delivery),
-        );
-      },
-      borderRadius: BorderRadius.circular(16),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color:
-              isSelected
-                  ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.08)
-                  : Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
+    return Opacity(
+      opacity: isDeliveryAllowed ? 1.0 : 0.5,
+      child: InkWell(
+        onTap:
+            isDeliveryAllowed
+                ? () {
+                  context.read<CartBloc>().add(
+                    SetCheckoutMethod(method: CheckoutMethod.delivery),
+                  );
+                }
+                : null,
+        borderRadius: BorderRadius.circular(16),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
             color:
-                isSelected
-                    ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.outline.withValues(alpha:0.2),
-            width: isSelected ? 2 : 1.5,
-          ),
-          boxShadow:
-              isSelected
-                  ? [
-                    BoxShadow(
-                      color: Theme.of(
+                isSelected && isDeliveryAllowed
+                    ? Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.08)
+                    : !isDeliveryAllowed
+                    ? Theme.of(context).colorScheme.surfaceContainerHighest
+                    : Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color:
+                  isSelected && isDeliveryAllowed
+                      ? Theme.of(context).colorScheme.primary
+                      : !isDeliveryAllowed
+                      ? Theme.of(
                         context,
-                      ).colorScheme.primary.withValues(alpha: 0.15),
-                      spreadRadius: 0,
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                  : [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha:0.04),
-                      spreadRadius: 0,
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-        ),
-        child: Row(
-          children: [
-            // Address Icon
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                Icons.location_on_rounded,
-                size: 28,
-                color: Theme.of(context).colorScheme.primary,
-              ),
+                      ).colorScheme.outline.withValues(alpha: 0.3)
+                      : Theme.of(
+                        context,
+                      ).colorScheme.outline.withValues(alpha: 0.2),
+              width: isSelected ? 2 : 1.5,
             ),
-            const SizedBox(width: 14),
+            boxShadow:
+                isSelected && isDeliveryAllowed
+                    ? [
+                      BoxShadow(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.15),
+                        spreadRadius: 0,
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ]
+                    : [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.04),
+                        spreadRadius: 0,
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+          ),
+          child: Row(
+            children: [
+              // Address Icon
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color:
+                      isDeliveryAllowed
+                          ? Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.12)
+                          : Theme.of(
+                            context,
+                          ).colorScheme.outline.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.location_on_rounded,
+                  size: 28,
+                  color:
+                      isDeliveryAllowed
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.outline,
+                ),
+              ),
+              const SizedBox(width: 14),
 
-            // Address Information
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    state.selectedAddress?.title ?? "Delivery Address",
-                    style: TextStyle(
-                      fontFamily: FontFamily.fontsPoppinsSemiBold,
-                      color: Theme.of(context).colorScheme.onSecondary,
-                      fontSize: 15,
-                    ),
-                  ),
-                  if (state.selectedAddress != null) ...[
-                    const SizedBox(height: 4),
+              // Address Information
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
-                      state.selectedAddress!.address ?? '',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                      state.selectedAddress?.title ?? "Delivery Address",
                       style: TextStyle(
-                        fontFamily: FontFamily.fontsPoppinsRegular,
-                        color: Theme.of(context).colorScheme.outline,
-                        fontSize: 13,
+                        fontFamily: FontFamily.fontsPoppinsSemiBold,
+                        color:
+                            isDeliveryAllowed
+                                ? Theme.of(context).colorScheme.onSecondary
+                                : Theme.of(context).colorScheme.outline,
+                        fontSize: 15,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.person_outline_rounded,
-                          size: 14,
+                    if (state.selectedAddress != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        state.selectedAddress!.address ?? '',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontFamily: FontFamily.fontsPoppinsRegular,
                           color: Theme.of(context).colorScheme.outline,
+                          fontSize: 13,
                         ),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            '${state.selectedAddress!.customerName ?? ''} • ${state.selectedAddress!.primaryPhoneNumber ?? ''}',
-                            style: TextStyle(
-                              fontFamily: FontFamily.fontsPoppinsRegular,
-                              color: Theme.of(context).colorScheme.outline,
-                              fontSize: 12,
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.person_outline_rounded,
+                            size: 14,
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              '${state.selectedAddress!.customerName ?? ''} • ${state.selectedAddress!.primaryPhoneNumber ?? ''}',
+                              style: TextStyle(
+                                fontFamily: FontFamily.fontsPoppinsRegular,
+                                color: Theme.of(context).colorScheme.outline,
+                                fontSize: 12,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ] else ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      Labels.selectDeliveryAddress,
-                      style: TextStyle(
-                        fontFamily: FontFamily.fontsPoppinsRegular,
-                        color: Theme.of(context).colorScheme.outline,
-                        fontSize: 13,
+                        ],
                       ),
-                    ),
+                    ] else ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        Labels.selectDeliveryAddress,
+                        style: TextStyle(
+                          fontFamily: FontFamily.fontsPoppinsRegular,
+                          color: Theme.of(context).colorScheme.outline,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
-            ),
 
-            // Radio Button
-            Radio<CheckoutMethod>(
-              value: CheckoutMethod.delivery,
-              groupValue: state.selectedMethod,
-              onChanged:
-                  (value) => context.read<CartBloc>().add(
-                    SetCheckoutMethod(method: value!),
-                  ),
-              activeColor: Theme.of(context).colorScheme.primary,
-            ),
-          ],
+              // Radio Button
+              Radio<CheckoutMethod>(
+                value: CheckoutMethod.delivery,
+                groupValue: state.selectedMethod,
+                onChanged:
+                    isDeliveryAllowed
+                        ? (value) => context.read<CartBloc>().add(
+                          SetCheckoutMethod(method: value!),
+                        )
+                        : null,
+                activeColor: Theme.of(context).colorScheme.primary,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -561,20 +675,26 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
             hintStyle: TextStyle(
               fontSize: 13,
               fontFamily: FontFamily.fontsPoppinsRegular,
-              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.7),
+              color: Theme.of(
+                context,
+              ).colorScheme.outline.withValues(alpha: 0.7),
             ),
             filled: true,
             fillColor: Theme.of(context).colorScheme.surface,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                color: Theme.of(
+                  context,
+                ).colorScheme.outline.withValues(alpha: 0.2),
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                color: Theme.of(
+                  context,
+                ).colorScheme.outline.withValues(alpha: 0.2),
               ),
             ),
             focusedBorder: OutlineInputBorder(
@@ -600,7 +720,9 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.15),
+            color: Theme.of(
+              context,
+            ).colorScheme.outline.withValues(alpha: 0.15),
           ),
           boxShadow: [
             BoxShadow(
@@ -641,7 +763,9 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
             Divider(
               height: 1,
               thickness: 1,
-              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+              color: Theme.of(
+                context,
+              ).colorScheme.outline.withValues(alpha: 0.1),
             ),
 
             // Summary Details
@@ -654,7 +778,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                     label:
                         '${Labels.itemsTotal} (${state.totalItems} ${state.totalItems == 1 ? Labels.item : '${Labels.item}s'})',
                     value:
-                        '${CurrencyIcon.currencyIcon} ${state.subtotal.toStringAsFixed(2)}',
+                        '${CurrencyIcon.currencyIcon}${state.subtotal.toStringAsFixed(2)}',
                   ),
                   const SizedBox(height: 10),
                   _buildSummaryRow(
@@ -833,7 +957,9 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
           label,
           style: TextStyle(
             fontFamily: FontFamily.fontsPoppinsRegular,
-            color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.8),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSecondary.withValues(alpha: 0.8),
             fontSize: 14,
           ),
         ),

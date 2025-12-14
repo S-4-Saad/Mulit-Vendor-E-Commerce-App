@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
@@ -15,22 +14,35 @@ import 'bloc/auth_bloc.dart';
 import 'bloc/auth_event.dart';
 import 'bloc/auth_state.dart';
 
-class ForgotPasswordScreen extends StatefulWidget {
-  ForgotPasswordScreen({super.key});
+class CreateNewPasswordScreen extends StatefulWidget {
+  final String email;
+  final String otp;
+
+  const CreateNewPasswordScreen({
+    super.key,
+    required this.email,
+    required this.otp,
+  });
 
   @override
-  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  State<CreateNewPasswordScreen> createState() =>
+      _CreateNewPasswordScreenState();
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  final TextEditingController emailController = TextEditingController();
-  final GlobalKey<FormState> _forgotPasswordFormKey = GlobalKey<FormState>();
-  final FocusNode emailFocusNode = FocusNode();
+class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
+  final TextEditingController newPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final FocusNode newPasswordFocusNode = FocusNode();
+  final FocusNode confirmPasswordFocusNode = FocusNode();
 
   @override
   void dispose() {
-    emailController.dispose();
-    emailFocusNode.dispose();
+    newPasswordController.dispose();
+    confirmPasswordController.dispose();
+    newPasswordFocusNode.dispose();
+    confirmPasswordFocusNode.dispose();
     super.dispose();
   }
 
@@ -61,18 +73,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     bool isLargeTablet,
   ) {
     if (isLargeTablet) {
-      // Large Tablet Layout - Side by side
       return _buildLargeTabletLayout(context);
     } else if (isTablet) {
-      // Tablet Layout - Centered with more space
       return _buildTabletLayout(context);
     } else {
-      // Mobile Layout - Original design enhanced
       return _buildMobileLayout(context);
     }
   }
 
-  // Mobile Layout (Enhanced)
+  // Mobile Layout
   Widget _buildMobileLayout(BuildContext context) {
     return SingleChildScrollView(
       child: SizedBox(
@@ -103,7 +112,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   _buildLogoSection(context, isMobile: true),
                   SizedBox(height: context.heightPct(.04)),
 
-                  // Forgot Password Form Card
+                  // Create New Password Form Card
                   Expanded(
                     child: Container(
                       width: double.infinity,
@@ -135,7 +144,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             ),
                             SizedBox(height: context.heightPct(.03)),
 
-                            _buildForgotPasswordForm(
+                            _buildPasswordForm(
                               context,
                               maxWidth: double.infinity,
                             ),
@@ -193,10 +202,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   children: [
                     _buildLogoSection(context, isMobile: false),
                     const SizedBox(height: 40),
-                    _buildForgotPasswordForm(
-                      context,
-                      maxWidth: double.infinity,
-                    ),
+                    _buildPasswordForm(context, maxWidth: double.infinity),
                     const SizedBox(height: 24),
                     _buildBottomLinks(context),
                   ],
@@ -209,7 +215,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 
-  // Large Tablet Layout (Side by side)
+  // Large Tablet Layout
   Widget _buildLargeTabletLayout(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
@@ -266,7 +272,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         Image.asset(AppImages.speezuLogo, height: 120),
                         const SizedBox(height: 32),
                         Text(
-                          Labels.letsStartWithRegister,
+                          Labels.createNewPassword,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onPrimary,
@@ -276,7 +282,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          Labels.enterYourEmailToResetYourPassword,
+                          Labels.enterNewPasswordToCompleteReset,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Theme.of(
@@ -300,7 +306,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          Labels.resetPassword,
+                          Labels.createNewPassword,
                           style: TextStyle(
                             fontSize: 32,
                             fontFamily: FontFamily.fontsPoppinsExtraBold,
@@ -309,7 +315,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          Labels.weSendYouALinkToResetYourPassword,
+                          Labels.pleaseEnterYourNewPassword,
                           style: TextStyle(
                             fontSize: 14,
                             fontFamily: FontFamily.fontsPoppinsRegular,
@@ -319,10 +325,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           ),
                         ),
                         const SizedBox(height: 40),
-                        _buildForgotPasswordForm(
-                          context,
-                          maxWidth: double.infinity,
-                        ),
+                        _buildPasswordForm(context, maxWidth: double.infinity),
                         const SizedBox(height: 24),
                         _buildBottomLinks(context),
                       ],
@@ -343,7 +346,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         Image.asset(AppImages.speezuLogo, height: isMobile ? 60 : 80),
         SizedBox(height: isMobile ? 16 : 24),
         Text(
-          Labels.letsStartWithRegister,
+          Labels.createNewPassword,
           textAlign: TextAlign.center,
           style: TextStyle(
             color:
@@ -357,7 +360,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         if (!isMobile) ...[
           const SizedBox(height: 8),
           Text(
-            Labels.enterYourEmailToReceiveAPasswordResetLink,
+            Labels.pleaseEnterYourNewPassword,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
@@ -370,18 +373,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 
-  Widget _buildForgotPasswordForm(
-    BuildContext context, {
-    required double maxWidth,
-  }) {
+  Widget _buildPasswordForm(BuildContext context, {required double maxWidth}) {
     return Form(
-      key: _forgotPasswordFormKey,
+      key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Email Field
+          // New Password Field
           Text(
-            '${Labels.email}',
+            Labels.newPassword,
             style: TextStyle(
               fontSize: 14,
               fontFamily: FontFamily.fontsPoppinsSemiBold,
@@ -390,43 +390,75 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           ),
           const SizedBox(height: 8),
           CustomTextFormField(
-            validator: AppValidators.validateEmail,
-            textEditingController: emailController,
-            hint: 'example@gmail.com',
-            focusNode: emailFocusNode,
-            textInputType: TextInputType.emailAddress,
+            validator: AppValidators.validatePassword,
+            textEditingController: newPasswordController,
+            hint: Labels.enterNewPassword,
+            focusNode: newPasswordFocusNode,
+            nextFocusNode: confirmPasswordFocusNode,
+            obscureText: true,
+          ),
+          const SizedBox(height: 16),
+
+          // Confirm Password Field
+          Text(
+            Labels.confirmPassword,
+            style: TextStyle(
+              fontSize: 14,
+              fontFamily: FontFamily.fontsPoppinsSemiBold,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 8),
+          CustomTextFormField(
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return Labels.pleaseEnterConfirmPassword;
+              }
+              if (value != newPasswordController.text) {
+                return Labels.passwordsDoNotMatch;
+              }
+              return null;
+            },
+            textEditingController: confirmPasswordController,
+            hint: Labels.enterConfirmPassword,
+            focusNode: confirmPasswordFocusNode,
+            obscureText: true,
           ),
           const SizedBox(height: 24),
 
-          // Send Link Button
+          // Save Button
           BlocConsumer<AuthBloc, AuthState>(
             builder:
                 (context, state) =>
-                    state.forgotPasswordStatus == ForgotPasswordStatus.loading
+                    state.createPasswordStatus == CreatePasswordStatus.loading
                         ? const AuthLoader()
                         : LoginCustomElevatedButton(
-                          title: Labels.sendLink,
+                          title: Labels.savePassword,
                           onPressed: () {
-                            if (_forgotPasswordFormKey.currentState!
-                                .validate()) {
+                            if (_formKey.currentState!.validate()) {
                               context.read<AuthBloc>().add(
-                                ResetPasswordEvent(
-                                  email: emailController.text.trim(),
+                                CreateNewPasswordEvent(
+                                  email: widget.email,
+                                  otp: widget.otp,
+                                  confirmPassword:
+                                      confirmPasswordController.text.trim(),
+                                  newPassword:
+                                      newPasswordController.text.trim(),
                                 ),
                               );
                             }
                           },
                         ),
             listener: (context, state) {
-              if (state.forgotPasswordStatus == ForgotPasswordStatus.success) {
-                Navigator.pushReplacementNamed(
+              if (state.createPasswordStatus == CreatePasswordStatus.success) {
+                Navigator.pushNamedAndRemoveUntil(
                   context,
-                  RouteNames.otpVerification,
-                  arguments: emailController.text.trim(),
+                  RouteNames.login,
+                  (route) => false,
                 );
                 SnackBarHelper.showSuccess(context, state.message);
-              } else if (state.forgotPasswordStatus ==
-                  ForgotPasswordStatus.error) {
+              } else if (state.createPasswordStatus ==
+                  CreatePasswordStatus.error) {
                 SnackBarHelper.showError(context, state.message);
               }
             },
@@ -454,7 +486,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  RouteNames.login,
+                  (route) => false,
+                );
               },
               style: TextButton.styleFrom(
                 padding: EdgeInsets.zero,
@@ -463,38 +499,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ),
               child: Text(
                 Labels.login,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
-                  fontSize: 14,
-                  fontFamily: FontFamily.fontsPoppinsSemiBold,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "${Labels.doNotHaveAnAccount} ",
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                fontSize: 14,
-                fontFamily: FontFamily.fontsPoppinsRegular,
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, RouteNames.signUp);
-              },
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.zero,
-                minimumSize: const Size(0, 0),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: Text(
-                Labels.signUp,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
                   fontSize: 14,

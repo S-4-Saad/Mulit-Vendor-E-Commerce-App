@@ -251,7 +251,8 @@ class Labels {
   static String get currentAddress => 'currentAddress'.tr();
   static String get otherAddress => 'otherAddress'.tr();
   static String get updateAddress => 'updateAddress'.tr();
-  static String get addressUpdatedSuccessfully => 'addressUpdatedSuccessfully'.tr();
+  static String get addressUpdatedSuccessfully =>
+      'addressUpdatedSuccessfully'.tr();
   static String get failedToUpdateAddress => 'failedToUpdateAddress'.tr();
   static String get errorMessagePrefix => 'errorMessagePrefix'.tr();
   static String get currentPassword => 'currentPassword'.tr();
@@ -322,7 +323,8 @@ class Labels {
   static String get retail => 'retail'.tr();
   static String get market => 'market'.tr();
   static String get yourOneStopShop => 'yourOneStopShop'.tr();
-  static String get forEveryEveryThingYouNeed => 'forEveryEveryThingYouNeed'.tr();
+  static String get forEveryEveryThingYouNeed =>
+      'forEveryEveryThingYouNeed'.tr();
   static String get loadingYourExperience => 'loadingYourExperience'.tr();
   static String get trySearching => 'trySearching'.tr();
   static String get found => 'found'.tr();
@@ -334,7 +336,9 @@ class Labels {
   static String get orderItems => 'orderItems'.tr();
   static String get placedOn => 'placedOn'.tr();
   static String get orderNumber => 'orderNumber'.tr();
-  static String get pleaseLoginToContinueWithTheActionYouWillGetAccessToAllFeatures => 'pleaseLoginToContinueWithTheActionYouWillGetAccessToAllFeatures'.tr();
+  static String
+  get pleaseLoginToContinueWithTheActionYouWillGetAccessToAllFeatures =>
+      'pleaseLoginToContinueWithTheActionYouWillGetAccessToAllFeatures'.tr();
   static String get mayBeLater => 'mayBeLater'.tr();
   static String get loginNow => 'loginNow'.tr();
   static String get loginRequired => 'loginRequired'.tr();
@@ -347,11 +351,14 @@ class Labels {
   static String get navigation => 'navigation'.tr();
   static String get account => 'account'.tr();
   static String get noActiveOrders => 'noActiveOrders'.tr();
-  static String get youDoNotHaveAnyActiveOrders => 'youDoNotHaveAnyActiveOrders'.tr();
+  static String get youDoNotHaveAnyActiveOrders =>
+      'youDoNotHaveAnyActiveOrders'.tr();
   static String get noCancelledOrders => 'noCancelledOrders'.tr();
-  static String get youDoNotHaveAnyCancelledOrders => 'youDoNotHaveAnyCancelledOrders'.tr();
+  static String get youDoNotHaveAnyCancelledOrders =>
+      'youDoNotHaveAnyCancelledOrders'.tr();
   static String get noCompletedOrders => 'noCompletedOrders'.tr();
-  static String get youDoNotHaveAnyCompletedOrders => 'youDoNotHaveAnyCompletedOrders'.tr();
+  static String get youDoNotHaveAnyCompletedOrders =>
+      'youDoNotHaveAnyCompletedOrders'.tr();
   static String get no => 'no'.tr();
   static String get productAvailable => 'productAvailable'.tr();
   static String get retry => 'retry'.tr();
@@ -365,8 +372,10 @@ class Labels {
   static String get km => 'km'.tr();
   static String get storeDetailNotAvailable => 'storeDetailNotAvailable'.tr();
   static String get noProductsAvailable => 'noProductsAvailable'.tr();
-  static String get weCouldNotFindStoreProducts => 'weCouldNotFindStoreProducts'.tr();
-  static String get areYouSureYouWantToRemoveThisItemFromTheCart => 'areYouSureYouWantToRemoveThisItemFromTheCart'.tr();
+  static String get weCouldNotFindStoreProducts =>
+      'weCouldNotFindStoreProducts'.tr();
+  static String get areYouSureYouWantToRemoveThisItemFromTheCart =>
+      'areYouSureYouWantToRemoveThisItemFromTheCart'.tr();
   static String get removeItem => 'removeItem'.tr();
   static String get remove => 'remove'.tr();
   static String get yourCartIsEmpty => 'yourCartIsEmpty'.tr();
@@ -374,39 +383,102 @@ class Labels {
   static String get continueShopping => 'continueShopping'.tr();
   static String get required => 'required'.tr();
   static String get from => 'from'.tr();
-  static String get paymentIntegrationNotAvailable => 'paymentIntegrationNotAvailable'.tr();
-  static String get addSpecialInstructionsForDeliveryPerson => 'addSpecialInstructionsForDeliveryPerson'.tr();
-  static String get deliveryInstructionsOptional => 'deliveryInstructionsOptional'.tr();
+  static String get paymentIntegrationNotAvailable =>
+      'paymentIntegrationNotAvailable'.tr();
+  static String get addSpecialInstructionsForDeliveryPerson =>
+      'addSpecialInstructionsForDeliveryPerson'.tr();
+  static String get deliveryInstructionsOptional =>
+      'deliveryInstructionsOptional'.tr();
   static String get placingYourOrder => 'placingYourOrder'.tr();
   static String get noAddressesFound => 'noAddressesFound'.tr();
-  static String get pleaseAddAnAddressToContinue => 'pleaseAddAnAddressToContinue'.tr();
+  static String get pleaseAddAnAddressToContinue =>
+      'pleaseAddAnAddressToContinue'.tr();
   static String get couponDiscount => 'couponDiscount'.tr();
   static String get minimumOrderAmount => 'minimumOrderAmount'.tr();
-  static String get invalidCouponCodeTryAgain => 'invalidCouponCodeTryAgain'.tr();
-  static String get couponAppliedSuccessfully => 'couponAppliedSuccessfully'.tr();
-  static String get clearCartAndSwitchProducts => 'clearCartAndSwitchProducts'.tr();
+  static String get invalidCouponCodeTryAgain =>
+      'invalidCouponCodeTryAgain'.tr();
+  static String get couponAppliedSuccessfully =>
+      'couponAppliedSuccessfully'.tr();
+  static String get clearCartAndSwitchProducts =>
+      'clearCartAndSwitchProducts'.tr();
   static String get viewCart => 'viewCart'.tr();
-  static String get youHaveItemsInYourCartFromAnotherStore => 'youHaveItemsInYourCartFromAnotherStore'.tr();
+  static String get youHaveItemsInYourCartFromAnotherStore =>
+      'youHaveItemsInYourCartFromAnotherStore'.tr();
   static String get differentStore => 'differentStore'.tr();
-  static String get noAddressesFoundPleaseAddAnAddress => 'noAddressesFoundPleaseAddAnAddress'.tr();
-  static String get somethingWentWrongPleaseTryAgain => 'somethingWentWrongPleaseTryAgain'.tr();
-  static String get welcomeBackPleaseLoginToContinue => 'welcomeBackPleaseLoginToContinue'.tr();
+  static String get noAddressesFoundPleaseAddAnAddress =>
+      'noAddressesFoundPleaseAddAnAddress'.tr();
+  static String get somethingWentWrongPleaseTryAgain =>
+      'somethingWentWrongPleaseTryAgain'.tr();
+  static String get welcomeBackPleaseLoginToContinue =>
+      'welcomeBackPleaseLoginToContinue'.tr();
   static String get signIn => 'signIn'.tr();
-  static String get enterYourCredentialsToAccessYourAccount => 'enterYourCredentialsToAccessYourAccount'.tr();
+  static String get enterYourCredentialsToAccessYourAccount =>
+      'enterYourCredentialsToAccessYourAccount'.tr();
   static String get donHaveAnAccount => 'donHaveAnAccount'.tr();
   static String get signUp => 'signUp'.tr();
-  static String get enterYourEmailToResetYourPassword => 'enterYourEmailToResetYourPassword'.tr();
+  static String get enterYourEmailToResetYourPassword =>
+      'enterYourEmailToResetYourPassword'.tr();
   static String get resetPassword => 'resetPassword'.tr();
-  static String get weSendYouALinkToResetYourPassword => 'weSendYouALinkToResetYourPassword'.tr();
-  static String get enterYourEmailToReceiveAPasswordResetLink => 'enterYourEmailToReceiveAPasswordResetLink'.tr();
+  static String get weSendYouALinkToResetYourPassword =>
+      'weSendYouALinkToResetYourPassword'.tr();
+  static String get enterYourEmailToReceiveAPasswordResetLink =>
+      'enterYourEmailToReceiveAPasswordResetLink'.tr();
   static String get rememberYourPassword => 'rememberYourPassword'.tr();
-  static String get createYourAccountToGetStarted => 'createYourAccountToGetStarted'.tr();
-  static String get fillInYourDetailsToRegister => 'fillInYourDetailsToRegister'.tr();
+  static String get createYourAccountToGetStarted =>
+      'createYourAccountToGetStarted'.tr();
+  static String get fillInYourDetailsToRegister =>
+      'fillInYourDetailsToRegister'.tr();
   static String get createAccount => 'createAccount'.tr();
-  static String get createAnAccountToGetStarted => 'createAnAccountToGetStarted'.tr();
+  static String get createAnAccountToGetStarted =>
+      'createAnAccountToGetStarted'.tr();
   static String get received => 'received'.tr();
 
+  // OTP Verification Labels
+  static String get otpVerification => 'otpVerification'.tr();
+  static String get verifyOtp => 'verifyOtp'.tr();
+  static String get enterOtp => 'enterOtp'.tr();
+  static String get otpSentTo => 'otpSentTo'.tr();
+  static String get enterOtpSentToYourEmail => 'enterOtpSentToYourEmail'.tr();
+  static String get resendOtp => 'resendOtp'.tr();
+  static String get pleaseEnterValidOtp => 'pleaseEnterValidOtp'.tr();
 
-
-
+  // Create New Password Labels
+  static String get createNewPassword => 'createNewPassword'.tr();
+  static String get confirmPassword => 'confirmPassword'.tr();
+  static String get enterNewPasswordToCompleteReset =>
+      'enterNewPasswordToCompleteReset'.tr();
+  static String get pleaseEnterYourNewPassword =>
+      'pleaseEnterYourNewPassword'.tr();
+  static String get savePassword => 'savePassword'.tr();
+  static String get pleaseEnterConfirmPassword =>
+      'pleaseEnterConfirmPassword'.tr();
+  static String get whatsappNumber => 'whatsappNumber'.tr();
+  static String get deliverable => 'deliverable'.tr();
+  static String get deliveryAvailable => 'deliveryAvailable'.tr();
+  static String get deliveryNotAvailable => 'deliveryNotAvailable'.tr();
+  static String get notDeliverable => 'notDeliverable'.tr();
+  static String get deliveryConflict => 'deliveryConflict'.tr();
+  static String get differentDeliveryStatus => 'differentDeliveryStatus'.tr();
+  static String get cartContainsDeliverable => 'cartContainsDeliverable'.tr();
+  static String get cartContainsNonDeliverable =>
+      'cartContainsNonDeliverable'.tr();
+  static String get areYouSureYouWantToExitTheApplication =>
+      'areYouSureYouWantToExitTheApplication'.tr();
+  static String get exitSpeezuApp => 'exitSpeezuApp'.tr();
+  static String get exit => 'exit'.tr();
+  static String get openSetting => 'openSetting'.tr();
+  static String get tapOpenSettingBelow => 'tapOpenSettingBelow'.tr();
+  static String get goToPrivacyAndSecurity => 'goToPrivacyAndSecurity'.tr();
+  static String get tapLocationServices => 'tapLocationServices'.tr();
+  static String get turnOnLocationServices => 'turnOnLocationServices'.tr();
+  static String get quickSetup => 'quickSetup'.tr();
+  static String get enableLocationServicesAccess =>
+      'enableLocationServicesAccess'.tr();
+  static String get locationServicesOff => 'locationServicesOff'.tr();
+  static String get locationAccessRequired => 'locationAccessRequired'.tr();
+  static String get thsiOrderArepickedUpFromStore =>
+      'thsiOrderArepickedUpFromStore'.tr();
+  static String get pickupLocation => 'pickupLocation'.tr();
+  static String get qrCode => 'qrCode'.tr();
+  static String get topPharmacyProducts => 'topPharmacyProducts'.tr();
 }

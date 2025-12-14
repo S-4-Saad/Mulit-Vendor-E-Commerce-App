@@ -15,7 +15,7 @@ import '../../models/product_model.dart';
 import '../../widgets/carousel_slider_widget.dart';
 import '../../widgets/category_box_widget.dart';
 import '../../widgets/home_header_tile.dart';
-import '../../widgets/home_shimmer_widget.dart';
+import '../../widgets/shimmer/home_shimmer_widget.dart';
 import '../products/bloc/products_event.dart';
 import 'bloc/home_bloc.dart';
 import 'bloc/home_event.dart';
@@ -47,9 +47,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   List<String> imageUrl = [
-    'https://t3.ftcdn.net/jpg/04/65/46/52/360_F_465465254_1pN9MGrA831idD6zIBL7q8rnZZpUCQTy.jpg',
-    "https://static.vecteezy.com/system/resources/thumbnails/002/006/774/small/paper-art-shopping-online-on-smartphone-and-new-buy-sale-promotion-backgroud-for-banner-market-ecommerce-free-vector.jpg",
-    "https://static.vecteezy.com/system/resources/thumbnails/004/299/835/small/online-shopping-on-phone-buy-sell-business-digital-web-banner-application-money-advertising-payment-ecommerce-illustration-search-free-vector.jpg",
+    "https://firebasestorage.googleapis.com/v0/b/qazaumri-9f2b2.firebasestorage.app/o/extra%2FSpeezzu_Radial_Service_Banner%20(1).png?alt=media&token=9c627564-9666-474b-8f7f-5a10ac192237",
+    'https://firebasestorage.googleapis.com/v0/b/qazaumri-9f2b2.firebasestorage.app/o/extra%2FImage%20December%2014%2C%202025%20-%202_38AM.png?alt=media&token=1d871787-762d-4f7a-9292-f762c4f6cb1a',
+    "https://firebasestorage.googleapis.com/v0/b/qazaumri-9f2b2.firebasestorage.app/o/extra%2FGenerated%20Image%20December%2014%2C%202025%20-%203_02AM.png?alt=media&token=5f71dc66-bb2d-4eb3-9347-d4824a2615be",
+    "https://firebasestorage.googleapis.com/v0/b/qazaumri-9f2b2.firebasestorage.app/o/extra%2FSpeezu_Product_Flow_Banner.png?alt=media&token=ad9c0b87-7e50-4030-af12-d853012b5f15",
+    "https://firebasestorage.googleapis.com/v0/b/qazaumri-9f2b2.firebasestorage.app/o/extra%2FGenerated%20Image%20December%2014%2C%202025%20-%203_08AM.png?alt=media&token=c6d4755c-6b34-4165-a9c8-8bc1fd79fb7d",
   ];
 
   ScreenType _getScreenType(double width) {
@@ -141,21 +143,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _fadeController,
+        curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+      ),
+    );
 
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.03),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.fastOutSlowIn,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.fastOutSlowIn),
+    );
 
     // Start animations with slight delay for smoother appearance
     Future.delayed(const Duration(milliseconds: 100), () {
@@ -241,7 +241,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
                           // Main Content
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: horizontalPadding,
+                            ),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -267,8 +269,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   products: getApiFoodProducts(state),
                                   emptyMessage: Labels.noFoodProducts,
                                   onViewAllTap: () {
-                                    context.read<NavBarBloc>().add(SelectTab(0));
-                                    context.read<ProductsBloc>().add(ChangeTabEvent(0));
+                                    context.read<NavBarBloc>().add(
+                                      SelectTab(0),
+                                    );
+                                    context.read<ProductsBloc>().add(
+                                      ChangeTabEvent(0),
+                                    );
                                   },
                                   delay: 300,
                                 ),
@@ -284,8 +290,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   products: getApiSupermarketProducts(state),
                                   emptyMessage: Labels.noSupermarketProducts,
                                   onViewAllTap: () {
-                                    context.read<NavBarBloc>().add(SelectTab(0));
-                                    context.read<ProductsBloc>().add(ChangeTabEvent(1));
+                                    context.read<NavBarBloc>().add(
+                                      SelectTab(0),
+                                    );
+                                    context.read<ProductsBloc>().add(
+                                      ChangeTabEvent(1),
+                                    );
                                   },
                                   delay: 400,
                                 ),
@@ -301,8 +311,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   products: getApiRetailProducts(state),
                                   emptyMessage: Labels.noRetailProducts,
                                   onViewAllTap: () {
-                                    context.read<NavBarBloc>().add(SelectTab(0));
-                                    context.read<ProductsBloc>().add(ChangeTabEvent(2));
+                                    context.read<NavBarBloc>().add(
+                                      SelectTab(0),
+                                    );
+                                    context.read<ProductsBloc>().add(
+                                      ChangeTabEvent(2),
+                                    );
                                   },
                                   delay: 500,
                                 ),
@@ -314,12 +328,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   context: context,
                                   state: state,
                                   screenType: screenType,
-                                  title: Labels.medicines,
+                                  title: Labels.topPharmacyProducts,
                                   products: getApiPharmacyProducts(state),
                                   emptyMessage: Labels.noPharmacyProducts,
                                   onViewAllTap: () {
-                                    context.read<NavBarBloc>().add(SelectTab(0));
-                                    context.read<ProductsBloc>().add(ChangeTabEvent(3));
+                                    context.read<NavBarBloc>().add(
+                                      SelectTab(0),
+                                    );
+                                    context.read<ProductsBloc>().add(
+                                      ChangeTabEvent(3),
+                                    );
                                   },
                                   delay: 600,
                                 ),
@@ -357,10 +375,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     return _AnimatedSection(
       delay: 100,
-      child: EcommerceBanner(
-        imageUrls: imageUrl,
-        height: bannerHeight,
-      ),
+      child: EcommerceBanner(imageUrls: imageUrl, height: bannerHeight),
     );
   }
 
@@ -412,7 +427,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             Icon(
               Icons.shopping_bag_outlined,
               size: 36,
-              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+              color: Theme.of(
+                context,
+              ).colorScheme.outline.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 8),
             Text(
@@ -430,36 +447,39 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildProductList(
-      BuildContext context,
-      ScreenType screenType,
-      List<ProductModel> products,
-      ) {
+    BuildContext context,
+    ScreenType screenType,
+    List<ProductModel> products,
+  ) {
     if (screenType == ScreenType.mobile) {
       // Mobile: Horizontal scroll
       return SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
-          children: products.asMap().entries.map((entry) {
-            return _AnimatedProductCard(
-              delay: entry.key * 50,
-              child: ProductBox(
-                productId: entry.value.id,
-                productPrice: entry.value.productPrice,
-                productOriginalPrice: entry.value.productOriginalPrice,
-                productCategory: entry.value.productCategory,
-                productRating: entry.value.productRating,
-                onProductTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    RouteNames.productScreen,
-                    arguments: entry.value.id,
-                  );
-                },
-                productImageUrl: entry.value.productImageUrl,
-                productTitle: entry.value.productTitle,
-              ),
-            );
-          }).toList(),
+          children:
+              products.asMap().entries.map((entry) {
+                return _AnimatedProductCard(
+                  delay: entry.key * 50,
+                  child: ProductBox(
+                    productId: entry.value.id,
+                    productPrice: entry.value.productPrice,
+                    productOriginalPrice: entry.value.productOriginalPrice,
+                    productCategory: entry.value.productCategory,
+                    productRating: entry.value.productRating,
+                    onProductTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        RouteNames.productScreen,
+                        arguments: entry.value.id,
+                      );
+                    },
+                    isDeliverable: entry.value.isDeliverable,
+                    categoryName: entry.value.categoryName,
+                    productImageUrl: entry.value.productImageUrl,
+                    productTitle: entry.value.productTitle,
+                  ),
+                );
+              }).toList(),
         ),
       );
     } else {
@@ -470,35 +490,40 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       return Wrap(
         spacing: 16,
         runSpacing: 16,
-        children: displayProducts.asMap().entries.map((entry) {
-          final product = entry.value;
-          final width = (MediaQuery.of(context).size.width -
-              (_getHorizontalPadding(screenType) * 2) -
-              (16 * (crossAxisCount - 1))) / crossAxisCount;
+        children:
+            displayProducts.asMap().entries.map((entry) {
+              final product = entry.value;
+              final width =
+                  (MediaQuery.of(context).size.width -
+                      (_getHorizontalPadding(screenType) * 2) -
+                      (16 * (crossAxisCount - 1))) /
+                  crossAxisCount;
 
-          return _AnimatedProductCard(
-            delay: entry.key * 50,
-            child: SizedBox(
-              width: width,
-              child: ProductBox(
-                productId: product.id,
-                productPrice: product.productPrice,
-                productOriginalPrice: product.productOriginalPrice,
-                productCategory: product.productCategory,
-                productRating: product.productRating,
-                onProductTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    RouteNames.productScreen,
-                    arguments: product.id,
-                  );
-                },
-                productImageUrl: product.productImageUrl,
-                productTitle: product.productTitle,
-              ),
-            ),
-          );
-        }).toList(),
+              return _AnimatedProductCard(
+                delay: entry.key * 50,
+                child: SizedBox(
+                  width: width,
+                  child: ProductBox(
+                    productId: product.id,
+                    productPrice: product.productPrice,
+                    productOriginalPrice: product.productOriginalPrice,
+                    productCategory: product.productCategory,
+                    productRating: product.productRating,
+                    isDeliverable: product.isDeliverable,
+                    categoryName: product.categoryName,
+                    onProductTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        RouteNames.productScreen,
+                        arguments: product.id,
+                      );
+                    },
+                    productImageUrl: product.productImageUrl,
+                    productTitle: product.productTitle,
+                  ),
+                ),
+              );
+            }).toList(),
       );
     }
   }
@@ -509,10 +534,7 @@ class _AnimatedSection extends StatefulWidget {
   final Widget child;
   final int delay;
 
-  const _AnimatedSection({
-    required this.child,
-    this.delay = 0,
-  });
+  const _AnimatedSection({required this.child, this.delay = 0});
 
   @override
   State<_AnimatedSection> createState() => _AnimatedSectionState();
@@ -532,21 +554,19 @@ class _AnimatedSectionState extends State<_AnimatedSection>
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.0, 0.65, curve: Curves.easeOut),
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.65, curve: Curves.easeOut),
+      ),
+    );
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.92,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.0, 0.8, curve: Curves.easeOutCubic),
-    ));
+    _scaleAnimation = Tween<double>(begin: 0.92, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.8, curve: Curves.easeOutCubic),
+      ),
+    );
 
     // Start animation with delay
     Future.delayed(Duration(milliseconds: widget.delay), () {
@@ -564,10 +584,7 @@ class _AnimatedSectionState extends State<_AnimatedSection>
   Widget build(BuildContext context) {
     return FadeTransition(
       opacity: _fadeAnimation,
-      child: ScaleTransition(
-        scale: _scaleAnimation,
-        child: widget.child,
-      ),
+      child: ScaleTransition(scale: _scaleAnimation, child: widget.child),
     );
   }
 }
@@ -577,10 +594,7 @@ class _AnimatedProductCard extends StatefulWidget {
   final Widget child;
   final int delay;
 
-  const _AnimatedProductCard({
-    required this.child,
-    this.delay = 0,
-  });
+  const _AnimatedProductCard({required this.child, this.delay = 0});
 
   @override
   State<_AnimatedProductCard> createState() => _AnimatedProductCardState();
@@ -600,21 +614,17 @@ class _AnimatedProductCardState extends State<_AnimatedProductCard>
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.0, 0.7, curve: Curves.easeOut),
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.7, curve: Curves.easeOut),
+      ),
+    );
 
     _scaleAnimation = Tween<double>(
       begin: 0.85,
       end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
 
     // Start animation with delay
     Future.delayed(Duration(milliseconds: widget.delay), () {
@@ -632,10 +642,7 @@ class _AnimatedProductCardState extends State<_AnimatedProductCard>
   Widget build(BuildContext context) {
     return FadeTransition(
       opacity: _fadeAnimation,
-      child: ScaleTransition(
-        scale: _scaleAnimation,
-        child: widget.child,
-      ),
+      child: ScaleTransition(scale: _scaleAnimation, child: widget.child),
     );
   }
 }

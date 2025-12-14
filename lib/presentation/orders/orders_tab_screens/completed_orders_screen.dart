@@ -45,7 +45,7 @@ class _CompletedOrdersScreenState extends State<CompletedOrdersScreen> {
 
           if (state.status == OrderStatus.error) {
             return Center(
-              child:CustomErrorWidget(
+              child: CustomErrorWidget(
                 message: state.errorMessage ?? Labels.error,
                 onRetry: () {
                   context.read<OrdersBloc>().add(RefreshOrdersEvent());
@@ -66,12 +66,12 @@ class _CompletedOrdersScreenState extends State<CompletedOrdersScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                  Labels.noCompletedOrders,
+                    Labels.noCompletedOrders,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                   Labels.youDoNotHaveAnyCompletedOrders,
+                    Labels.youDoNotHaveAnyCompletedOrders,
                     style: Theme.of(context).textTheme.bodyMedium,
                     textAlign: TextAlign.center,
                   ),
@@ -92,6 +92,7 @@ class _CompletedOrdersScreenState extends State<CompletedOrdersScreen> {
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 16),
                   child: OrderCard(
+                    orderCode: order.orderCode,
                     status: order.status,
                     orderId: order.orderId,
                     customerName: order.customerName,
@@ -103,8 +104,10 @@ class _CompletedOrdersScreenState extends State<CompletedOrdersScreen> {
                         context,
                         MaterialPageRoute(
                           builder:
-                              (context) =>
-                                  OrderDetailsScreen(orderId: order.orderId),
+                              (context) => OrderDetailsScreen(
+                                orderId: order.orderId,
+                                orderStatus: order.status,
+                              ),
                         ),
                       );
                     },

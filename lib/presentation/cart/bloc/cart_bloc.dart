@@ -57,9 +57,9 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   }
 
   Future<void> _onCouponCodeChanged(
-      CouponCodeChanged event,
-      Emitter<CartState> emit,
-      ) async {
+    CouponCodeChanged event,
+    Emitter<CartState> emit,
+  ) async {
     print('🔹 Coupon change detected: ${event.code}');
     emit(state.copyWith(couponLoading: CouponLoading.loading));
 
@@ -69,7 +69,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         state.copyWith(
           couponModel: null,
           couponStatus: CouponStatus.initial,
-            couponLoading: CouponLoading.initial,
+          couponLoading: CouponLoading.initial,
           cart: state.cart.copyWith(couponDiscount: 0.0),
         ),
       );
@@ -90,20 +90,27 @@ class CartBloc extends Bloc<CartEvent, CartState> {
 
             if (coupon.status == true) {
               final minOrderAmount =
-                  double.tryParse(coupon.data?.minOrderAmount.toString() ?? '0') ??
-                      0.0;
+                  double.tryParse(
+                    coupon.data?.minOrderAmount.toString() ?? '0',
+                  ) ??
+                  0.0;
               final totalAmount = state.cart.totalAmount;
               final discountAmount =
                   double.tryParse(coupon.data?.maxDiscount.toString() ?? '0') ??
-                      0.0;
+                  0.0;
 
-              print('🧮 Cart total: $totalAmount | Min required: $minOrderAmount');
+              print(
+                '🧮 Cart total: $totalAmount | Min required: $minOrderAmount',
+              );
 
               if (totalAmount >= minOrderAmount) {
-                print('💰 Coupon valid and applicable! Discount: $discountAmount');
+                print(
+                  '💰 Coupon valid and applicable! Discount: $discountAmount',
+                );
 
-                final updatedCart =
-                state.cart.copyWith(couponDiscount: discountAmount);
+                final updatedCart = state.cart.copyWith(
+                  couponDiscount: discountAmount,
+                );
 
                 emit(
                   state.copyWith(
@@ -121,7 +128,8 @@ class CartBloc extends Bloc<CartEvent, CartState> {
                 );
               } else {
                 print(
-                    '🚫 Coupon not applicable. Order must be at least $minOrderAmount.');
+                  '🚫 Coupon not applicable. Order must be at least $minOrderAmount.',
+                );
 
                 emit(
                   state.copyWith(
@@ -193,7 +201,6 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     }
   }
 
-
   // Load cart data from UserRepository
   Future<Cart?> _loadCartFromStorage() async {
     try {
@@ -228,6 +235,9 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         variationParentId: event.variationParentId,
         variationChildId: event.variationChildId,
         storeId: event.product.shop.id.toString(), // Real server store ID
+        calculatedPrice: event.calculatedPrice, // Use pre-calculated price
+        calculatedOriginalPrice:
+            event.calculatedOriginalPrice, // Use pre-calculated original price
       );
 
       // Check if cart has items from a different store
@@ -241,6 +251,23 @@ class CartBloc extends Bloc<CartEvent, CartState> {
             status: CartStatus.error,
             errorMessage:
                 'STORE_CONFLICT:${newCartItem.storeId}:${state.cart.currentStoreId}',
+          ),
+        );
+        return;
+      }
+
+      // Check if cart has items from the same store but with different delivery status
+      if (state.cart.isNotEmpty &&
+          state.cart.currentStoreId == newCartItem.storeId &&
+          state.cart.currentDeliveryStatus != newCartItem.isDeliveryAvailable) {
+        print(
+          'Delivery status conflict detected: Current delivery status: ${state.cart.currentDeliveryStatus}, New delivery status: ${newCartItem.isDeliveryAvailable}',
+        );
+        emit(
+          state.copyWith(
+            status: CartStatus.error,
+            errorMessage:
+                'DELIVERY_CONFLICT:${newCartItem.isDeliveryAvailable}:${state.cart.currentDeliveryStatus}',
           ),
         );
         return;
@@ -670,11 +697,9 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     );
   }
 
-  // Load addresses from UserRepository
+  // Load addresses from UserRepository (local storage - no loading state needed)
   Future<void> loadAddresses() async {
-    emit(state.copyWith(addressLoadStatus: AddressLoadStatus.loading));
     try {
-
       final userRepository = UserRepository();
       await userRepository.init();
       final addresses = userRepository.deliveryAddresses ?? [];

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-
 import '../core/utils/currency_icon.dart';
 import '../core/utils/labels.dart';
-import '../presentation/orders/orders_tab_screens/active_orders_screen.dart';
 import 'custom_mini_elevated_button.dart';
 
 class OrderCard extends StatelessWidget {
@@ -16,6 +14,7 @@ class OrderCard extends StatelessWidget {
   final VoidCallback onViewDetails;
   final VoidCallback? onCancel;
   final VoidCallback? onVerify;
+  final String orderCode;
 
   const OrderCard({
     super.key,
@@ -28,6 +27,7 @@ class OrderCard extends StatelessWidget {
     this.onVerify,
     required this.onViewDetails,
     this.onCancel,
+    required this.orderCode,
   });
 
   Color _getStatusColor() {
@@ -181,8 +181,7 @@ class OrderCard extends StatelessWidget {
 
         // Action Buttons
         // Action Buttons
-        if (status.toLowerCase() == "approved" ||
-            status.toLowerCase() == "pending") ...[
+        if (status.toLowerCase() == "pending") ...[
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -194,16 +193,6 @@ class OrderCard extends StatelessWidget {
                 backgroundColor: Colors.red,
                 textColor: Colors.white,
               ),
-              CustomMiniElevatedButton(
-                title: Labels.received,
-                onPressed: () {
-                  showQrDialog(context, orderId, customerName);
-                },
-                backgroundColor: Colors.green,
-                textColor: Colors.white,
-              ),
-
-              const SizedBox(width: 8),
 
               // 👁 View Details (always visible)
               CustomMiniElevatedButton(
@@ -214,27 +203,27 @@ class OrderCard extends StatelessWidget {
               ),
             ],
           ),
-        ] else if (status.toLowerCase() == "pickedup") ...[
+        ] else if (status.toLowerCase() == "approved" ||
+            status.toLowerCase() == "pending") ...[
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               // ✅ Verify Button
               // For completed/canceled orders -> Only view details
               CustomMiniElevatedButton(
+                title: Labels.qrCode,
+                onPressed: () {
+                  showQrDialog(context, orderId, customerName, orderCode);
+                },
+                backgroundColor: Colors.green,
+                textColor: Colors.white,
+              ),
+              CustomMiniElevatedButton(
                 title: Labels.viewDetails,
                 onPressed: onViewDetails,
                 backgroundColor: Colors.blue,
                 textColor: Colors.white,
               ),
-              CustomMiniElevatedButton(
-                title: Labels.received,
-                onPressed: () {
-                  showQrDialog(context, orderId, customerName);
-                },
-                backgroundColor: Colors.green,
-                textColor: Colors.white,
-              ),
-
             ],
           ),
         ] else ...[
@@ -257,8 +246,13 @@ class OrderCard extends StatelessWidget {
     );
   }
 
-  void showQrDialog(BuildContext context, String orderId, String customerName) {
-    final qrData = "$orderId${customerName.toLowerCase()}";
+  void showQrDialog(
+    BuildContext context,
+    String orderId,
+    String customerName,
+    String orderCode,
+  ) {
+    final qrData = orderCode;
 
     showGeneralDialog(
       context: context,
@@ -289,7 +283,6 @@ class OrderCard extends StatelessWidget {
       },
     );
   }
-
 }
 
 class _PremiumQrDialog extends StatelessWidget {
@@ -308,7 +301,7 @@ class _PremiumQrDialog extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
-       color: Theme.of(context).scaffoldBackgroundColor,
+        color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
@@ -323,7 +316,6 @@ class _PremiumQrDialog extends StatelessWidget {
         children: [
           // Header with gradient
 
-
           // Content
           Padding(
             padding: const EdgeInsets.all(32),
@@ -335,44 +327,45 @@ class _PremiumQrDialog extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.onPrimary,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: Colors.grey.shade200,
-                      width: 1.5,
-                    ),
+                    border: Border.all(color: Colors.grey.shade200, width: 1.5),
                     boxShadow: [
                       BoxShadow(
-                        color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withOpacity(0.2),
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
                     ],
                   ),
-                  child: qrData.isNotEmpty
-                      ? QrImageView(
-                    data: qrData,
-                    version: QrVersions.auto,
-                    size: 200,
-                    backgroundColor: Theme.of(context).colorScheme.onPrimary,
-                    eyeStyle:  QrEyeStyle(
-                      eyeShape: QrEyeShape.square,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    dataModuleStyle:  QrDataModuleStyle(
-                      dataModuleShape: QrDataModuleShape.square,
-                      color:Theme.of(context).colorScheme.onSecondary,
-                    ),
-                  )
-                      : const SizedBox(
-                    width: 200,
-                    height: 200,
-                    child: Center(
-                      child: Icon(
-                        Icons.error_outline,
-                        size: 48,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ),
+                  child:
+                      qrData.isNotEmpty
+                          ? QrImageView(
+                            data: qrData,
+                            version: QrVersions.auto,
+                            size: 200,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.onPrimary,
+                            eyeStyle: QrEyeStyle(
+                              eyeShape: QrEyeShape.square,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            dataModuleStyle: QrDataModuleStyle(
+                              dataModuleShape: QrDataModuleShape.square,
+                              color: Theme.of(context).colorScheme.onSecondary,
+                            ),
+                          )
+                          : const SizedBox(
+                            width: 200,
+                            height: 200,
+                            child: Center(
+                              child: Icon(
+                                Icons.error_outline,
+                                size: 48,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
                 ),
 
                 const SizedBox(height: 24),
@@ -383,10 +376,7 @@ class _PremiumQrDialog extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.onPrimary,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: Colors.grey.shade200,
-                      width: 1,
-                    ),
+                    border: Border.all(color: Colors.grey.shade200, width: 1),
                   ),
                   child: Column(
                     children: [
@@ -398,7 +388,7 @@ class _PremiumQrDialog extends StatelessWidget {
                       const SizedBox(height: 12),
                       _InfoRow(
                         icon: Icons.person_rounded,
-                        label:"${Labels.customer}:",
+                        label: "${Labels.customer}:",
                         value: customerName,
                       ),
                     ],
@@ -413,7 +403,9 @@ class _PremiumQrDialog extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
@@ -447,7 +439,7 @@ class _PremiumQrDialog extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:Theme.of(context).colorScheme.primary,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   elevation: 0,
@@ -455,7 +447,7 @@ class _PremiumQrDialog extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child:  Text(
+                child: Text(
                   Labels.close,
                   style: TextStyle(
                     fontSize: 16,
@@ -487,11 +479,7 @@ class _InfoRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 18,
-          color:Theme.of(context).colorScheme.primary,
-        ),
+        Icon(icon, size: 18, color: Theme.of(context).colorScheme.primary),
         const SizedBox(width: 12),
         Text(
           "$label",
@@ -505,7 +493,7 @@ class _InfoRow extends StatelessWidget {
         Expanded(
           child: Text(
             value,
-            style:  TextStyle(
+            style: TextStyle(
               color: Theme.of(context).colorScheme.onSecondary,
               fontSize: 14,
               fontWeight: FontWeight.w600,

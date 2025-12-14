@@ -23,11 +23,7 @@ class FavouriteListModel {
     return result;
   }
 
-  /// ✅ copyWith
-  FavouriteListModel copyWith({
-    String? status,
-    List<Data>? data,
-  }) {
+  FavouriteListModel copyWith({String? status, List<Data>? data}) {
     return FavouriteListModel(
       status: status ?? this.status,
       data: data ?? List<Data>.from(this.data ?? []),
@@ -61,7 +57,8 @@ class Data {
     storeId = json['store_id'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
-    product = json['product'] != null ? Product.fromJson(json['product']) : null;
+    product =
+        json['product'] != null ? Product.fromJson(json['product']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -78,7 +75,6 @@ class Data {
     return result;
   }
 
-  /// ✅ copyWith
   Data copyWith({
     int? id,
     int? userId,
@@ -112,9 +108,12 @@ class Product {
   String? productMoreImages;
   String? productRating;
   String? productDescription;
-  int? status;
+  bool? isDeliverable; // NEW
+  bool? status;
   String? createdAt;
   String? updatedAt;
+  Store? store; // NEW
+  Category? category;
 
   Product({
     this.id,
@@ -128,9 +127,12 @@ class Product {
     this.productMoreImages,
     this.productRating,
     this.productDescription,
+    this.isDeliverable,
     this.status,
     this.createdAt,
     this.updatedAt,
+    this.store,
+    this.category,
   });
 
   Product.fromJson(Map<String, dynamic> json) {
@@ -145,9 +147,13 @@ class Product {
     productMoreImages = json['product_more_images'];
     productRating = json['product_rating'];
     productDescription = json['product_description'];
+    isDeliverable = json['is_deliverable']; // NEW
     status = json['status'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
+    store = json['store'] != null ? Store.fromJson(json['store']) : null; // NEW
+    category =
+        json['category'] != null ? Category.fromJson(json['category']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -163,13 +169,19 @@ class Product {
     result['product_more_images'] = productMoreImages;
     result['product_rating'] = productRating;
     result['product_description'] = productDescription;
+    result['is_deliverable'] = isDeliverable; // NEW
     result['status'] = status;
     result['created_at'] = createdAt;
     result['updated_at'] = updatedAt;
+    if (store != null) {
+      result['store'] = store!.toJson(); // NEW
+    }
+    if (category != null) {
+      result['category'] = category!.toJson();
+    }
     return result;
   }
 
-  /// ✅ copyWith
   Product copyWith({
     int? id,
     int? categoryId,
@@ -182,9 +194,11 @@ class Product {
     String? productMoreImages,
     String? productRating,
     String? productDescription,
-    int? status,
+    bool? isDeliverable,
+    bool? status,
     String? createdAt,
     String? updatedAt,
+    Store? store,
   }) {
     return Product(
       id: id ?? this.id,
@@ -194,14 +208,60 @@ class Product {
       productPrice: productPrice ?? this.productPrice,
       productDiscount: productDiscount ?? this.productDiscount,
       productDiscountedPrice:
-      productDiscountedPrice ?? this.productDiscountedPrice,
+          productDiscountedPrice ?? this.productDiscountedPrice,
       productImage: productImage ?? this.productImage,
       productMoreImages: productMoreImages ?? this.productMoreImages,
       productRating: productRating ?? this.productRating,
       productDescription: productDescription ?? this.productDescription,
+      isDeliverable: isDeliverable ?? this.isDeliverable,
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      store: store ?? this.store,
     );
+  }
+}
+
+class Store {
+  int? id;
+  String? name;
+  String? image;
+
+  Store({this.id, this.name, this.image});
+
+  Store.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+    image = json['image'];
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'id': id, 'name': name, 'image': image};
+  }
+
+  Store copyWith({int? id, String? name, String? image}) {
+    return Store(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      image: image ?? this.image,
+    );
+  }
+}
+
+class Category {
+  int? id;
+  String? name;
+  String? image;
+
+  Category({this.id, this.name, this.image});
+
+  Category.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+    image = json['image'];
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'id': id, 'name': name, 'image': image};
   }
 }

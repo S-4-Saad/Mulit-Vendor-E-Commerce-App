@@ -3,6 +3,8 @@ class RouteNames {
   static const String login = '/login';
   static const String signUp = '/signUp';
   static const String forgotPassword = '/forgotPassword';
+  static const String otpVerification = '/otpVerification';
+  static const String createNewPassword = '/createNewPassword';
   static const String home = '/home';
   static const String navBarScreen = '/navBarScreen';
   static const String languagesScreen = '/languagesScreen';

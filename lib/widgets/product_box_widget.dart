@@ -259,6 +259,7 @@
 import 'package:flutter/material.dart';
 import '../core/assets/font_family.dart';
 import '../core/utils/currency_icon.dart';
+import '../core/utils/labels.dart';
 import 'app_cache_image.dart';
 
 class ProductBox extends StatefulWidget {
@@ -271,11 +272,13 @@ class ProductBox extends StatefulWidget {
     required this.productOriginalPrice,
     this.productRating = 0.0,
     this.productWidth = 190.0,
-    this.marginPadding = const Padding(padding: EdgeInsets.only(right: 5, left: 5)),
+    this.marginPadding = const Padding(
+      padding: EdgeInsets.only(right: 5, left: 5),
+    ),
     this.currencySymbol = CurrencyIcon.currencyIcon,
     this.productCategory,
     required this.productId,
-    this.isProductFavourite = false,
+    this.isProductFavourite = false,  this.categoryName, required this.isDeliverable,
   });
 
   final VoidCallback onProductTap;
@@ -290,12 +293,15 @@ class ProductBox extends StatefulWidget {
   final String currencySymbol;
   final String? productCategory;
   final bool isProductFavourite;
+  final String? categoryName;
+  final bool isDeliverable;
 
   @override
   State<ProductBox> createState() => _ProductBoxState();
 }
 
-class _ProductBoxState extends State<ProductBox> with SingleTickerProviderStateMixin {
+class _ProductBoxState extends State<ProductBox>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   bool _isPressed = false;
@@ -307,9 +313,10 @@ class _ProductBoxState extends State<ProductBox> with SingleTickerProviderStateM
       duration: const Duration(milliseconds: 150),
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.97).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.97,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -323,8 +330,10 @@ class _ProductBoxState extends State<ProductBox> with SingleTickerProviderStateM
     bool hasDiscount = widget.productPrice < widget.productOriginalPrice;
     double discount = 0.0;
     if (hasDiscount) {
-      discount = ((widget.productOriginalPrice - widget.productPrice) /
-          widget.productOriginalPrice) * 100;
+      discount =
+          ((widget.productOriginalPrice - widget.productPrice) /
+              widget.productOriginalPrice) *
+          100;
     }
 
     return GestureDetector(
@@ -350,16 +359,24 @@ class _ProductBoxState extends State<ProductBox> with SingleTickerProviderStateM
             color: Theme.of(context).colorScheme.onPrimary,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: _isPressed
-                  ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)
-                  : Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.08),
+              color:
+                  _isPressed
+                      ? Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.3)
+                      : Theme.of(
+                        context,
+                      ).colorScheme.onSecondary.withValues(alpha: 0.08),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: _isPressed
-                    ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.15)
-                    : Colors.black.withValues(alpha: 0.04),
+                color:
+                    _isPressed
+                        ? Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.15)
+                        : Colors.black.withValues(alpha: 0.04),
                 spreadRadius: _isPressed ? 2 : 0,
                 blurRadius: _isPressed ? 12 : 8,
                 offset: Offset(0, _isPressed ? 4 : 2),
@@ -386,9 +403,10 @@ class _ProductBoxState extends State<ProductBox> with SingleTickerProviderStateM
                                 height: 155,
                                 width: double.infinity,
                                 round: 12,
-                                imageUrl: widget.productImageUrl.isEmpty
-                                    ? 'https://codup.co/wp-content/uploads/2021/06/How-To-Fix-Failed-to-load-resource-net-ERR_BLOCKED_BY_CLIENT-Error.png-1.webp'
-                                    : widget.productImageUrl,
+                                imageUrl:
+                                    widget.productImageUrl.isEmpty
+                                        ? 'https://codup.co/wp-content/uploads/2021/06/How-To-Fix-Failed-to-load-resource-net-ERR_BLOCKED_BY_CLIENT-Error.png-1.webp'
+                                        : widget.productImageUrl,
                               ),
                               // Subtle gradient overlay
                               Positioned(
@@ -461,6 +479,53 @@ class _ProductBoxState extends State<ProductBox> with SingleTickerProviderStateM
                               ),
                             ),
                           ),
+                        if (widget.isDeliverable)
+                          Positioned(
+                            bottom: 8,
+                            right: 8,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                  Colors.blue.shade400,
+                                  Colors.blue.shade600,
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.blue.withValues(alpha: 0.3),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.delivery_dining,
+                                    size: 10,
+                                    color: Colors.white,
+                                  ),
+                                  const SizedBox(width: 3),
+                                  Text(
+                                    Labels.deliverable,
+                                    style: const TextStyle(
+                                      fontFamily: FontFamily.fontsPoppinsBold,
+                                      color: Colors.white,
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                       ],
                     ),
 
@@ -480,14 +545,39 @@ class _ProductBoxState extends State<ProductBox> with SingleTickerProviderStateM
                                 vertical: 3,
                               ),
                               decoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .primary
-                                    .withValues(alpha: 0.08),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primary.withValues(alpha: 0.08),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
                                 widget.productCategory!,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontFamily: FontFamily.fontsPoppinsMedium,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontSize: 9,
+                                ),
+                              ),
+                            ),
+                          ),
+                        if (widget.categoryName != null &&
+                            widget.categoryName!.isNotEmpty)
+                          Flexible(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primary.withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                widget.categoryName!,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -563,7 +653,7 @@ class _ProductBoxState extends State<ProductBox> with SingleTickerProviderStateM
                           style: TextStyle(
                             fontFamily: FontFamily.fontsPoppinsBold,
                             color: Theme.of(context).colorScheme.primary,
-                            fontSize: 16,
+                            fontSize: 15,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -575,16 +665,14 @@ class _ProductBoxState extends State<ProductBox> with SingleTickerProviderStateM
                             '${widget.currencySymbol}${widget.productOriginalPrice.toStringAsFixed(0)}',
                             style: TextStyle(
                               fontFamily: FontFamily.fontsPoppinsRegular,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSecondary
-                                  .withValues(alpha: 0.5),
-                              fontSize: 11,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSecondary.withValues(alpha: 0.5),
+                              fontSize: 10,
                               decoration: TextDecoration.lineThrough,
-                              decorationColor: Theme.of(context)
-                                  .colorScheme
-                                  .onSecondary
-                                  .withValues(alpha: 0.5),
+                              decorationColor: Theme.of(
+                                context,
+                              ).colorScheme.onSecondary.withValues(alpha: 0.5),
                             ),
                           ),
                         ],
@@ -621,10 +709,7 @@ class _FavoriteButton extends StatefulWidget {
   final bool isFavorite;
   final VoidCallback onPressed;
 
-  const _FavoriteButton({
-    required this.isFavorite,
-    required this.onPressed,
-  });
+  const _FavoriteButton({required this.isFavorite, required this.onPressed});
 
   @override
   State<_FavoriteButton> createState() => _FavoriteButtonState();
@@ -642,9 +727,10 @@ class _FavoriteButtonState extends State<_FavoriteButton>
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.3).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.3,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -666,19 +752,25 @@ class _FavoriteButtonState extends State<_FavoriteButton>
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.95),
+          color: Theme.of(
+            context,
+          ).colorScheme.onPrimary.withValues(alpha: 0.95),
           shape: BoxShape.circle,
           border: Border.all(
-            color: widget.isFavorite
-                ? Colors.red.shade300
-                : Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.15),
+            color:
+                widget.isFavorite
+                    ? Colors.red.shade300
+                    : Theme.of(
+                      context,
+                    ).colorScheme.onSecondary.withValues(alpha: 0.15),
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: widget.isFavorite
-                  ? Colors.red.withValues(alpha: 0.2)
-                  : Colors.black.withValues(alpha: 0.08),
+              color:
+                  widget.isFavorite
+                      ? Colors.red.withValues(alpha: 0.2)
+                      : Colors.black.withValues(alpha: 0.08),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -692,9 +784,12 @@ class _FavoriteButtonState extends State<_FavoriteButton>
             child: Center(
               child: Icon(
                 widget.isFavorite ? Icons.favorite : Icons.favorite_border,
-                color: widget.isFavorite
-                    ? Colors.red.shade500
-                    : Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.6),
+                color:
+                    widget.isFavorite
+                        ? Colors.red.shade500
+                        : Theme.of(
+                          context,
+                        ).colorScheme.onSecondary.withValues(alpha: 0.6),
                 size: 18,
               ),
             ),

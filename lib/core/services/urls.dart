@@ -6,7 +6,10 @@ const String imageBaseUrl = "https://speezu.arhamwaheed.com/";
 ///-----------Auth Apis-----------------///
 const String registerUserUrl = "$baseUrl/signup";
 const String loginUserUrl = "$baseUrl/login";
-const String resetPasswordUrl = "$baseUrl/send_reset_link_email";
+const String changePasswordUrl = "$baseUrl/change-password";
+const String resetPasswordUrl = "$baseUrl/forgot-password";
+const String verifyOtpUrl = "$baseUrl/verify-password-otp";
+const String createNewPasswordUrl = "$baseUrl/reset-password";
 const String faqsUrl = "$baseUrl/faqs";
 const String fcmTokenUrl = "$baseUrl/update-fcm-token";
 

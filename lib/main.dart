@@ -7,6 +7,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speezu/core/theme/theme_bloc/theme_state.dart';
+import 'package:speezu/core/theme/theme_bloc/theme_event.dart';
+import 'package:speezu/core/theme/theme_repository.dart';
 import 'package:speezu/presentation/auth/bloc/auth_bloc.dart';
 import 'package:speezu/presentation/category/bloc/category_bloc.dart';
 import 'package:speezu/presentation/favourites/bloc/favourite_bloc.dart';
@@ -40,7 +42,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Load environment variables
   try {
     await dotenv.load(fileName: ".env");
@@ -56,24 +58,23 @@ void main() async {
   final UserRepository userRepository = UserRepository();
   userRepository.init();
 
-
   // Initialize notification service
   final notificationService = NotificationService();
   await notificationService.initializeLocalNotifications();
   notificationService.requestNotificationPermission();
   notificationService.firebaseInit();
   notificationService.setupInteractMessage();
-  
+
   // Get FCM token and save to server if user is logged in
   final fcmToken = await notificationService.getDeviceToken();
-  
+
   // Check if user is logged in and save FCM token to server
   final isAuthenticated = await userRepository.isUserAuthenticated();
   if (isAuthenticated && fcmToken.isNotEmpty) {
     // Check if token has changed by comparing with stored token
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final storedToken = prefs.getString("fcm");
-    
+
     // Save token if it's different from stored token or if no token is stored
     if (storedToken != fcmToken) {
       try {
@@ -95,18 +96,26 @@ void main() async {
     EasyLocalization(
       supportedLocales: const [
         Locale('en'),
-      Locale('ar'),
-      Locale('es'),
-      Locale('fr'),
-      Locale('fr', 'CA'), // French (Canada)
-      Locale('ko'),
-      Locale('pt', 'BR'), // Portuguese (Brazil)
-       ],
+        Locale('ar'),
+        Locale('es'),
+        Locale('fr'),
+        Locale('fr', 'CA'), // French (Canada)
+        Locale('ko'),
+        Locale('pt', 'BR'), // Portuguese (Brazil)
+      ],
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
       child: MultiBlocProvider(
         providers: [
-          BlocProvider<ThemeBloc>(create: (_) => ThemeBloc()),
+          BlocProvider<ThemeBloc>(
+            create: (_) {
+              final themeRepository = ThemeRepository();
+              final themeBloc = ThemeBloc(themeRepository);
+              // Load saved theme on app startup
+              themeBloc.add(const LoadThemeEvent());
+              return themeBloc;
+            },
+          ),
           BlocProvider<AuthBloc>(create: (_) => AuthBloc()),
           BlocProvider<LanguageBloc>(create: (_) => LanguageBloc()),
           BlocProvider<HomeBloc>(create: (_) => HomeBloc()),

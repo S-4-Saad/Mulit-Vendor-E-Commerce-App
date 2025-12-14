@@ -489,6 +489,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                                       right: index < stores.length - 1 ? 12 : 0,
                                     ),
                                     child: ShopBox(
+                                      onOpenTap: () {},
                                       isRequireDirection: false,
                                       imageUrl: '$imageBaseUrl/${store.image}',
                                       isDelivering: store.isDelivery ?? false,
@@ -554,72 +555,93 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                             const SizedBox(height: 12),
 
                             // Always use grid layout for products
-                   LayoutBuilder(
-                  builder: (context, constraints) {
-                  double screenWidth = constraints.maxWidth;
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                                double screenWidth = constraints.maxWidth;
 
-                  // 🔹 Dynamically decide number of columns based on screen width
-                  int crossAxisCount;
-                  if (screenWidth >= 1200) {
-                  crossAxisCount = 4; // Desktop / large tablet
-                  } else if (screenWidth >= 700) {
-                  crossAxisCount = 3; // Tablet (your 800px screen)
-                  } else if (screenWidth >= 600) {
-                  crossAxisCount = 2; // Large phones / foldables
-                  } else {
-                  crossAxisCount = 2; // Standard mobile
-                  }
+                                // 🔹 Dynamically decide number of columns based on screen width
+                                int crossAxisCount;
+                                if (screenWidth >= 1200) {
+                                  crossAxisCount = 4; // Desktop / large tablet
+                                } else if (screenWidth >= 700) {
+                                  crossAxisCount =
+                                      3; // Tablet (your 800px screen)
+                                } else if (screenWidth >= 600) {
+                                  crossAxisCount =
+                                      2; // Large phones / foldables
+                                } else {
+                                  crossAxisCount = 2; // Standard mobile
+                                }
 
-                  print('📱 Screen width: $screenWidth → Columns: $crossAxisCount');
+                                print(
+                                  '📱 Screen width: $screenWidth → Columns: $crossAxisCount',
+                                );
 
-                  return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                  child: SingleChildScrollView(
-                  child: StaggeredGrid.count(
-                  crossAxisCount: crossAxisCount,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  children: List.generate(products.length, (index) {
-                  final product = products[index];
-                  final productWidth = screenWidth / crossAxisCount - 20;
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10.0,
+                                  ),
+                                  child: SingleChildScrollView(
+                                    child: StaggeredGrid.count(
+                                      crossAxisCount: crossAxisCount,
+                                      mainAxisSpacing: 12,
+                                      crossAxisSpacing: 12,
+                                      children: List.generate(products.length, (
+                                        index,
+                                      ) {
+                                        final product = products[index];
+                                        final productWidth =
+                                            screenWidth / crossAxisCount - 20;
 
-                  return StaggeredGridTile.fit(
-                  crossAxisCellCount: 1,
-                  child: ProductBox(
-                  marginPadding: const Padding(padding: EdgeInsets.all(0)),
-                  productWidth: productWidth,
-                  productId: product.id.toString(),
-                  onProductTap: () {
-                  Navigator.pushNamed(
-                  context,
-                  RouteNames.productScreen,
-                  arguments: product.id.toString(),
-                  );
-                  },
-                  productCategory: product.category?.name ?? '',
-                  productTitle: product.productName ?? '',
-                  productPrice: double.tryParse(
-                  product.productDiscountedPrice ?? '',
-                  ) ??
-                  0.0,
-                  productImageUrl: '$imageBaseUrl/${product.productImage}',
-                  productOriginalPrice: double.tryParse(
-                  product.productPrice ?? '',
-                  ) ??
-                  0.0,
-                  productRating: double.tryParse(
-                  product.productRating ?? '',
-                  ) ??
-                  0.0,
-                  ),
-                  );
-                  }),
-                  ),
-                  ),
-                  );
-                  },
-                  ),
-                  ],
+                                        return StaggeredGridTile.fit(
+                                          crossAxisCellCount: 1,
+                                          child: ProductBox(
+                                            isDeliverable: product.isDeliverable??false,
+                                            categoryName: product.category?.name??'',
+                                            marginPadding: const Padding(
+                                              padding: EdgeInsets.all(0),
+                                            ),
+                                            productWidth: productWidth,
+                                            productId: product.id.toString(),
+                                            onProductTap: () {
+                                              Navigator.pushNamed(
+                                                context,
+                                                RouteNames.productScreen,
+                                                arguments:
+                                                    product.id.toString(),
+                                              );
+                                            },
+                                            productCategory:
+                                                product.store?.name ?? '',
+                                            productTitle:
+                                                product.productName ?? '',
+                                            productPrice:
+                                                double.tryParse(
+                                                  product.productDiscountedPrice ??
+                                                      '',
+                                                ) ??
+                                                0.0,
+                                            productImageUrl:
+                                                '$imageBaseUrl/${product.productImage}',
+                                            productOriginalPrice:
+                                                double.tryParse(
+                                                  product.productPrice ?? '',
+                                                ) ??
+                                                0.0,
+                                            productRating:
+                                                double.tryParse(
+                                                  product.productRating ?? '',
+                                                ) ??
+                                                0.0,
+                                          ),
+                                        );
+                                      }),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
                         ],
                       ),
                     );

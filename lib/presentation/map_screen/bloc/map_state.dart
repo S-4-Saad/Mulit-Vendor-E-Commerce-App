@@ -31,6 +31,14 @@ class MapLoaded extends MapState {
   final Set<Marker> markers;
   final List<ShopModel> restaurants;
   final bool isLoadingRestaurants;
+  // Route navigation fields
+  final Set<Polyline> polylines;
+  final String? routeDistance;
+  final String? routeDuration;
+  final ShopModel? selectedShop;
+  final bool isLoadingRoute;
+  // Restaurant list visibility
+  final bool isRestaurantListVisible;
 
   const MapLoaded({
     this.currentPosition,
@@ -41,19 +49,31 @@ class MapLoaded extends MapState {
     this.markers = const {},
     this.restaurants = const [],
     this.isLoadingRestaurants = false,
+    this.polylines = const {},
+    this.routeDistance,
+    this.routeDuration,
+    this.selectedShop,
+    this.isLoadingRoute = false,
+    this.isRestaurantListVisible = true,
   });
 
   @override
   List<Object?> get props => [
-        currentPosition,
-        isLocationEnabled,
-        mapType,
-        controller,
-        cameraPosition,
-        markers,
-        restaurants,
-        isLoadingRestaurants,
-      ];
+    currentPosition,
+    isLocationEnabled,
+    mapType,
+    controller,
+    cameraPosition,
+    markers,
+    restaurants,
+    isLoadingRestaurants,
+    polylines,
+    routeDistance,
+    routeDuration,
+    selectedShop,
+    isLoadingRoute,
+    isRestaurantListVisible,
+  ];
 
   MapLoaded copyWith({
     LatLng? currentPosition,
@@ -64,6 +84,13 @@ class MapLoaded extends MapState {
     Set<Marker>? markers,
     List<ShopModel>? restaurants,
     bool? isLoadingRestaurants,
+    Set<Polyline>? polylines,
+    String? routeDistance,
+    String? routeDuration,
+    ShopModel? selectedShop,
+    bool? isLoadingRoute,
+    bool? isRestaurantListVisible,
+    bool clearRoute = false,
   }) {
     return MapLoaded(
       currentPosition: currentPosition ?? this.currentPosition,
@@ -74,6 +101,15 @@ class MapLoaded extends MapState {
       markers: markers ?? this.markers,
       restaurants: restaurants ?? this.restaurants,
       isLoadingRestaurants: isLoadingRestaurants ?? this.isLoadingRestaurants,
+      polylines: clearRoute ? const {} : (polylines ?? this.polylines),
+      routeDistance: clearRoute ? null : (routeDistance ?? this.routeDistance),
+      routeDuration: clearRoute ? null : (routeDuration ?? this.routeDuration),
+      selectedShop: clearRoute ? null : (selectedShop ?? this.selectedShop),
+      isLoadingRoute: isLoadingRoute ?? this.isLoadingRoute,
+      isRestaurantListVisible:
+          clearRoute
+              ? true
+              : (isRestaurantListVisible ?? this.isRestaurantListVisible),
     );
   }
 }
@@ -89,13 +125,28 @@ class MapError extends MapState {
 }
 
 class MapLocationPermissionDenied extends MapState {
-  const MapLocationPermissionDenied();
+  final DateTime timestamp;
+
+  MapLocationPermissionDenied() : timestamp = DateTime.now();
+
+  @override
+  List<Object> get props => [timestamp];
 }
 
 class MapLocationPermissionDeniedPermanently extends MapState {
-  const MapLocationPermissionDeniedPermanently();
+  final DateTime timestamp;
+
+  MapLocationPermissionDeniedPermanently() : timestamp = DateTime.now();
+
+  @override
+  List<Object> get props => [timestamp];
 }
 
 class MapLocationServiceDisabled extends MapState {
-  const MapLocationServiceDisabled();
+  final DateTime timestamp;
+
+  MapLocationServiceDisabled() : timestamp = DateTime.now();
+
+  @override
+  List<Object> get props => [timestamp];
 }

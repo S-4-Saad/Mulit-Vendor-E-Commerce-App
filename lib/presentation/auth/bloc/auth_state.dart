@@ -10,12 +10,18 @@ enum SignUpStatus { initial, loading, success, error }
 
 enum LogoutStatus { initial, loading, success, error }
 
+enum OtpVerificationStatus { initial, loading, success, error }
+
+enum CreatePasswordStatus { initial, loading, success, error }
+
 class AuthState extends Equatable {
   final String message;
   final LoginStatus loginStatus;
   final ForgotPasswordStatus forgotPasswordStatus;
   final LogoutStatus logoutStatus;
   final SignUpStatus signUpStatus;
+  final OtpVerificationStatus otpVerificationStatus;
+  final CreatePasswordStatus createPasswordStatus;
   final UserModel? userModel; // Store the full response here
 
   const AuthState({
@@ -24,6 +30,8 @@ class AuthState extends Equatable {
     this.logoutStatus = LogoutStatus.initial,
     this.forgotPasswordStatus = ForgotPasswordStatus.initial,
     this.signUpStatus = SignUpStatus.initial,
+    this.otpVerificationStatus = OtpVerificationStatus.initial,
+    this.createPasswordStatus = CreatePasswordStatus.initial,
     this.userModel,
   });
 
@@ -33,6 +41,8 @@ class AuthState extends Equatable {
     ForgotPasswordStatus? forgotPasswordStatus,
     LogoutStatus? logoutStatus,
     SignUpStatus? signUpStatus,
+    OtpVerificationStatus? otpVerificationStatus,
+    CreatePasswordStatus? createPasswordStatus,
     UserModel? userModel,
   }) {
     return AuthState(
@@ -41,17 +51,19 @@ class AuthState extends Equatable {
       forgotPasswordStatus: forgotPasswordStatus ?? this.forgotPasswordStatus,
       logoutStatus: logoutStatus ?? this.logoutStatus,
       signUpStatus: signUpStatus ?? this.signUpStatus,
+      otpVerificationStatus:
+          otpVerificationStatus ?? this.otpVerificationStatus,
+      createPasswordStatus: createPasswordStatus ?? this.createPasswordStatus,
       userModel: userModel ?? this.userModel,
     );
   }
 
   @override
   String toString() {
-    return 'LoginState(message: $message, loginStatus: $loginStatus, forgotPasswordStatus: $forgotPasswordStatus, logoutStatus: $logoutStatus, userModel: $userModel, signUpStatus: $signUpStatus)';
+    return 'LoginState(message: $message, loginStatus: $loginStatus, forgotPasswordStatus: $forgotPasswordStatus, logoutStatus: $logoutStatus, userModel: $userModel, signUpStatus: $signUpStatus, otpVerificationStatus: $otpVerificationStatus, createPasswordStatus: $createPasswordStatus)';
   }
 
   @override
-  // TODO: implement props
   List<Object?> get props => [
     message,
     loginStatus,
@@ -59,5 +71,7 @@ class AuthState extends Equatable {
     forgotPasswordStatus,
     signUpStatus,
     logoutStatus,
+    otpVerificationStatus,
+    createPasswordStatus,
   ];
 }

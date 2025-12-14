@@ -1,5 +1,4 @@
-
 class CurrencyIcon {
   CurrencyIcon._();
-  static const String currencyIcon = 'NGN ';
+  static const String currencyIcon = '₦ ';
 }

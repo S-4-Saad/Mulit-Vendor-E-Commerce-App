@@ -7,6 +7,8 @@ class ProductModel {
   final double productRating;
   final String? productCategory;
   final bool isProductFavourite;
+  final String categoryName;
+  final bool isDeliverable;
 
   ProductModel({
     required this.id,
@@ -17,5 +19,7 @@ class ProductModel {
     this.productRating = 0.0,
     this.productCategory,
     this.isProductFavourite = false,
+    required this.categoryName,
+    required this.isDeliverable
   });
 }
