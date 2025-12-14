@@ -108,3 +108,23 @@ class MapRestaurantsError extends MapEvent {
   @override
   List<Object> get props => [error];
 }
+
+/// Event to show route from current location to selected shop
+class MapShowRouteToShop extends MapEvent {
+  final ShopModel shop;
+
+  const MapShowRouteToShop(this.shop);
+
+  @override
+  List<Object> get props => [shop];
+}
+
+/// Event to clear the current route from the map
+class MapClearRoute extends MapEvent {
+  const MapClearRoute();
+}
+
+/// Event to toggle restaurant list visibility
+class MapToggleRestaurantListVisibility extends MapEvent {
+  const MapToggleRestaurantListVisibility();
+}

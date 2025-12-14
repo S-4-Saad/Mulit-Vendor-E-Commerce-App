@@ -18,7 +18,8 @@ class CategoryProductsModel {
       message: json['message'] ?? '',
       data: (json['data'] as List<dynamic>?)
           ?.map((item) => CategoryProductData.fromJson(item))
-          .toList() ?? [],
+          .toList() ??
+          [],
     );
   }
 }
@@ -33,6 +34,8 @@ class CategoryProductData {
   final String productRating;
   final String productDescription;
   final ProductCategory? category;
+  final ProductStore? store;
+  final bool isDeliverable;
 
   CategoryProductData({
     required this.id,
@@ -43,6 +46,8 @@ class CategoryProductData {
     required this.productImage,
     required this.productRating,
     required this.productDescription,
+    required this.isDeliverable,
+    this.store,
     this.category,
   });
 
@@ -56,21 +61,24 @@ class CategoryProductData {
       productImage: json['product_image'] ?? '',
       productRating: json['product_rating'] ?? '0',
       productDescription: json['product_description'] ?? '',
-      category: json['category'] != null ? ProductCategory.fromJson(json['category']) : null,
+      isDeliverable: json['is_deliverable'] == true, // ✅ FIXED
+      store: json['store'] != null ? ProductStore.fromJson(json['store']) : null,
+      category:
+      json['category'] != null ? ProductCategory.fromJson(json['category']) : null,
     );
   }
 
-  // Convert to DummyProductModel for UI compatibility
+  /// Convert to ProductModel
   ProductModel toDummyProductModel({String? category}) {
-    // Construct full image URL if the image path is relative
-    String fullImageUrl = productImage;
-    if (!productImage.startsWith('http')) {
-      fullImageUrl = "$imageBaseUrl$productImage";
-    }
-    
-    // Use the real category name from the nested category object
-    String categoryName = category ?? this.category?.name ?? 'Product';
-    
+    // Fix image path
+    String fullImageUrl = productImage.startsWith('http')
+        ? productImage
+        : "$imageBaseUrl$productImage";
+
+    // Correct category & store name mapping (FIXED)
+    String categoryName = category ?? this.category?.name ?? '';
+    String storeName = this.store?.name ?? '';
+
     return ProductModel(
       id: id.toString(),
       productTitle: productName,
@@ -78,7 +86,9 @@ class CategoryProductData {
       productOriginalPrice: double.tryParse(productPrice) ?? 0.0,
       productImageUrl: fullImageUrl,
       productRating: double.tryParse(productRating) ?? 0.0,
-      productCategory: categoryName,
+      productCategory: storeName, // FIXED
+      isDeliverable: isDeliverable,
+      categoryName: categoryName,
       isProductFavourite: false,
     );
   }
@@ -97,6 +107,26 @@ class ProductCategory {
 
   factory ProductCategory.fromJson(Map<String, dynamic> json) {
     return ProductCategory(
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      image: json['image'] ?? '',
+    );
+  }
+}
+
+class ProductStore {
+  final int id;
+  final String name;
+  final String image;
+
+  ProductStore({
+    required this.id,
+    required this.name,
+    required this.image,
+  });
+
+  factory ProductStore.fromJson(Map<String, dynamic> json) {
+    return ProductStore(
       id: json['id'] ?? 0,
       name: json['name'] ?? '',
       image: json['image'] ?? '',

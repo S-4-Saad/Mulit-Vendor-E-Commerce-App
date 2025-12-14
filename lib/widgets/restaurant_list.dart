@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/models/shop_model.dart';
+import 'package:speezu/presentation/map_screen/bloc/map_bloc.dart';
+import 'package:speezu/presentation/map_screen/bloc/map_event.dart';
 import 'package:speezu/widgets/shop_box_widget.dart';
+
 class ShopList extends StatelessWidget {
   final List<ShopModel> shops;
   final Function(ShopModel)? onShopTap;
@@ -38,12 +42,16 @@ class ShopList extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.all(8.0),
             child: ShopBox(
-              onShopBoxTap: () => onShopTap?.call(shop),
+              onShopBoxTap: () {
+                // Show route to this shop on the map
+                context.read<MapBloc>().add(MapShowRouteToShop(shop));
+              },
+              onOpenTap: () => onShopTap?.call(shop),
 
               imageUrl: shop.imageUrl.toString(),
               isDelivering: true,
               isOpen: true,
-             onDirectionTap: () => onLocationTap?.call(shop),
+              onDirectionTap: () => onLocationTap?.call(shop),
 
               shopName: shop.shopName,
               shopDescription: shop.shopDescription,

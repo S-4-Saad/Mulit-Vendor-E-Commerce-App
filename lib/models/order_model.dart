@@ -5,6 +5,7 @@ class OrderModel {
   final String amount;
   final String dateTime;
   final String status;
+  final String orderCode;
 
   OrderModel({
     required this.orderId,
@@ -13,6 +14,7 @@ class OrderModel {
     required this.amount,
     required this.dateTime,
     required this.status,
+    required this.orderCode,
   });
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class OrderModel {
       amount: json['amount']?.toString() ?? '0.00',
       dateTime: json['dateTime'] ?? '',
       status: json['status'] ?? '',
+      orderCode: json['orderCode'] ?? '',
     );
   }
 
@@ -34,12 +37,13 @@ class OrderModel {
       'amount': amount,
       'dateTime': dateTime,
       'status': status,
+      'orderCode': orderCode,
     };
   }
 
   @override
   String toString() {
-    return 'OrderModel(orderId: $orderId, customerName: $customerName, paymentMethod: $paymentMethod, amount: $amount, status: $status)';
+    return 'OrderModel(orderId: $orderId, customerName: $customerName, paymentMethod: $paymentMethod, amount: $amount, status: $status, orderCode: $orderCode)';
   }
 }
 
@@ -58,7 +62,8 @@ class OrdersResponse {
     return OrdersResponse(
       success: json['success'] ?? false,
       message: json['message'] ?? '',
-      orders: (json['orders'] as List<dynamic>?)
+      orders:
+          (json['orders'] as List<dynamic>?)
               ?.map((order) => OrderModel.fromJson(order))
               .toList() ??
           [],

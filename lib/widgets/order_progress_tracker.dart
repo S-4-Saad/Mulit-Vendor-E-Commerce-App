@@ -9,14 +9,18 @@ import '../core/utils/labels.dart';
 class OrderProgressTracker extends StatelessWidget {
   final bool isFoodOrder;
   final int currentStep;
+  final bool isPickupOrder;
 
   const OrderProgressTracker({
     super.key,
     required this.currentStep,
     this.isFoodOrder = false,
+    this.isPickupOrder = false,
   });
 
   Color _getStepColor(BuildContext context, int stepIndex) {
+    // Adjust step index checking for pickup flow mapping if needed
+    // For now simplistic index comparison
     if (currentStep >= stepIndex) {
       return Theme.of(context).colorScheme.primary;
     }
@@ -24,14 +28,27 @@ class OrderProgressTracker extends StatelessWidget {
   }
 
   Widget _buildStepCircle(
-      BuildContext context,
-      int stepIndex,
-      bool isMobile,
-      bool isTablet,
-      ) {
-    final isCompleted = currentStep > stepIndex;
-    final isActive = currentStep == stepIndex;
-    final isPending = currentStep < stepIndex;
+    BuildContext context,
+    int stepIndex,
+    bool isMobile,
+    bool isTablet,
+  ) {
+    // Map current status to step index for pickup
+    // Pickup Flow: 0 (Placed) -> 1 (Accepted) -> 2 (Ready/Delivered)
+    // Backend Status: 0(Placed) -> 1(Processing) -> 2,3,4(Ready/Delivered)
+    int actualCurrentStepForUI = currentStep;
+
+    if (isPickupOrder) {
+      if (currentStep >= 2) {
+        actualCurrentStepForUI = 2;
+      } else {
+        actualCurrentStepForUI = currentStep;
+      }
+    }
+
+    final isCompleted = actualCurrentStepForUI > stepIndex;
+    final isActive = actualCurrentStepForUI == stepIndex;
+    final isPending = actualCurrentStepForUI < stepIndex;
 
     final double circleSize = isMobile ? 32 : (isTablet ? 36 : 40);
     final double iconSize = isMobile ? 14 : (isTablet ? 16 : 18);
@@ -53,13 +70,17 @@ class OrderProgressTracker extends StatelessWidget {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.4),
               blurRadius: isMobile ? 8 : 12,
               spreadRadius: isMobile ? 1 : 2,
               offset: const Offset(0, 2),
             ),
             BoxShadow(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.2),
               blurRadius: isMobile ? 4 : 6,
               spreadRadius: 0,
               offset: const Offset(0, 1),
@@ -85,13 +106,17 @@ class OrderProgressTracker extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.4),
               blurRadius: isMobile ? 12 : 16,
               spreadRadius: isMobile ? 2 : 3,
               offset: const Offset(0, 2),
             ),
             BoxShadow(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.2),
               blurRadius: isMobile ? 6 : 8,
               spreadRadius: 0,
               offset: const Offset(0, 1),
@@ -122,7 +147,9 @@ class OrderProgressTracker extends StatelessWidget {
           color: Theme.of(context).colorScheme.onPrimary,
           shape: BoxShape.circle,
           border: Border.all(
-            color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.15),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSecondary.withValues(alpha: 0.15),
             width: 2.0,
           ),
           boxShadow: [
@@ -138,81 +165,122 @@ class OrderProgressTracker extends StatelessWidget {
   }
 
   Widget _buildStepIcon(
-      BuildContext context,
-      String iconPath,
-      int stepIndex,
-      bool isMobile,
-      bool isTablet,
-      ) {
-    final isActive = currentStep >= stepIndex;
+    BuildContext context,
+    String iconPath,
+    int stepIndex,
+    bool isMobile,
+    bool isTablet,
+  ) {
+    // Adjusted active check for pickup mapping
+    int actualCurrentStepForUI = currentStep;
+    if (isPickupOrder) {
+      if (currentStep >= 2) {
+        actualCurrentStepForUI = 2;
+      } else {
+        actualCurrentStepForUI = currentStep;
+      }
+    }
+
+    final isActive = actualCurrentStepForUI >= stepIndex;
     final double iconSize = isMobile ? 22 : (isTablet ? 26 : 30);
     final double padding = isMobile ? 8 : (isTablet ? 10 : 12);
 
     return Container(
       padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
-        gradient: isActive
-            ? LinearGradient(
-          colors: [
-            Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
-            Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        )
-            : null,
-        color: isActive
-            ? null
-            : Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.04),
+        gradient:
+            isActive
+                ? LinearGradient(
+                  colors: [
+                    Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.15),
+                    Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.08),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+                : null,
+        color:
+            isActive
+                ? null
+                : Theme.of(
+                  context,
+                ).colorScheme.onSecondary.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
         border: Border.all(
-          color: isActive
-              ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)
-              : Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.08),
+          color:
+              isActive
+                  ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)
+                  : Theme.of(
+                    context,
+                  ).colorScheme.onSecondary.withValues(alpha: 0.08),
           width: 1,
         ),
-        boxShadow: isActive
-            ? [
-          BoxShadow(
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ]
-            : [],
+        boxShadow:
+            isActive
+                ? [
+                  BoxShadow(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.15),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+                : [],
       ),
       child: SvgPicture.asset(
         iconPath,
         height: iconSize,
         width: iconSize,
-        color: isActive
-            ? Theme.of(context).colorScheme.primary
-            : Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.3),
+        color:
+            isActive
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(
+                  context,
+                ).colorScheme.onSecondary.withValues(alpha: 0.3),
       ),
     );
   }
 
   Widget _buildStepLabel(
-      BuildContext context,
-      String label,
-      int stepIndex,
-      bool isMobile,
-      bool isTablet,
-      ) {
-    final isActive = currentStep >= stepIndex;
+    BuildContext context,
+    String label,
+    int stepIndex,
+    bool isMobile,
+    bool isTablet,
+  ) {
+    // Adjusted active check for pickup mapping
+    int actualCurrentStepForUI = currentStep;
+    if (isPickupOrder) {
+      if (currentStep >= 2) {
+        actualCurrentStepForUI = 2;
+      } else {
+        actualCurrentStepForUI = currentStep;
+      }
+    }
+
+    final isActive = actualCurrentStepForUI >= stepIndex;
     final double fontSize = isMobile ? 9 : (isTablet ? 10 : 11);
 
     return Text(
       label,
       textAlign: TextAlign.center,
       style: TextStyle(
-        fontFamily: isActive
-            ? FontFamily.fontsPoppinsSemiBold
-            : FontFamily.fontsPoppinsRegular,
+        fontFamily:
+            isActive
+                ? FontFamily.fontsPoppinsSemiBold
+                : FontFamily.fontsPoppinsRegular,
         fontSize: fontSize,
-        color: isActive
-            ? Theme.of(context).colorScheme.onSecondary
-            : Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.5),
+        color:
+            isActive
+                ? Theme.of(context).colorScheme.onSecondary
+                : Theme.of(
+                  context,
+                ).colorScheme.onSecondary.withValues(alpha: 0.5),
         height: 1.3,
         letterSpacing: 0.2,
       ),
@@ -237,6 +305,16 @@ class OrderProgressTracker extends StatelessWidget {
         final double labelWidth = isMobile ? 60 : (isTablet ? 70 : 80);
         final double stepSpacing = isMobile ? 8 : (isTablet ? 10 : 12);
 
+        // Map current Step for EasyStepper
+        int activeStep = currentStep;
+        if (isPickupOrder) {
+          if (currentStep >= 2) {
+            activeStep = 2;
+          } else {
+            activeStep = currentStep;
+          }
+        }
+
         return Container(
           padding: EdgeInsets.symmetric(
             vertical: verticalPadding,
@@ -255,10 +333,11 @@ class OrderProgressTracker extends StatelessWidget {
             borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
           ),
           child: EasyStepper(
-            activeStep: currentStep,
+            activeStep: activeStep,
             activeStepBackgroundColor: Theme.of(context).colorScheme.primary,
             finishedStepBackgroundColor: Theme.of(context).colorScheme.primary,
-            unreachedStepBackgroundColor: Theme.of(context).colorScheme.onPrimary,
+            unreachedStepBackgroundColor:
+                Theme.of(context).colorScheme.onPrimary,
             internalPadding: 0.0,
             stepShape: StepShape.circle,
             stepBorderRadius: isMobile ? 10 : 12,
@@ -267,155 +346,311 @@ class OrderProgressTracker extends StatelessWidget {
               lineThickness: lineThickness,
               lineType: LineType.normal,
               lineLength: lineLength,
-              defaultLineColor: Theme.of(context)
-                  .colorScheme
-                  .onSecondary
-                  .withValues(alpha: 0.12),
+              defaultLineColor: Theme.of(
+                context,
+              ).colorScheme.onSecondary.withValues(alpha: 0.12),
               finishedLineColor: Theme.of(context).colorScheme.primary,
               activeLineColor: Theme.of(context).colorScheme.primary,
-              unreachedLineColor: Theme.of(context)
-                  .colorScheme
-                  .onSecondary
-                  .withValues(alpha: 0.12),
+              unreachedLineColor: Theme.of(
+                context,
+              ).colorScheme.onSecondary.withValues(alpha: 0.12),
             ),
             finishedStepBorderType: BorderType.normal,
             borderThickness: 2,
-            steps: [
-              EasyStep(
-                customStep: _buildStepCircle(context, 0, isMobile, isTablet),
-                customTitle: Column(
-                  children: [
-                    SizedBox(height: stepSpacing),
-                    _buildStepIcon(
-                      context,
-                      AppImages.noteBookIcon,
-                      0,
-                      isMobile,
-                      isTablet,
-                    ),
-                    SizedBox(height: isMobile ? 6 : 8),
-                    SizedBox(
-                      width: labelWidth,
-                      child: _buildStepLabel(
-                        context,
-                        Labels.orderPlaced,
-                        0,
-                        isMobile,
-                        isTablet,
+            steps:
+                isPickupOrder
+                    ? [
+                      // Pickup Step 1: Placed
+                      EasyStep(
+                        customStep: _buildStepCircle(
+                          context,
+                          0,
+                          isMobile,
+                          isTablet,
+                        ),
+                        customTitle: Column(
+                          children: [
+                            SizedBox(height: stepSpacing),
+                            _buildStepIcon(
+                              context,
+                              AppImages.noteBookIcon,
+                              0,
+                              isMobile,
+                              isTablet,
+                            ),
+                            SizedBox(height: isMobile ? 6 : 8),
+                            SizedBox(
+                              width: labelWidth,
+                              child: _buildStepLabel(
+                                context,
+                                Labels.orderPlaced,
+                                0,
+                                isMobile,
+                                isTablet,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              EasyStep(
-                customStep: _buildStepCircle(context, 1, isMobile, isTablet),
-                customTitle: Column(
-                  children: [
-                    SizedBox(height: stepSpacing),
-                    _buildStepIcon(
-                      context,
-                      isFoodOrder
-                          ? AppImages.foodPreparingIcon
-                          : AppImages.packageIcon,
-                      1,
-                      isMobile,
-                      isTablet,
-                    ),
-                    SizedBox(height: isMobile ? 6 : 8),
-                    SizedBox(
-                      width: labelWidth,
-                      child: _buildStepLabel(
-                        context,
-                        isFoodOrder
-                            ? Labels.foodPreparation
-                            : Labels.packaging,
-                        1,
-                        isMobile,
-                        isTablet,
+                      // Pickup Step 2: Accepted (Processing)
+                      EasyStep(
+                        customStep: _buildStepCircle(
+                          context,
+                          1,
+                          isMobile,
+                          isTablet,
+                        ),
+                        customTitle: Column(
+                          children: [
+                            SizedBox(height: stepSpacing),
+                            _buildStepIcon(
+                              context,
+                              isFoodOrder
+                                  ? AppImages.foodPreparingIcon
+                                  : AppImages.packageIcon,
+                              1,
+                              isMobile,
+                              isTablet,
+                            ),
+                            SizedBox(height: isMobile ? 6 : 8),
+                            SizedBox(
+                              width: labelWidth,
+                              child: _buildStepLabel(
+                                context,
+                                'Accepted',
+                                1,
+                                isMobile,
+                                isTablet,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              EasyStep(
-                customStep: _buildStepCircle(context, 2, isMobile, isTablet),
-                customTitle: Column(
-                  children: [
-                    SizedBox(height: stepSpacing),
-                    _buildStepIcon(
-                      context,
-                      AppImages.pickedByRiderIcon,
-                      2,
-                      isMobile,
-                      isTablet,
-                    ),
-                    SizedBox(height: isMobile ? 6 : 8),
-                    SizedBox(
-                      width: labelWidth,
-                      child: _buildStepLabel(
-                        context,
-                        Labels.pickedByRider,
-                        2,
-                        isMobile,
-                        isTablet,
+                      // Pickup Step 3: Ready for Pickup
+                      EasyStep(
+                        customStep: _buildStepCircle(
+                          context,
+                          2,
+                          isMobile,
+                          isTablet,
+                        ),
+                        customTitle: Column(
+                          children: [
+                            SizedBox(height: stepSpacing),
+                            _buildStepIcon(
+                              context,
+                              AppImages.handshakeIcon,
+                              2,
+                              isMobile,
+                              isTablet,
+                            ),
+                            SizedBox(height: isMobile ? 6 : 8),
+                            SizedBox(
+                              width: labelWidth,
+                              child: _buildStepLabel(
+                                context,
+                                'Ready for Pickup',
+                                2,
+                                isMobile,
+                                isTablet,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              EasyStep(
-                customStep: _buildStepCircle(context, 3, isMobile, isTablet),
-                customTitle: Column(
-                  children: [
-                    SizedBox(height: stepSpacing),
-                    _buildStepIcon(
-                      context,
-                      AppImages.cycleIcon,
-                      3,
-                      isMobile,
-                      isTablet,
-                    ),
-                    SizedBox(height: isMobile ? 6 : 8),
-                    SizedBox(
-                      width: labelWidth,
-                      child: _buildStepLabel(
-                        context,
-                        Labels.outForDelivery,
-                        3,
-                        isMobile,
-                        isTablet,
+                      EasyStep(
+                        customStep: _buildStepCircle(
+                          context,
+                          3,
+                          isMobile,
+                          isTablet,
+                        ),
+                        customTitle: Column(
+                          children: [
+                            SizedBox(height: stepSpacing),
+                            _buildStepIcon(
+                              context,
+                              AppImages.handshakeIcon,
+                              2,
+                              isMobile,
+                              isTablet,
+                            ),
+                            SizedBox(height: isMobile ? 6 : 8),
+                            SizedBox(
+                              width: labelWidth,
+                              child: _buildStepLabel(
+                                context,
+                                "Successfully Picked Up",
+                                2,
+                                isMobile,
+                                isTablet,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              EasyStep(
-                customStep: _buildStepCircle(context, 4, isMobile, isTablet),
-                customTitle: Column(
-                  children: [
-                    SizedBox(height: stepSpacing),
-                    _buildStepIcon(
-                      context,
-                      AppImages.handshakeIcon,
-                      4,
-                      isMobile,
-                      isTablet,
-                    ),
-                    SizedBox(height: isMobile ? 6 : 8),
-                    SizedBox(
-                      width: labelWidth,
-                      child: _buildStepLabel(
-                        context,
-                        Labels.delivered,
-                        4,
-                        isMobile,
-                        isTablet,
+                    ]
+                    : [
+                      EasyStep(
+                        customStep: _buildStepCircle(
+                          context,
+                          0,
+                          isMobile,
+                          isTablet,
+                        ),
+                        customTitle: Column(
+                          children: [
+                            SizedBox(height: stepSpacing),
+                            _buildStepIcon(
+                              context,
+                              AppImages.noteBookIcon,
+                              0,
+                              isMobile,
+                              isTablet,
+                            ),
+                            SizedBox(height: isMobile ? 6 : 8),
+                            SizedBox(
+                              width: labelWidth,
+                              child: _buildStepLabel(
+                                context,
+                                Labels.orderPlaced,
+                                0,
+                                isMobile,
+                                isTablet,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+                      EasyStep(
+                        customStep: _buildStepCircle(
+                          context,
+                          1,
+                          isMobile,
+                          isTablet,
+                        ),
+                        customTitle: Column(
+                          children: [
+                            SizedBox(height: stepSpacing),
+                            _buildStepIcon(
+                              context,
+                              isFoodOrder
+                                  ? AppImages.foodPreparingIcon
+                                  : AppImages.packageIcon,
+                              1,
+                              isMobile,
+                              isTablet,
+                            ),
+                            SizedBox(height: isMobile ? 6 : 8),
+                            SizedBox(
+                              width: labelWidth,
+                              child: _buildStepLabel(
+                                context,
+                                isFoodOrder
+                                    ? Labels.foodPreparation
+                                    : Labels.packaging,
+                                1,
+                                isMobile,
+                                isTablet,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      EasyStep(
+                        customStep: _buildStepCircle(
+                          context,
+                          2,
+                          isMobile,
+                          isTablet,
+                        ),
+                        customTitle: Column(
+                          children: [
+                            SizedBox(height: stepSpacing),
+                            _buildStepIcon(
+                              context,
+                              AppImages.pickedByRiderIcon,
+                              2,
+                              isMobile,
+                              isTablet,
+                            ),
+                            SizedBox(height: isMobile ? 6 : 8),
+                            SizedBox(
+                              width: labelWidth,
+                              child: _buildStepLabel(
+                                context,
+                                Labels.pickedByRider,
+                                2,
+                                isMobile,
+                                isTablet,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      EasyStep(
+                        customStep: _buildStepCircle(
+                          context,
+                          3,
+                          isMobile,
+                          isTablet,
+                        ),
+                        customTitle: Column(
+                          children: [
+                            SizedBox(height: stepSpacing),
+                            _buildStepIcon(
+                              context,
+                              AppImages.cycleIcon,
+                              3,
+                              isMobile,
+                              isTablet,
+                            ),
+                            SizedBox(height: isMobile ? 6 : 8),
+                            SizedBox(
+                              width: labelWidth,
+                              child: _buildStepLabel(
+                                context,
+                                Labels.outForDelivery,
+                                3,
+                                isMobile,
+                                isTablet,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      EasyStep(
+                        customStep: _buildStepCircle(
+                          context,
+                          4,
+                          isMobile,
+                          isTablet,
+                        ),
+                        customTitle: Column(
+                          children: [
+                            SizedBox(height: stepSpacing),
+                            _buildStepIcon(
+                              context,
+                              AppImages.handshakeIcon,
+                              4,
+                              isMobile,
+                              isTablet,
+                            ),
+                            SizedBox(height: isMobile ? 6 : 8),
+                            SizedBox(
+                              width: labelWidth,
+                              child: _buildStepLabel(
+                                context,
+                                Labels.delivered,
+                                4,
+                                isMobile,
+                                isTablet,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
             stepAnimationCurve: Curves.easeInOut,
             showLoadingAnimation: false,
             showStepBorder: true,

@@ -142,9 +142,12 @@ class _DynamicProductsScreenState extends State<DynamicProductsScreen> {
                       return StaggeredGridTile.fit(
                         crossAxisCellCount: 1,
                         child: ProductBox(
+
                           marginPadding: const Padding(padding: EdgeInsets.all(0)),
                           productWidth: screenWidth / crossAxisCount - 20,
                           productId: product.id,
+                          isDeliverable: product.isDeliverable,
+                          categoryName: product.categoryName,
                           productPrice: product.productPrice,
                           productOriginalPrice: product.productOriginalPrice,
                           productCategory: product.productCategory,

@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/assets/font_family.dart';
 import 'package:speezu/core/theme/theme_bloc/theme_bloc.dart';
 import 'package:speezu/core/utils/labels.dart';
-import 'package:speezu/core/utils/media_querry_extention.dart';
 import 'package:speezu/presentation/auth/bloc/auth_state.dart';
 import 'package:speezu/repositories/user_repository.dart';
 import 'package:speezu/routes/route_names.dart';
@@ -12,7 +11,6 @@ import 'package:speezu/core/services/localStorage/my-local-controller.dart';
 import 'package:speezu/core/utils/constants.dart';
 import 'package:speezu/models/user_model.dart';
 import 'package:speezu/widgets/app_cache_image.dart';
-
 import '../../core/services/urls.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/theme_bloc/theme_event.dart';
@@ -56,7 +54,9 @@ class DrawerWidget extends StatelessWidget {
                   end: Alignment.bottomCenter,
                   colors: [
                     Theme.of(context).colorScheme.surface,
-                    Theme.of(context).colorScheme.surface.withValues(alpha: 0.95),
+                    Theme.of(
+                      context,
+                    ).colorScheme.surface.withValues(alpha: 0.95),
                   ],
                 ),
               ),
@@ -68,7 +68,11 @@ class DrawerWidget extends StatelessWidget {
                   return Column(
                     children: <Widget>[
                       // Premium User Header
-                      _buildPremiumUserHeader(context, isAuthenticated, deviceType),
+                      _buildPremiumUserHeader(
+                        context,
+                        isAuthenticated,
+                        deviceType,
+                      ),
 
                       // Scrollable Content
                       Expanded(
@@ -95,9 +99,16 @@ class DrawerWidget extends StatelessWidget {
                               ),
 
                               if (deviceType != DeviceType.mobile)
-                                _buildTabletPreferencesGrid(context, isAuthenticated, deviceType)
+                                _buildTabletPreferencesGrid(
+                                  context,
+                                  isAuthenticated,
+                                  deviceType,
+                                )
                               else
-                                _buildMobilePreferencesList(context, isAuthenticated),
+                                _buildMobilePreferencesList(
+                                  context,
+                                  isAuthenticated,
+                                ),
 
                               SizedBox(height: _getSpacing(deviceType, 1)),
 
@@ -160,30 +171,58 @@ class DrawerWidget extends StatelessWidget {
   }
 
   /// Tablet Navigation Grid
-  Widget _buildTabletNavigationGrid(BuildContext context, DeviceType deviceType) {
+  Widget _buildTabletNavigationGrid(
+    BuildContext context,
+    DeviceType deviceType,
+  ) {
     final crossAxisCount = deviceType == DeviceType.largeTablet ? 2 : 2;
 
     final items = [
-      _NavItem(Icons.home_rounded, Labels.home, [Color(0xFF6366F1), Color(0xFF8B5CF6)], () {
-        context.read<NavBarBloc>().add(const SelectTab(2));
-        Navigator.pop(context);
-      }),
-      _NavItem(CupertinoIcons.cube_box_fill, Labels.products, [Color(0xFFEC4899), Color(0xFFF43F5E)], () {
-        context.read<NavBarBloc>().add(const SelectTab(0));
-        Navigator.pop(context);
-      }),
-      _NavItem(Icons.map_rounded, Labels.mapExplorer, [Color(0xFF10B981), Color(0xFF059669)], () {
-        context.read<NavBarBloc>().add(const SelectTab(1));
-        Navigator.pop(context);
-      }),
-      _NavItem(Icons.shopping_bag_rounded, Labels.myOrders, [Color(0xFFF59E0B), Color(0xFFEF4444)], () {
-        context.read<NavBarBloc>().add(const SelectTab(3));
-        Navigator.pop(context);
-      }),
-      _NavItem(Icons.favorite_rounded, Labels.favouriteFoods, [Color(0xFFEF4444), Color(0xFFDC2626)], () {
-        context.read<NavBarBloc>().add(const SelectTab(4));
-        Navigator.pop(context);
-      }),
+      _NavItem(
+        Icons.home_rounded,
+        Labels.home,
+        [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+        () {
+          context.read<NavBarBloc>().add(const SelectTab(2));
+          Navigator.pop(context);
+        },
+      ),
+      _NavItem(
+        CupertinoIcons.cube_box_fill,
+        Labels.products,
+        [Color(0xFFEC4899), Color(0xFFF43F5E)],
+        () {
+          context.read<NavBarBloc>().add(const SelectTab(0));
+          Navigator.pop(context);
+        },
+      ),
+      _NavItem(
+        Icons.map_rounded,
+        Labels.mapExplorer,
+        [Color(0xFF10B981), Color(0xFF059669)],
+        () {
+          context.read<NavBarBloc>().add(const SelectTab(1));
+          Navigator.pop(context);
+        },
+      ),
+      _NavItem(
+        Icons.shopping_bag_rounded,
+        Labels.myOrders,
+        [Color(0xFFF59E0B), Color(0xFFEF4444)],
+        () {
+          context.read<NavBarBloc>().add(const SelectTab(3));
+          Navigator.pop(context);
+        },
+      ),
+      _NavItem(
+        Icons.favorite_rounded,
+        Labels.favouriteFoods,
+        [Color(0xFFEF4444), Color(0xFFDC2626)],
+        () {
+          context.read<NavBarBloc>().add(const SelectTab(4));
+          Navigator.pop(context);
+        },
+      ),
     ];
 
     return Padding(
@@ -207,7 +246,11 @@ class DrawerWidget extends StatelessWidget {
   }
 
   /// Tablet Grid Tile
-  Widget _buildTabletGridTile(BuildContext context, _NavItem item, DeviceType deviceType) {
+  Widget _buildTabletGridTile(
+    BuildContext context,
+    _NavItem item,
+    DeviceType deviceType,
+  ) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -217,7 +260,8 @@ class DrawerWidget extends StatelessWidget {
           padding: EdgeInsets.all(_getSpacing(deviceType, 12)),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: item.gradient.map((c) => c.withValues(alpha: 0.1)).toList(),
+              colors:
+                  item.gradient.map((c) => c.withValues(alpha: 0.1)).toList(),
             ),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
@@ -277,7 +321,9 @@ class DrawerWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionHeader(context, Labels.navigation, DeviceType.mobile),
-        _buildPremiumTile(context, DeviceType.mobile,
+        _buildPremiumTile(
+          context,
+          DeviceType.mobile,
           icon: Icons.home_rounded,
           text: Labels.home,
           gradient: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
@@ -286,7 +332,9 @@ class DrawerWidget extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-        _buildPremiumTile(context, DeviceType.mobile,
+        _buildPremiumTile(
+          context,
+          DeviceType.mobile,
           icon: CupertinoIcons.cube_box_fill,
           text: Labels.products,
           gradient: [Color(0xFFEC4899), Color(0xFFF43F5E)],
@@ -295,7 +343,9 @@ class DrawerWidget extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-        _buildPremiumTile(context, DeviceType.mobile,
+        _buildPremiumTile(
+          context,
+          DeviceType.mobile,
           icon: Icons.map_rounded,
           text: Labels.mapExplorer,
           gradient: [Color(0xFF10B981), Color(0xFF059669)],
@@ -304,7 +354,9 @@ class DrawerWidget extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-        _buildPremiumTile(context, DeviceType.mobile,
+        _buildPremiumTile(
+          context,
+          DeviceType.mobile,
           icon: Icons.shopping_bag_rounded,
           text: Labels.myOrders,
           gradient: [Color(0xFFF59E0B), Color(0xFFEF4444)],
@@ -313,7 +365,9 @@ class DrawerWidget extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-        _buildPremiumTile(context, DeviceType.mobile,
+        _buildPremiumTile(
+          context,
+          DeviceType.mobile,
           icon: Icons.favorite_rounded,
           text: Labels.favouriteFoods,
           gradient: [Color(0xFFEF4444), Color(0xFFDC2626)],
@@ -327,25 +381,43 @@ class DrawerWidget extends StatelessWidget {
   }
 
   /// Tablet Preferences Grid
-  Widget _buildTabletPreferencesGrid(BuildContext context, bool isAuthenticated, DeviceType deviceType) {
+  Widget _buildTabletPreferencesGrid(
+    BuildContext context,
+    bool isAuthenticated,
+    DeviceType deviceType,
+  ) {
     final items = <_NavItem>[
-      _NavItem(Icons.help_outline_rounded, Labels.helpAndSupport, [Color(0xFF3B82F6), Color(0xFF2563EB)],
-              () => Navigator.pushNamed(context, RouteNames.faqsScreen)),
+      _NavItem(
+        Icons.help_outline_rounded,
+        Labels.helpAndSupport,
+        [Color(0xFF3B82F6), Color(0xFF2563EB)],
+        () => Navigator.pushNamed(context, RouteNames.faqsScreen),
+      ),
       if (isAuthenticated)
-        _NavItem(Icons.settings_rounded, Labels.settings, [Color(0xFF6B7280), Color(0xFF4B5563)],
-                () => Navigator.pushNamed(context, RouteNames.settingsScreen)),
-      _NavItem(Icons.translate_rounded, Labels.languages, [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
-              () => Navigator.pushNamed(context, RouteNames.languagesScreen)),
+        _NavItem(
+          Icons.settings_rounded,
+          Labels.settings,
+          [Color(0xFF6B7280), Color(0xFF4B5563)],
+          () => Navigator.pushNamed(context, RouteNames.settingsScreen),
+        ),
+      _NavItem(
+        Icons.translate_rounded,
+        Labels.languages,
+        [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
+        () => Navigator.pushNamed(context, RouteNames.languagesScreen),
+      ),
     ];
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: _getSpacing(deviceType, 12)),
       child: Column(
         children: [
-          ...items.map((item) => Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: _buildTabletCompactTile(context, item, deviceType),
-          )),
+          ...items.map(
+            (item) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: _buildTabletCompactTile(context, item, deviceType),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: _buildThemeTile(context, deviceType),
@@ -356,7 +428,11 @@ class DrawerWidget extends StatelessWidget {
   }
 
   /// Tablet Compact Tile (for preferences)
-  Widget _buildTabletCompactTile(BuildContext context, _NavItem item, DeviceType deviceType) {
+  Widget _buildTabletCompactTile(
+    BuildContext context,
+    _NavItem item,
+    DeviceType deviceType,
+  ) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -368,7 +444,9 @@ class DrawerWidget extends StatelessWidget {
             vertical: _getSpacing(deviceType, 14),
           ),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.5),
+            color: Theme.of(
+              context,
+            ).colorScheme.onPrimary.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: item.gradient.first.withValues(alpha: 0.2),
@@ -381,11 +459,18 @@ class DrawerWidget extends StatelessWidget {
                 padding: EdgeInsets.all(_getSpacing(deviceType, 10)),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: item.gradient.map((c) => c.withValues(alpha: 0.15)).toList(),
+                    colors:
+                        item.gradient
+                            .map((c) => c.withValues(alpha: 0.15))
+                            .toList(),
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(item.icon, size: 22 * _getFontMultiplier(deviceType), color: item.gradient.first),
+                child: Icon(
+                  item.icon,
+                  size: 22 * _getFontMultiplier(deviceType),
+                  color: item.gradient.first,
+                ),
               ),
               SizedBox(width: _getSpacing(deviceType, 14)),
               Expanded(
@@ -402,7 +487,9 @@ class DrawerWidget extends StatelessWidget {
               Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 16 * _getFontMultiplier(deviceType),
-                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                color: Theme.of(
+                  context,
+                ).colorScheme.outline.withValues(alpha: 0.5),
               ),
             ],
           ),
@@ -412,23 +499,33 @@ class DrawerWidget extends StatelessWidget {
   }
 
   /// Mobile Preferences List
-  Widget _buildMobilePreferencesList(BuildContext context, bool isAuthenticated) {
+  Widget _buildMobilePreferencesList(
+    BuildContext context,
+    bool isAuthenticated,
+  ) {
     return Column(
       children: [
-        _buildPremiumTile(context, DeviceType.mobile,
+        _buildPremiumTile(
+          context,
+          DeviceType.mobile,
           icon: Icons.help_outline_rounded,
           text: Labels.helpAndSupport,
           gradient: [Color(0xFF3B82F6), Color(0xFF2563EB)],
           onTap: () => Navigator.pushNamed(context, RouteNames.faqsScreen),
         ),
         if (isAuthenticated)
-          _buildPremiumTile(context, DeviceType.mobile,
+          _buildPremiumTile(
+            context,
+            DeviceType.mobile,
             icon: Icons.settings_rounded,
             text: Labels.settings,
             gradient: [Color(0xFF6B7280), Color(0xFF4B5563)],
-            onTap: () => Navigator.pushNamed(context, RouteNames.settingsScreen),
+            onTap:
+                () => Navigator.pushNamed(context, RouteNames.settingsScreen),
           ),
-        _buildPremiumTile(context, DeviceType.mobile,
+        _buildPremiumTile(
+          context,
+          DeviceType.mobile,
           icon: Icons.translate_rounded,
           text: Labels.languages,
           gradient: [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
@@ -455,7 +552,9 @@ class DrawerWidget extends StatelessWidget {
                     Labels.login,
                     Icons.login_rounded,
                     [Color(0xFF10B981), Color(0xFF059669)],
-                        () => Navigator.of(context).pushReplacementNamed(RouteNames.login),
+                    () => Navigator.of(
+                      context,
+                    ).pushReplacementNamed(RouteNames.login),
                     deviceType,
                   ),
                 ),
@@ -466,7 +565,10 @@ class DrawerWidget extends StatelessWidget {
                     Labels.register,
                     Icons.person_add_alt_rounded,
                     [Color(0xFF6366F1), Color(0xFF4F46E5)],
-                        () => Navigator.pushReplacementNamed(context, RouteNames.signUp),
+                    () => Navigator.pushReplacementNamed(
+                      context,
+                      RouteNames.signUp,
+                    ),
                     deviceType,
                   ),
                 ),
@@ -479,17 +581,26 @@ class DrawerWidget extends StatelessWidget {
       return Column(
         children: [
           _buildSectionHeader(context, Labels.account, deviceType),
-          _buildPremiumTile(context, deviceType,
+          _buildPremiumTile(
+            context,
+            deviceType,
             icon: Icons.login_rounded,
             text: Labels.login,
             gradient: [Color(0xFF10B981), Color(0xFF059669)],
-            onTap: () => Navigator.of(context).pushReplacementNamed(RouteNames.login),
+            onTap:
+                () => Navigator.of(
+                  context,
+                ).pushReplacementNamed(RouteNames.login),
           ),
-          _buildPremiumTile(context, deviceType,
+          _buildPremiumTile(
+            context,
+            deviceType,
             icon: Icons.person_add_alt_rounded,
             text: Labels.register,
             gradient: [Color(0xFF6366F1), Color(0xFF4F46E5)],
-            onTap: () => Navigator.pushReplacementNamed(context, RouteNames.signUp),
+            onTap:
+                () =>
+                    Navigator.pushReplacementNamed(context, RouteNames.signUp),
           ),
         ],
       );
@@ -498,13 +609,13 @@ class DrawerWidget extends StatelessWidget {
 
   /// Tablet Account Button
   Widget _buildTabletAccountButton(
-      BuildContext context,
-      String text,
-      IconData icon,
-      List<Color> gradient,
-      VoidCallback onTap,
-      DeviceType deviceType,
-      ) {
+    BuildContext context,
+    String text,
+    IconData icon,
+    List<Color> gradient,
+    VoidCallback onTap,
+    DeviceType deviceType,
+  ) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -513,13 +624,22 @@ class DrawerWidget extends StatelessWidget {
         child: Container(
           padding: EdgeInsets.symmetric(vertical: _getSpacing(deviceType, 16)),
           decoration: BoxDecoration(
-            gradient: LinearGradient(colors: gradient.map((c) => c.withValues(alpha: 0.1)).toList()),
+            gradient: LinearGradient(
+              colors: gradient.map((c) => c.withValues(alpha: 0.1)).toList(),
+            ),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: gradient.first.withValues(alpha: 0.3), width: 1.5),
+            border: Border.all(
+              color: gradient.first.withValues(alpha: 0.3),
+              width: 1.5,
+            ),
           ),
           child: Column(
             children: [
-              Icon(icon, size: 28 * _getFontMultiplier(deviceType), color: gradient.first),
+              Icon(
+                icon,
+                size: 28 * _getFontMultiplier(deviceType),
+                color: gradient.first,
+              ),
               SizedBox(height: _getSpacing(deviceType, 8)),
               Text(
                 text,
@@ -538,9 +658,17 @@ class DrawerWidget extends StatelessWidget {
   }
 
   /// Premium User Header
-  Widget _buildPremiumUserHeader(BuildContext context, bool isAuthenticated, DeviceType deviceType) {
-    final avatarRadius = deviceType == DeviceType.largeTablet ? 44.0 :
-    deviceType == DeviceType.mediumTablet ? 40.0 : 36.0;
+  Widget _buildPremiumUserHeader(
+    BuildContext context,
+    bool isAuthenticated,
+    DeviceType deviceType,
+  ) {
+    final avatarRadius =
+        deviceType == DeviceType.largeTablet
+            ? 44.0
+            : deviceType == DeviceType.mediumTablet
+            ? 40.0
+            : 36.0;
     final fontSize = 18.0 * _getFontMultiplier(deviceType);
     final emailFontSize = 13.0 * _getFontMultiplier(deviceType);
 
@@ -570,7 +698,9 @@ class DrawerWidget extends StatelessWidget {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.2),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -677,7 +807,9 @@ class DrawerWidget extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.outline.withValues(alpha: 0.3),
                     width: 2,
                   ),
                 ),
@@ -707,7 +839,9 @@ class DrawerWidget extends StatelessWidget {
               'Tap to login or register',
               style: TextStyle(
                 fontFamily: FontFamily.fontsPoppinsRegular,
-                color: Theme.of(context).colorScheme.onSecondary.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSecondary.withValues(alpha: 0.7),
                 fontSize: emailFontSize,
               ),
             ),
@@ -718,7 +852,11 @@ class DrawerWidget extends StatelessWidget {
   }
 
   /// Section Header
-  Widget _buildSectionHeader(BuildContext context, String title, DeviceType deviceType) {
+  Widget _buildSectionHeader(
+    BuildContext context,
+    String title,
+    DeviceType deviceType,
+  ) {
     return Padding(
       padding: EdgeInsets.fromLTRB(
         _getSpacing(deviceType, 20),
@@ -741,13 +879,13 @@ class DrawerWidget extends StatelessWidget {
 
   /// Premium Drawer Tile (Mobile)
   Widget _buildPremiumTile(
-      BuildContext context,
-      DeviceType deviceType, {
-        required IconData icon,
-        required String text,
-        required List<Color> gradient,
-        required VoidCallback onTap,
-      }) {
+    BuildContext context,
+    DeviceType deviceType, {
+    required IconData icon,
+    required String text,
+    required List<Color> gradient,
+    required VoidCallback onTap,
+  }) {
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: _getSpacing(deviceType, 12),
@@ -770,7 +908,10 @@ class DrawerWidget extends StatelessWidget {
                   padding: EdgeInsets.all(_getSpacing(deviceType, 8)),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: gradient.map((c) => c.withValues(alpha: 0.15)).toList(),
+                      colors:
+                          gradient
+                              .map((c) => c.withValues(alpha: 0.15))
+                              .toList(),
                     ),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
@@ -778,7 +919,11 @@ class DrawerWidget extends StatelessWidget {
                       width: 1,
                     ),
                   ),
-                  child: Icon(icon, size: 20 * _getFontMultiplier(deviceType), color: gradient.first),
+                  child: Icon(
+                    icon,
+                    size: 20 * _getFontMultiplier(deviceType),
+                    color: gradient.first,
+                  ),
                 ),
                 SizedBox(width: _getSpacing(deviceType, 14)),
                 Expanded(
@@ -795,7 +940,9 @@ class DrawerWidget extends StatelessWidget {
                 Icon(
                   Icons.arrow_forward_ios_rounded,
                   size: 14 * _getFontMultiplier(deviceType),
-                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.outline.withValues(alpha: 0.5),
                 ),
               ],
             ),
@@ -817,7 +964,9 @@ class DrawerWidget extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(deviceType == DeviceType.mobile ? 12 : 14),
+          borderRadius: BorderRadius.circular(
+            deviceType == DeviceType.mobile ? 12 : 14,
+          ),
           onTap: () {
             context.read<ThemeBloc>().add(
               SwitchThemeEvent(isDark ? AppThemeMode.light : AppThemeMode.dark),
@@ -826,50 +975,77 @@ class DrawerWidget extends StatelessWidget {
           },
           child: Container(
             padding: EdgeInsets.symmetric(
-              horizontal: _getSpacing(deviceType, deviceType == DeviceType.mobile ? 12 : 16),
-              vertical: _getSpacing(deviceType, deviceType == DeviceType.mobile ? 5 : 14),
+              horizontal: _getSpacing(
+                deviceType,
+                deviceType == DeviceType.mobile ? 12 : 16,
+              ),
+              vertical: _getSpacing(
+                deviceType,
+                deviceType == DeviceType.mobile ? 5 : 14,
+              ),
             ),
             decoration: BoxDecoration(
-              color: deviceType != DeviceType.mobile
-                  ? Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.5)
-                  : null,
-              borderRadius: BorderRadius.circular(deviceType == DeviceType.mobile ? 12 : 14),
-              border: deviceType != DeviceType.mobile
-                  ? Border.all(
-                color: (isDark ? Color(0xFFFCD34D) : Color(0xFF6366F1)).withValues(alpha: 0.2),
-                width: 1,
-              )
-                  : null,
+              color:
+                  deviceType != DeviceType.mobile
+                      ? Theme.of(
+                        context,
+                      ).colorScheme.onPrimary.withValues(alpha: 0.5)
+                      : null,
+              borderRadius: BorderRadius.circular(
+                deviceType == DeviceType.mobile ? 12 : 14,
+              ),
+              border:
+                  deviceType != DeviceType.mobile
+                      ? Border.all(
+                        color: (isDark ? Color(0xFFFCD34D) : Color(0xFF6366F1))
+                            .withValues(alpha: 0.2),
+                        width: 1,
+                      )
+                      : null,
             ),
             child: Row(
               children: [
                 Container(
-                  padding: EdgeInsets.all(_getSpacing(deviceType, deviceType == DeviceType.mobile ? 8 : 10)),
+                  padding: EdgeInsets.all(
+                    _getSpacing(
+                      deviceType,
+                      deviceType == DeviceType.mobile ? 8 : 10,
+                    ),
+                  ),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: isDark
-                          ? [
-                        Color(0xFFFCD34D).withValues(alpha: 0.15),
-                        Color(0xFFF59E0B).withValues(alpha: 0.15),
-                      ]
-                          : [
-                        Color(0xFF6366F1).withValues(alpha: 0.15),
-                        Color(0xFF4F46E5).withValues(alpha: 0.15),
-                      ],
+                      colors:
+                          isDark
+                              ? [
+                                Color(0xFFFCD34D).withValues(alpha: 0.15),
+                                Color(0xFFF59E0B).withValues(alpha: 0.15),
+                              ]
+                              : [
+                                Color(0xFF6366F1).withValues(alpha: 0.15),
+                                Color(0xFF4F46E5).withValues(alpha: 0.15),
+                              ],
                     ),
-                    borderRadius: BorderRadius.circular(deviceType == DeviceType.mobile ? 10 : 12),
-                    border: deviceType == DeviceType.mobile
-                        ? Border.all(
-                      color: isDark
-                          ? Color(0xFFFCD34D).withValues(alpha: 0.2)
-                          : Color(0xFF6366F1).withValues(alpha: 0.2),
-                      width: 1,
-                    )
-                        : null,
+                    borderRadius: BorderRadius.circular(
+                      deviceType == DeviceType.mobile ? 10 : 12,
+                    ),
+                    border:
+                        deviceType == DeviceType.mobile
+                            ? Border.all(
+                              color:
+                                  isDark
+                                      ? Color(0xFFFCD34D).withValues(alpha: 0.2)
+                                      : Color(
+                                        0xFF6366F1,
+                                      ).withValues(alpha: 0.2),
+                              width: 1,
+                            )
+                            : null,
                   ),
                   child: Icon(
                     isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-                    size: (deviceType == DeviceType.mobile ? 20 : 22) * _getFontMultiplier(deviceType),
+                    size:
+                        (deviceType == DeviceType.mobile ? 20 : 22) *
+                        _getFontMultiplier(deviceType),
                     color: isDark ? Color(0xFFF59E0B) : Color(0xFF6366F1),
                   ),
                 ),
@@ -880,17 +1056,22 @@ class DrawerWidget extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: FontFamily.fontsPoppinsSemiBold,
                       fontSize: 14 * _getFontMultiplier(deviceType),
-                      color: deviceType != DeviceType.mobile
-                          ? Theme.of(context).colorScheme.onSecondary
-                          : Theme.of(context).colorScheme.onSecondary,
+                      color:
+                          deviceType != DeviceType.mobile
+                              ? Theme.of(context).colorScheme.onSecondary
+                              : Theme.of(context).colorScheme.onSecondary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
                 Icon(
                   Icons.arrow_forward_ios_rounded,
-                  size: (deviceType == DeviceType.mobile ? 14 : 16) * _getFontMultiplier(deviceType),
-                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                  size:
+                      (deviceType == DeviceType.mobile ? 14 : 16) *
+                      _getFontMultiplier(deviceType),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.outline.withValues(alpha: 0.5),
                 ),
               ],
             ),
@@ -903,74 +1084,97 @@ class DrawerWidget extends StatelessWidget {
   /// Logout Tile with Bloc Consumer
   Widget _buildLogoutTile(BuildContext context, DeviceType deviceType) {
     return BlocConsumer<AuthBloc, AuthState>(
-      builder: (context, state) => Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: _getSpacing(deviceType, 12),
-          vertical: _getSpacing(deviceType, 4),
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(deviceType == DeviceType.mobile ? 12 : 14),
-            onTap: () {
-              context.read<AuthBloc>().add(LogOutUserEvent());
-            },
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: _getSpacing(deviceType, deviceType == DeviceType.mobile ? 12 : 16),
-                vertical: _getSpacing(deviceType, deviceType == DeviceType.mobile ? 12 : 16),
-              ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(deviceType == DeviceType.mobile ? 12 : 14),
-                color: Colors.red.withValues(alpha: 0.05),
-                border: deviceType != DeviceType.mobile
-                    ? Border.all(
-                  color: Colors.red.withValues(alpha: 0.2),
-                  width: 1.5,
-                )
-                    : null,
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(_getSpacing(deviceType, deviceType == DeviceType.mobile ? 8 : 10)),
-                    decoration: BoxDecoration(
-                      color: Colors.red.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(deviceType == DeviceType.mobile ? 10 : 12),
-                      border: Border.all(
-                        color: Colors.red.withValues(alpha: 0.2),
-                        width: 1,
+      builder:
+          (context, state) => Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: _getSpacing(deviceType, 12),
+              vertical: _getSpacing(deviceType, 4),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(
+                  deviceType == DeviceType.mobile ? 12 : 14,
+                ),
+                onTap: () {
+                  context.read<AuthBloc>().add(LogOutUserEvent());
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: _getSpacing(
+                      deviceType,
+                      deviceType == DeviceType.mobile ? 12 : 16,
+                    ),
+                    vertical: _getSpacing(
+                      deviceType,
+                      deviceType == DeviceType.mobile ? 12 : 16,
+                    ),
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(
+                      deviceType == DeviceType.mobile ? 12 : 14,
+                    ),
+                    color: Colors.red.withValues(alpha: 0.05),
+                    border:
+                        deviceType != DeviceType.mobile
+                            ? Border.all(
+                              color: Colors.red.withValues(alpha: 0.2),
+                              width: 1.5,
+                            )
+                            : null,
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(
+                          _getSpacing(
+                            deviceType,
+                            deviceType == DeviceType.mobile ? 8 : 10,
+                          ),
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(
+                            deviceType == DeviceType.mobile ? 10 : 12,
+                          ),
+                          border: Border.all(
+                            color: Colors.red.withValues(alpha: 0.2),
+                            width: 1,
+                          ),
+                        ),
+                        child: Icon(
+                          Icons.logout_rounded,
+                          size:
+                              (deviceType == DeviceType.mobile ? 20 : 24) *
+                              _getFontMultiplier(deviceType),
+                          color: Colors.red.shade700,
+                        ),
                       ),
-                    ),
-                    child: Icon(
-                      Icons.logout_rounded,
-                      size: (deviceType == DeviceType.mobile ? 20 : 24) * _getFontMultiplier(deviceType),
-                      color: Colors.red.shade700,
-                    ),
-                  ),
-                  SizedBox(width: _getSpacing(deviceType, 14)),
-                  Expanded(
-                    child: Text(
-                      Labels.logout,
-                      style: TextStyle(
-                        fontFamily: FontFamily.fontsPoppinsSemiBold,
-                        fontSize: 14 * _getFontMultiplier(deviceType),
-                        color: Colors.red.shade700,
-                        fontWeight: FontWeight.w600,
+                      SizedBox(width: _getSpacing(deviceType, 14)),
+                      Expanded(
+                        child: Text(
+                          Labels.logout,
+                          style: TextStyle(
+                            fontFamily: FontFamily.fontsPoppinsSemiBold,
+                            fontSize: 14 * _getFontMultiplier(deviceType),
+                            color: Colors.red.shade700,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
-                    ),
+                      Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size:
+                            (deviceType == DeviceType.mobile ? 14 : 16) *
+                            _getFontMultiplier(deviceType),
+                        color: Colors.red.shade700.withValues(alpha: 0.5),
+                      ),
+                    ],
                   ),
-                  Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    size: (deviceType == DeviceType.mobile ? 14 : 16) * _getFontMultiplier(deviceType),
-                    color: Colors.red.shade700.withValues(alpha: 0.5),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
-        ),
-      ),
       listener: (context, state) {
         if (state.logoutStatus == LogoutStatus.success) {
           Navigator.of(context).pushReplacementNamed(RouteNames.login);

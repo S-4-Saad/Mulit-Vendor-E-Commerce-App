@@ -187,6 +187,8 @@ class ShopProductsScreen extends StatelessWidget {
                                               marginPadding: const Padding(
                                                 padding: EdgeInsets.all(0),
                                               ),
+                                              isDeliverable: product.isDeliverable,
+                                              categoryName: product.categoryName,
                                               productWidth: productWidth,
                                               productPrice: product.productPrice,
                                               productOriginalPrice: product.productOriginalPrice,

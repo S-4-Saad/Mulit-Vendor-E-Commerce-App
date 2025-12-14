@@ -41,7 +41,7 @@ class _ActiveOrdersScreenState extends State<ActiveOrdersScreen> {
     return Scaffold(
       body: BlocConsumer<OrdersBloc, OrderState>(
         listener: (context, state) {
-          if(state.cancelOrderStatus==CancelOrderStatus.success){
+          if (state.cancelOrderStatus == CancelOrderStatus.success) {
             // Navigator.pop(context); // Close dialog
 
             // context.read<OrdersBloc>().add(RefreshOrdersEvent());
@@ -101,6 +101,7 @@ class _ActiveOrdersScreenState extends State<ActiveOrdersScreen> {
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 16),
                   child: OrderCard(
+                    orderCode: order.orderCode,
                     status: order.status,
                     orderId: order.orderId,
                     customerName: order.customerName,
@@ -127,8 +128,10 @@ class _ActiveOrdersScreenState extends State<ActiveOrdersScreen> {
                         context,
                         MaterialPageRoute(
                           builder:
-                              (context) =>
-                                  OrderDetailsScreen(orderId: order.orderId),
+                              (context) => OrderDetailsScreen(
+                                orderId: order.orderId,
+                                orderStatus: order.status,
+                              ),
                         ),
                       );
                     },

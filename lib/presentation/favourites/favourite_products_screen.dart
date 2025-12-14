@@ -4,7 +4,6 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:speezu/core/services/urls.dart';
 import 'package:speezu/presentation/favourites/bloc/favourite_event.dart';
-
 import '../../routes/route_names.dart';
 import '../../widgets/empty_favourite_list.dart';
 import '../../widgets/error_widget.dart';
@@ -83,7 +82,9 @@ class _FavouriteProductsScreenState extends State<FavouriteProductsScreen> {
                   crossAxisCount = 2; // Standard mobile (like 411px width)
                 }
 
-                print('📱 Screen width: $screenWidth → Columns: $crossAxisCount');
+                print(
+                  '📱 Screen width: $screenWidth → Columns: $crossAxisCount',
+                );
 
                 final favorites = state.favouriteListModel?.data ?? [];
 
@@ -104,23 +105,34 @@ class _FavouriteProductsScreenState extends State<FavouriteProductsScreen> {
                         final imageUrl = '$imageBaseUrl${product.productImage}';
                         final productName = product.productName ?? '';
                         final productPrice =
-                            double.tryParse(product.productDiscountedPrice ?? '0') ?? 0;
+                            double.tryParse(
+                              product.productDiscountedPrice ?? '0',
+                            ) ??
+                            0;
                         final productOriginalPrice =
                             double.tryParse(product.productPrice ?? '0') ?? 0;
                         final productRating =
-                            double.tryParse(product.productRating?.toString() ?? '0.0') ??
-                                0.0;
+                            double.tryParse(
+                              product.productRating?.toString() ?? '0.0',
+                            ) ??
+                            0.0;
 
                         return StaggeredGridTile.fit(
                           crossAxisCellCount: 1,
                           child: ProductBox(
-                            marginPadding: const Padding(padding: EdgeInsets.all(0)),
+                            isDeliverable: product.isDeliverable ?? false,
+
+                            // categoryName: product.category?.name??'',
+                            marginPadding: const Padding(
+                              padding: EdgeInsets.all(0),
+                            ),
                             productWidth: screenWidth / crossAxisCount - 20,
                             productId: productId,
                             productPrice: productPrice,
                             productOriginalPrice: productOriginalPrice,
-                            productCategory: 'Test',
+                            productCategory: product.store?.name ?? '',
                             productRating: productRating,
+                            categoryName: product.category?.name ?? '',
                             onProductTap: () {
                               Navigator.pushNamed(
                                 context,

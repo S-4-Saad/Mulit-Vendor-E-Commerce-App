@@ -17,6 +17,7 @@ class CartItem {
   final String shopName;
   final String categoryName;
   final String storeId;
+  final bool isDeliveryAvailable;
 
   CartItem({
     required this.id,
@@ -35,6 +36,7 @@ class CartItem {
     required this.shopName,
     required this.categoryName,
     required this.storeId,
+    required this.isDeliveryAvailable,
   });
 
   // Calculate total price for this item
@@ -64,6 +66,7 @@ class CartItem {
     String? shopName,
     String? categoryName,
     String? storeId,
+    bool? isDeliveryAvailable,
   }) {
     return CartItem(
       id: id ?? this.id,
@@ -82,6 +85,7 @@ class CartItem {
       shopName: shopName ?? this.shopName,
       categoryName: categoryName ?? this.categoryName,
       storeId: storeId ?? this.storeId,
+      isDeliveryAvailable: isDeliveryAvailable ?? this.isDeliveryAvailable,
     );
   }
 
@@ -170,23 +174,31 @@ class CartItem {
     String? variationParentId,
     String? variationChildId,
     String? storeId,
+    double? calculatedPrice, // NEW: Pre-calculated price from product detail
+    double?
+    calculatedOriginalPrice, // NEW: Pre-calculated original price from product detail
+    bool? isDeliveryAvailable, // NEW: Delivery status from product detail
   }) {
     // Create unique item ID using real server IDs
     final itemId =
         '${product.id}_${variationParentValue ?? ''}_${variationChildValue ?? ''}';
 
-    // Calculate variation-specific prices
-    final variationPrice = _getCurrentPrice(
-      product,
-      variationParentValue: variationParentValue,
-      variationChildValue: variationChildValue,
-    );
+    // Use pre-calculated prices if provided, otherwise fall back to old logic
+    final variationPrice =
+        calculatedPrice ??
+        _getCurrentPrice(
+          product,
+          variationParentValue: variationParentValue,
+          variationChildValue: variationChildValue,
+        );
 
-    final variationOriginalPrice = _getCurrentOriginalPrice(
-      product,
-      variationParentValue: variationParentValue,
-      variationChildValue: variationChildValue,
-    );
+    final variationOriginalPrice =
+        calculatedOriginalPrice ??
+        _getCurrentOriginalPrice(
+          product,
+          variationParentValue: variationParentValue,
+          variationChildValue: variationChildValue,
+        );
 
     return CartItem(
       id: itemId,
@@ -205,6 +217,7 @@ class CartItem {
       shopName: product.shopName,
       categoryName: product.categoryName,
       storeId: storeId ?? product.shop.id.toString(), // Real server store ID
+      isDeliveryAvailable: isDeliveryAvailable ?? product.isDeliveryAvailable,
     );
   }
 
@@ -247,6 +260,7 @@ class CartItem {
       'shopName': shopName,
       'categoryName': categoryName,
       'storeId': storeId,
+      'isDeliveryAvailable': isDeliveryAvailable,
     };
   }
 
@@ -269,6 +283,7 @@ class CartItem {
       shopName: json['shopName'] ?? '',
       categoryName: json['categoryName'] ?? '',
       storeId: json['storeId'] ?? '',
+      isDeliveryAvailable: json['isDeliveryAvailable'] ?? true,
     );
   }
 
@@ -317,6 +332,10 @@ class Cart {
   // 🏬 Get current store ID (from first item)
   String? get currentStoreId => items.isEmpty ? null : items.first.storeId;
 
+  // 🚚 Get current delivery status (from first item)
+  bool? get currentDeliveryStatus =>
+      items.isEmpty ? null : items.first.isDeliveryAvailable;
+
   // 🏷️ Check if cart has items from a specific store
   bool hasItemsFromStore(String storeId) =>
       items.any((item) => item.storeId == storeId);
@@ -353,9 +372,10 @@ class Cart {
   // 🏗️ Create from JSON
   factory Cart.fromJson(Map<String, dynamic> json) {
     return Cart(
-      items: (json['items'] as List<dynamic>?)
-          ?.map((item) => CartItem.fromJson(item as Map<String, dynamic>))
-          .toList() ??
+      items:
+          (json['items'] as List<dynamic>?)
+              ?.map((item) => CartItem.fromJson(item as Map<String, dynamic>))
+              .toList() ??
           [],
       deliveryFee: (json['deliveryFee'] ?? 0.0).toDouble(),
       taxRate: (json['taxRate'] ?? 0.0).toDouble(),
@@ -368,4 +388,3 @@ class Cart {
     return 'Cart(items: ${items.length}, totalItems: $totalItems, totalAmount: $totalAmount, couponDiscount: $couponDiscount)';
   }
 }
-

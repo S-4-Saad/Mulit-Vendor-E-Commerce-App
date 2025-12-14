@@ -14,9 +14,10 @@ class ShopBox extends StatelessWidget {
     required this.shopRating,
     required this.onShopBoxTap,
     required this.onDirectionTap,
+    required this.onOpenTap,
     required this.isOpen,
     required this.isDelivering,
-    this.isRequireDirection=true,
+    this.isRequireDirection = true,
   });
   final String imageUrl;
   final String shopName;
@@ -24,6 +25,7 @@ class ShopBox extends StatelessWidget {
   final double shopRating;
   final VoidCallback onShopBoxTap;
   final VoidCallback onDirectionTap;
+  final VoidCallback onOpenTap;
   final bool isOpen;
   final bool isDelivering;
   final bool isRequireDirection;
@@ -119,8 +121,7 @@ class ShopBox extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    width: 180,
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -137,9 +138,10 @@ class ShopBox extends StatelessWidget {
                         ),
                         Text(
                           shopDescription,
-                          maxLines: 1,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
+                            height: 1,
                             fontFamily: FontFamily.fontsPoppinsRegular,
                             fontSize: 13,
                             color: Theme.of(context).colorScheme.onSecondary,
@@ -149,25 +151,50 @@ class ShopBox extends StatelessWidget {
                       ],
                     ),
                   ),
-                  if(isRequireDirection)
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      padding: EdgeInsets.symmetric(horizontal: 8),
+                  if (isRequireDirection)
+                    Row(
+                      children: [
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 8),
 
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      elevation: 0,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            elevation: 0,
+                          ),
+                          onPressed: onOpenTap,
+                          child: Icon(
+                            Icons.remove_red_eye_outlined,
+                            color: Colors.white,
+                            size: 25,
+                          ),
+                        ),
+                        SizedBox(width: 5),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 8),
+
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            elevation: 0,
+                          ),
+                          onPressed: onDirectionTap,
+                          child: Icon(
+                            Icons.directions,
+                            color: Colors.white,
+                            size: 25,
+                          ),
+                        ),
+                      ],
                     ),
-                    onPressed: onDirectionTap,
-                    child: Icon(
-                      Icons.directions,
-                      color: Colors.white,
-                      size: 25,
-                    ),
-                  ),
                 ],
               ),
             ),

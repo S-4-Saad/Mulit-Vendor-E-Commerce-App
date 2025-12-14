@@ -71,7 +71,7 @@ class _CancelledOrdersScreenState extends State<CancelledOrdersScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                  Labels.youDoNotHaveAnyCancelledOrders,
+                    Labels.youDoNotHaveAnyCancelledOrders,
                     style: Theme.of(context).textTheme.bodyMedium,
                     textAlign: TextAlign.center,
                   ),
@@ -92,6 +92,7 @@ class _CancelledOrdersScreenState extends State<CancelledOrdersScreen> {
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 16),
                   child: OrderCard(
+                    orderCode: order.orderCode,
                     status: order.status,
                     orderId: order.orderId,
                     customerName: order.customerName,
@@ -103,8 +104,10 @@ class _CancelledOrdersScreenState extends State<CancelledOrdersScreen> {
                         context,
                         MaterialPageRoute(
                           builder:
-                              (context) =>
-                                  OrderDetailsScreen(orderId: order.orderId),
+                              (context) => OrderDetailsScreen(
+                                orderId: order.orderId,
+                                orderStatus: order.status,
+                              ),
                         ),
                       );
                     },

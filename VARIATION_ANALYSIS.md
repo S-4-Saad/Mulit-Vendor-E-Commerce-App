@@ -136,3 +136,4 @@ For a product with multiple variation categories (e.g., Size and Color):
 6. **Cart storage**: Store all selected variations as a structured list
 
 
+

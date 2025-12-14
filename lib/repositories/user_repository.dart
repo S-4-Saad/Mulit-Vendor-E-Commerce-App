@@ -74,7 +74,7 @@ class UserRepository {
       } else {
         log("No user data found, returning null.");
       }
-await _getCurrentLocation();  // Fetch location on initialization
+      await _getCurrentLocation(); // Fetch location on initialization
       // Load cart data
       final savedCartData = await LocalStorage.getData(key: AppKeys.cartData);
 
@@ -245,7 +245,9 @@ await _getCurrentLocation();  // Fetch location on initialization
     // Prepare the request data
     final requestData = {
       'user_id': _currentUser!.userData!.id,
-      'user_details': _currentUser!.userData!.userDetails?.toJson(),
+      'user_details': jsonEncode(
+        _currentUser!.userData!.userDetails?.toJson() ?? {},
+      ),
     };
 
     log("Updating user details on server: ${jsonEncode(requestData)}");
@@ -401,16 +403,13 @@ await _getCurrentLocation();  // Fetch location on initialization
       _currentUser?.userData?.userDetails?.getDefaultAddress();
   CardDetailsModel? get card => _currentUser?.userData?.userDetails?.getCard();
 
-
   Future<bool> saveFcmTokenToServer(String fcmToken) async {
     if (_currentUser?.userData == null) {
       return false;
     }
 
     try {
-      final requestData = {
-        'fcm_token': fcmToken,
-      };
+      final requestData = {'fcm_token': fcmToken};
 
       bool apiSuccess = false;
 
@@ -434,7 +433,6 @@ await _getCurrentLocation();  // Fetch location on initialization
     }
   }
 
-
   Future<bool> clearFcmTokenFromServer() async {
     final token = await LocalStorage.getData(key: AppKeys.authToken);
     if (token == null) {
@@ -442,9 +440,7 @@ await _getCurrentLocation();  // Fetch location on initialization
     }
 
     try {
-      final requestData = {
-        'fcm_token': '',
-      };
+      final requestData = {'fcm_token': ''};
 
       bool apiSuccess = false;
 

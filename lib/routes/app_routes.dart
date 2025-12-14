@@ -11,6 +11,8 @@ import 'package:speezu/routes/route_names.dart';
 import '../presentation/auth/forgot_password_screen.dart';
 import '../presentation/auth/login_screen.dart';
 import '../presentation/auth/sign_up_screen.dart';
+import '../presentation/auth/otp_verification_screen.dart';
+import '../presentation/auth/create_new_password_screen.dart';
 import '../presentation/faqs/faqs_screen.dart';
 import '../presentation/home/home_screen.dart';
 import '../presentation/languages/languages_screen.dart';
@@ -30,6 +32,18 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => SignUpScreen());
       case RouteNames.forgotPassword:
         return MaterialPageRoute(builder: (_) => ForgotPasswordScreen());
+      case RouteNames.otpVerification:
+        final String email = settings.arguments as String? ?? '';
+        return MaterialPageRoute(
+          builder: (_) => OtpVerificationScreen(email: email),
+        );
+      case RouteNames.createNewPassword:
+        final args = settings.arguments as Map<String, dynamic>? ?? {};
+        final String email = args['email'] ?? '';
+        final String otp = args['otp'] ?? '';
+        return MaterialPageRoute(
+          builder: (_) => CreateNewPasswordScreen(email: email, otp: otp),
+        );
       case RouteNames.home:
         return MaterialPageRoute(builder: (_) => HomeScreen());
       case RouteNames.navBarScreen:
@@ -50,18 +64,23 @@ class AppRoutes {
         final int categoryId = args['categoryId'] ?? 1;
 
         return MaterialPageRoute(
-          builder: (_) => CategoryScreen(
-            categoryName: categoryName,
-            categoryId: categoryId,
-          ),
+          builder:
+              (_) => CategoryScreen(
+                categoryName: categoryName,
+                categoryId: categoryId,
+              ),
         );
 
       case RouteNames.shopNavBarScreen:
         final int? storeId = settings.arguments as int?;
-        return MaterialPageRoute(builder: (_) => ShopNavbarScreen(storeId: storeId));
+        return MaterialPageRoute(
+          builder: (_) => ShopNavbarScreen(storeId: storeId),
+        );
       case RouteNames.productScreen:
         final String? productId = settings.arguments as String?;
-        return MaterialPageRoute(builder: (_) => ProductDetailScreen(productId: productId ?? '1'));
+        return MaterialPageRoute(
+          builder: (_) => ProductDetailScreen(productId: productId ?? '1'),
+        );
       case RouteNames.cartScreen:
         return MaterialPageRoute(builder: (_) => CartScreen());
       case RouteNames.checkOutScreen:
@@ -70,7 +89,7 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => AddNewAddressScreen());
       case RouteNames.editProfileScreen:
         return MaterialPageRoute(builder: (_) => EditProfileScreen());
-        case RouteNames.addressBookScreen:
+      case RouteNames.addressBookScreen:
         return MaterialPageRoute(builder: (_) => AddressBookScreen());
       default:
         return MaterialPageRoute(

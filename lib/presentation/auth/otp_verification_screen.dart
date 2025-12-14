@@ -1,38 +1,29 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
 import 'package:speezu/widgets/auth_loader.dart';
 import '../../core/assets/app_images.dart';
 import '../../core/assets/font_family.dart';
-import '../../core/utils/app_validators.dart';
 import '../../core/utils/labels.dart';
 import '../../core/utils/snackbar_helper.dart';
 import '../../routes/route_names.dart';
-import '../../widgets/custom_text_form_field.dart';
 import '../../widgets/login_custom_elevated_button.dart';
+import '../../widgets/otp_input_widget.dart';
 import 'bloc/auth_bloc.dart';
 import 'bloc/auth_event.dart';
 import 'bloc/auth_state.dart';
 
-class ForgotPasswordScreen extends StatefulWidget {
-  ForgotPasswordScreen({super.key});
+class OtpVerificationScreen extends StatefulWidget {
+  final String email;
+
+  const OtpVerificationScreen({super.key, required this.email});
 
   @override
-  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  final TextEditingController emailController = TextEditingController();
-  final GlobalKey<FormState> _forgotPasswordFormKey = GlobalKey<FormState>();
-  final FocusNode emailFocusNode = FocusNode();
-
-  @override
-  void dispose() {
-    emailController.dispose();
-    emailFocusNode.dispose();
-    super.dispose();
-  }
+class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
+  String _otpCode = '';
 
   @override
   Widget build(BuildContext context) {
@@ -61,18 +52,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     bool isLargeTablet,
   ) {
     if (isLargeTablet) {
-      // Large Tablet Layout - Side by side
       return _buildLargeTabletLayout(context);
     } else if (isTablet) {
-      // Tablet Layout - Centered with more space
       return _buildTabletLayout(context);
     } else {
-      // Mobile Layout - Original design enhanced
       return _buildMobileLayout(context);
     }
   }
 
-  // Mobile Layout (Enhanced)
+  // Mobile Layout
   Widget _buildMobileLayout(BuildContext context) {
     return SingleChildScrollView(
       child: SizedBox(
@@ -103,7 +91,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   _buildLogoSection(context, isMobile: true),
                   SizedBox(height: context.heightPct(.04)),
 
-                  // Forgot Password Form Card
+                  // OTP Verification Form Card
                   Expanded(
                     child: Container(
                       width: double.infinity,
@@ -135,7 +123,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             ),
                             SizedBox(height: context.heightPct(.03)),
 
-                            _buildForgotPasswordForm(
+                            _buildOtpVerificationForm(
                               context,
                               maxWidth: double.infinity,
                             ),
@@ -193,7 +181,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   children: [
                     _buildLogoSection(context, isMobile: false),
                     const SizedBox(height: 40),
-                    _buildForgotPasswordForm(
+                    _buildOtpVerificationForm(
                       context,
                       maxWidth: double.infinity,
                     ),
@@ -209,7 +197,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 
-  // Large Tablet Layout (Side by side)
+  // Large Tablet Layout
   Widget _buildLargeTabletLayout(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
@@ -266,7 +254,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         Image.asset(AppImages.speezuLogo, height: 120),
                         const SizedBox(height: 32),
                         Text(
-                          Labels.letsStartWithRegister,
+                          Labels.otpVerification,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onPrimary,
@@ -276,7 +264,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          Labels.enterYourEmailToResetYourPassword,
+                          Labels.enterOtpSentToYourEmail,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Theme.of(
@@ -300,7 +288,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          Labels.resetPassword,
+                          Labels.verifyOtp,
                           style: TextStyle(
                             fontSize: 32,
                             fontFamily: FontFamily.fontsPoppinsExtraBold,
@@ -309,7 +297,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          Labels.weSendYouALinkToResetYourPassword,
+                          '${Labels.otpSentTo} ${widget.email}',
                           style: TextStyle(
                             fontSize: 14,
                             fontFamily: FontFamily.fontsPoppinsRegular,
@@ -319,7 +307,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           ),
                         ),
                         const SizedBox(height: 40),
-                        _buildForgotPasswordForm(
+                        _buildOtpVerificationForm(
                           context,
                           maxWidth: double.infinity,
                         ),
@@ -343,7 +331,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         Image.asset(AppImages.speezuLogo, height: isMobile ? 60 : 80),
         SizedBox(height: isMobile ? 16 : 24),
         Text(
-          Labels.letsStartWithRegister,
+          Labels.otpVerification,
           textAlign: TextAlign.center,
           style: TextStyle(
             color:
@@ -357,7 +345,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         if (!isMobile) ...[
           const SizedBox(height: 8),
           Text(
-            Labels.enterYourEmailToReceiveAPasswordResetLink,
+            '${Labels.otpSentTo} ${widget.email}',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
@@ -370,69 +358,107 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 
-  Widget _buildForgotPasswordForm(
+  Widget _buildOtpVerificationForm(
     BuildContext context, {
     required double maxWidth,
   }) {
-    return Form(
-      key: _forgotPasswordFormKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Email Field
-          Text(
-            '${Labels.email}',
-            style: TextStyle(
-              fontSize: 14,
-              fontFamily: FontFamily.fontsPoppinsSemiBold,
-              color: Theme.of(context).colorScheme.onSurface,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Instruction Text
+        Text(
+          Labels.enterOtp,
+          style: TextStyle(
+            fontSize: 14,
+            fontFamily: FontFamily.fontsPoppinsSemiBold,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          '${Labels.otpSentTo} ${widget.email}',
+          style: TextStyle(
+            fontSize: 12,
+            fontFamily: FontFamily.fontsPoppinsRegular,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+          ),
+        ),
+        const SizedBox(height: 24),
+
+        // OTP Input Fields
+        OtpInputWidget(
+          onCompleted: (otp) {
+            setState(() {
+              _otpCode = otp;
+            });
+          },
+        ),
+        const SizedBox(height: 32),
+
+        // Resend OTP Link
+        Center(
+          child: TextButton(
+            onPressed: () {
+              // Trigger resend OTP
+              context.read<AuthBloc>().add(
+                ResetPasswordEvent(email: widget.email),
+              );
+              SnackBarHelper.showSuccess(
+                context,
+                'OTP resent to ${widget.email}',
+              );
+            },
+            child: Text(
+              Labels.resendOtp,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontSize: 14,
+                fontFamily: FontFamily.fontsPoppinsSemiBold,
+              ),
             ),
           ),
-          const SizedBox(height: 8),
-          CustomTextFormField(
-            validator: AppValidators.validateEmail,
-            textEditingController: emailController,
-            hint: 'example@gmail.com',
-            focusNode: emailFocusNode,
-            textInputType: TextInputType.emailAddress,
-          ),
-          const SizedBox(height: 24),
+        ),
+        const SizedBox(height: 24),
 
-          // Send Link Button
-          BlocConsumer<AuthBloc, AuthState>(
-            builder:
-                (context, state) =>
-                    state.forgotPasswordStatus == ForgotPasswordStatus.loading
-                        ? const AuthLoader()
-                        : LoginCustomElevatedButton(
-                          title: Labels.sendLink,
-                          onPressed: () {
-                            if (_forgotPasswordFormKey.currentState!
-                                .validate()) {
-                              context.read<AuthBloc>().add(
-                                ResetPasswordEvent(
-                                  email: emailController.text.trim(),
-                                ),
-                              );
-                            }
-                          },
-                        ),
-            listener: (context, state) {
-              if (state.forgotPasswordStatus == ForgotPasswordStatus.success) {
-                Navigator.pushReplacementNamed(
-                  context,
-                  RouteNames.otpVerification,
-                  arguments: emailController.text.trim(),
-                );
-                SnackBarHelper.showSuccess(context, state.message);
-              } else if (state.forgotPasswordStatus ==
-                  ForgotPasswordStatus.error) {
-                SnackBarHelper.showError(context, state.message);
-              }
-            },
-          ),
-        ],
-      ),
+        // Verify Button
+        BlocConsumer<AuthBloc, AuthState>(
+          builder:
+              (context, state) =>
+                  state.otpVerificationStatus == OtpVerificationStatus.loading
+                      ? const AuthLoader()
+                      : LoginCustomElevatedButton(
+                        title: Labels.verifyOtp,
+                        onPressed: () {
+                          if (_otpCode.length == 6) {
+                            context.read<AuthBloc>().add(
+                              VerifyOtpEvent(
+                                email: widget.email,
+                                otp: _otpCode,
+                              ),
+                            );
+                          } else {
+                            SnackBarHelper.showError(
+                              context,
+                              Labels.pleaseEnterValidOtp,
+                            );
+                          }
+                        },
+                      ),
+          listener: (context, state) {
+            if (state.otpVerificationStatus == OtpVerificationStatus.success) {
+              Navigator.pushReplacementNamed(
+                context,
+                RouteNames.createNewPassword,
+                arguments: {'email': widget.email, 'otp': _otpCode},
+              );
+              SnackBarHelper.showSuccess(context, state.message);
+            } else if (state.otpVerificationStatus ==
+                OtpVerificationStatus.error) {
+              SnackBarHelper.showError(context, state.message);
+            }
+          },
+        ),
+      ],
     );
   }
 
@@ -454,7 +480,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.pushReplacementNamed(context, RouteNames.login);
               },
               style: TextButton.styleFrom(
                 padding: EdgeInsets.zero,
@@ -463,38 +489,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ),
               child: Text(
                 Labels.login,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
-                  fontSize: 14,
-                  fontFamily: FontFamily.fontsPoppinsSemiBold,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "${Labels.doNotHaveAnAccount} ",
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                fontSize: 14,
-                fontFamily: FontFamily.fontsPoppinsRegular,
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, RouteNames.signUp);
-              },
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.zero,
-                minimumSize: const Size(0, 0),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: Text(
-                Labels.signUp,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
                   fontSize: 14,

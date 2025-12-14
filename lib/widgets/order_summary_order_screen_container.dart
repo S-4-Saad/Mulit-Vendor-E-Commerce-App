@@ -137,7 +137,7 @@ class OrderSummaryOrderScreenContainer extends StatelessWidget {
           ),
         ),
         Text(
-          '${CurrencyIcon.currencyIcon} $value',
+          '${CurrencyIcon.currencyIcon}$value',
           style: TextStyle(
             fontSize: isLarge ? 16 : 14,
             fontFamily: isBold

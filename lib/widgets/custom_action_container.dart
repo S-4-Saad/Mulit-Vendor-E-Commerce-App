@@ -5,12 +5,14 @@ import '../core/assets/font_family.dart';
 
 class CustomActionContainer extends StatelessWidget {
   final String text;
+  final String title;
   final IconData icon;
   final VoidCallback onTap;
 
   const CustomActionContainer({
     super.key,
     required this.text,
+    required this.title,
     required this.icon,
     required this.onTap,
   });
@@ -41,21 +43,35 @@ class CustomActionContainer extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Text
-          Expanded(
-            child: Text(
-              text,
-              style: TextStyle(
-                fontFamily:
-                FontFamily
-                    .fontsPoppinsRegular, // replace with your FontFamily
-                color: Theme.of(context).colorScheme.onSecondary,
-                fontSize: context.scaledFont(
-                  12,
-                ), // replace with context.scaledFont(12) if you use extensions
+          Column(crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontFamily:
+                  FontFamily.fontsPoppinsSemiBold, // replace with your FontFamily
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: context.scaledFont(
+                    10,
+                  ), // replace with context.scaledFont(14) if you use extensions
+                ),
               ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 2,
-            ),
+              const SizedBox(height: 4),
+              Text(
+                text,
+                style: TextStyle(
+                  fontFamily:
+                  FontFamily
+                      .fontsPoppinsRegular, // replace with your FontFamily
+                  color: Theme.of(context).colorScheme.onSecondary,
+                  fontSize: context.scaledFont(
+                    13,
+                  ), // replace with context.scaledFont(12) if you use extensions
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+              ),
+            ],
           ),
           const SizedBox(width: 10),
           // Action Button

@@ -66,6 +66,7 @@ class Products {
   String? productImage;
   String? productRating;
   String? productDescription;
+  bool?  isDeliverable;
   Store? store;
   Store? category;
 
@@ -80,6 +81,7 @@ class Products {
         this.productImage,
         this.productRating,
         this.productDescription,
+        this.isDeliverable,
         this.store,
         this.category});
 
@@ -94,6 +96,7 @@ class Products {
     productImage = json['product_image'];
     productRating = json['product_rating'];
     productDescription = json['product_description'];
+    isDeliverable = json['is_deliverable'] == 1;
     store = json['store'] != null ? new Store.fromJson(json['store']) : null;
     category =
     json['category'] != null ? new Store.fromJson(json['category']) : null;
@@ -111,6 +114,7 @@ class Products {
     data['product_image'] = this.productImage;
     data['product_rating'] = this.productRating;
     data['product_description'] = this.productDescription;
+    data['is_deliverable'] = this.isDeliverable;
     if (this.store != null) {
       data['store'] = this.store!.toJson();
     }

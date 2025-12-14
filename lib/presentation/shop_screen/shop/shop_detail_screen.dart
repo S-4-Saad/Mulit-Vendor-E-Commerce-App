@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:speezu/core/assets/font_family.dart';
 import 'package:speezu/core/utils/media_querry_extention.dart';
+import 'package:speezu/core/utils/snackbar_helper.dart';
 import 'package:speezu/models/store_detail_model.dart';
 import 'package:speezu/presentation/nav_bar_screen/bloc/nav_bar_event.dart';
+import 'package:speezu/widgets/custom_action_container.dart';
 import 'package:speezu/widgets/error_widget.dart';
 import 'package:speezu/widgets/image_gallery_viewer_widget.dart';
 import 'package:speezu/widgets/product_review_box.dart';
+import '../../../core/utils/CallAndWhatsAppUtils.dart';
 import '../../../core/utils/labels.dart';
 import '../../../widgets/business_hours_widget.dart';
 import '../../../widgets/image_type_extention.dart';
@@ -89,11 +93,12 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
   ) {
     final theme = Theme.of(context);
 
-    return  WillPopScope(
-        onWillPop: () async {
-          // 👇 Do whatever you want before leaving
-          context.read<ShopBloc>().add(ClearStoreDetail());
-          return true;},
+    return WillPopScope(
+      onWillPop: () async {
+        // 👇 Do whatever you want before leaving
+        context.read<ShopBloc>().add(ClearStoreDetail());
+        return true;
+      },
       child: Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
         body: CustomScrollView(
@@ -261,7 +266,8 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           itemCount: storeModel.store?.moreImages?.length ?? 0,
-                          separatorBuilder: (_, __) => const SizedBox(width: 10),
+                          separatorBuilder:
+                              (_, __) => const SizedBox(width: 10),
                           itemBuilder: (context, index) {
                             return GestureDetector(
                               onTap: () {
@@ -271,7 +277,8 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                     builder:
                                         (context) => ImageGalleryViewer(
                                           imageUrls:
-                                              storeModel.store?.moreImages ?? [],
+                                              storeModel.store?.moreImages ??
+                                              [],
                                           initialIndex: index,
                                         ),
                                   ),
@@ -280,7 +287,8 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(12),
                                 child: CustomImageView(
-                                  imagePath: storeModel.store!.moreImages![index],
+                                  imagePath:
+                                      storeModel.store!.moreImages![index],
                                   width: context.widthPct(.55),
                                   fit: BoxFit.cover,
                                 ),
@@ -297,6 +305,38 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       openingTime: storeModel.store?.openingTime ?? '',
                       closingTime: storeModel.store?.closingTime ?? '',
                     ),
+                    if ((state.storeDetail?.store?.primaryNumber?.isNotEmpty ?? false)) ...[
+                      SizedBox(height: 10),
+                      CustomActionContainer(
+                        text: state.storeDetail?.store?.primaryNumber ?? '',
+                        icon: Icons.phone,
+                        onTap: () {
+                          CallAndWhatsAppUtils.openDialer(
+                            state.storeDetail?.store?.primaryNumber ?? '',
+                          );
+
+                        },
+                        title: Labels.primaryPhoneNumber,
+                      ),
+                    ],
+                    if ((state.storeDetail?.store?.whatsappNumber?.isNotEmpty ?? false)) ...[
+                      SizedBox(height: 10),
+                      CustomActionContainer(
+                        text: state.storeDetail?.store?.whatsappNumber ?? '',
+                        icon: FontAwesomeIcons.whatsapp,
+                        onTap: () {
+                          CallAndWhatsAppUtils.openWhatsAppChat(
+                            whatsappNumber: state.storeDetail?.store?.whatsappNumber ?? '',
+                            message: "Hello! I want more details.",
+                            onError: () {
+                              SnackBarHelper.showError(context, "WhatsApp number not available!");
+                            },
+                          );
+
+                        },
+                        title: Labels.whatsappNumber,
+                      ),
+                    ],
 
                     const SizedBox(height: 20),
 
@@ -316,7 +356,9 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                           children: [
                             GestureDetector(
                               onTap: () {
-                                context.read<NavBarBloc>().add(ShopSelectTab(1));
+                                context.read<NavBarBloc>().add(
+                                  ShopSelectTab(1),
+                                );
                               },
                               child: Row(
                                 children: [
@@ -324,13 +366,14 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                     Labels.rattingAndReviews,
                                     style: TextStyle(
                                       fontSize: context.scaledFont(15),
-                                      fontFamily: FontFamily.fontsPoppinsSemiBold,
+                                      fontFamily:
+                                          FontFamily.fontsPoppinsSemiBold,
                                       color: theme.colorScheme.onSecondary,
                                     ),
                                   ),
                                   const SizedBox(width: 5),
                                   Text(
-                                    '(${storeModel.store!.reviews!.length})',
+                                    '(${storeModel.store?.reviewsCount ?? 0})',
                                     style: TextStyle(
                                       fontSize: context.scaledFont(13),
                                       color: theme.colorScheme.outline,
@@ -368,17 +411,19 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                       : storeModel.store!.reviews!.length,
                               separatorBuilder:
                                   (context, index) => Divider(
-                                    color: theme.colorScheme.outline.withOpacity(
-                                      0.1,
-                                    ),
+                                    color: theme.colorScheme.outline
+                                        .withOpacity(0.1),
                                     height: 20,
                                   ),
                               itemBuilder: (context, index) {
-                                final review = storeModel.store!.reviews![index];
+                                final review =
+                                    storeModel.store!.reviews![index];
                                 return ProductReviewBox(
                                   userName: review.userName ?? '',
                                   review: review.review ?? '',
-                                  rating: double.parse(review.rating.toString()),
+                                  rating: double.parse(
+                                    review.rating.toString(),
+                                  ),
                                 );
                               },
                             ),
@@ -394,7 +439,8 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                     '${Labels.seeAllReviews} (${storeModel.store!.reviews!.length})',
                                     style: TextStyle(
                                       fontSize: context.scaledFont(13),
-                                      fontFamily: FontFamily.fontsPoppinsSemiBold,
+                                      fontFamily:
+                                          FontFamily.fontsPoppinsSemiBold,
                                       color: theme.colorScheme.primary,
                                     ),
                                   ),

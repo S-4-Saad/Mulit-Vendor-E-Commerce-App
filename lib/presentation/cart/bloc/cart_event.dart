@@ -22,6 +22,9 @@ class AddToCart extends CartEvent {
   final String? variationChildValue;
   final String? variationParentId;
   final String? variationChildId;
+  final double? calculatedPrice; // Pre-calculated price from product detail
+  final double?
+  calculatedOriginalPrice; // Pre-calculated original price from product detail
 
   AddToCart({
     required this.product,
@@ -32,19 +35,23 @@ class AddToCart extends CartEvent {
     this.variationChildValue,
     this.variationParentId,
     this.variationChildId,
+    this.calculatedPrice,
+    this.calculatedOriginalPrice,
   });
 
   @override
   List<Object?> get props => [
-        product,
-        quantity,
-        variationParentName,
-        variationParentValue,
-        variationChildName,
-        variationChildValue,
-        variationParentId,
-        variationChildId,
-      ];
+    product,
+    quantity,
+    variationParentName,
+    variationParentValue,
+    variationChildName,
+    variationChildValue,
+    variationParentId,
+    variationChildId,
+    calculatedPrice,
+    calculatedOriginalPrice,
+  ];
 }
 
 class RemoveFromCart extends CartEvent {
@@ -60,10 +67,7 @@ class UpdateCartItemQuantity extends CartEvent {
   final String cartItemId;
   final int newQuantity;
 
-  UpdateCartItemQuantity({
-    required this.cartItemId,
-    required this.newQuantity,
-  });
+  UpdateCartItemQuantity({required this.cartItemId, required this.newQuantity});
 
   @override
   List<Object?> get props => [cartItemId, newQuantity];
@@ -224,6 +228,7 @@ class PostOrder extends CartEvent {
 }
 
 class ResetCheckout extends CartEvent {}
+
 class ResetCartStatus extends CartEvent {}
 
 class CouponCodeChanged extends CartEvent {
@@ -232,4 +237,5 @@ class CouponCodeChanged extends CartEvent {
   @override
   List<Object?> get props => [code];
 }
+
 class ResetCouponStatus extends CartEvent {}
