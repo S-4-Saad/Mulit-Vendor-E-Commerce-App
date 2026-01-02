@@ -29,6 +29,7 @@ import '../../widgets/shimmer/product_detail_shimmar.dart';
 import '../../widgets/shop_product_box.dart';
 import 'bloc/product_detail_event.dart';
 import 'bloc/product_detail_state.dart';
+import 'package:intl/intl.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final String productId;
@@ -48,6 +49,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       false; // Track if conflict dialog is currently showing
   String?
   _lastConflictMessage; // Track last conflict message to prevent duplicates
+  bool _isAddingToCart = false; // Track if we're currently adding a product to cart
+  String? _productNameForSnackbar; // Store product name for snackbar
 
   Map<String, String?> get selectedVariations {
     final Map<String, String?> flatMap = {};
@@ -142,6 +145,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     _scrollController.dispose();
     selectedVariationsByType.clear(); // Ensure clean disposal
     _currentProductId = null;
+    _isAddingToCart = false; // Reset flag
+    _productNameForSnackbar = null; // Reset product name
     super.dispose();
   }
 
@@ -388,6 +393,39 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     return '';
   }
 
+  bool _isShopOpen(ProductDetail product) {
+    try {
+      final openTimeStr = product.shop.openTime;
+      final closeTimeStr = product.shop.closeTime;
+
+      if (openTimeStr.isEmpty || closeTimeStr.isEmpty) return true;
+
+      final now = DateTime.now();
+      final dateFormat = DateFormat("hh:mm a");
+
+      // Parse open time
+      final openTime = dateFormat.parse(openTimeStr);
+
+      // Parse close time
+      final closeTime = dateFormat.parse(closeTimeStr);
+
+      int openMinutes = openTime.hour * 60 + openTime.minute;
+      int closeMinutes = closeTime.hour * 60 + closeTime.minute;
+      int nowMinutes = now.hour * 60 + now.minute;
+
+      if (closeMinutes < openMinutes) {
+        // Spans midnight (e.g. 10 PM to 2 AM)
+        return nowMinutes >= openMinutes || nowMinutes <= closeMinutes;
+      } else {
+        // Same day (e.g. 10 AM to 6 PM)
+        return nowMinutes >= openMinutes && nowMinutes <= closeMinutes;
+      }
+    } catch (e) {
+      debugPrint("Error parsing store time: $e");
+      return true; // Default to open on error
+    }
+  }
+
   void _handleAddToCart(
     BuildContext context,
     ProductDetail product,
@@ -397,6 +435,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final isAuthenticated = await _isUserAuthenticated();
     if (!isAuthenticated) {
       LoginRequiredBottomSheet.show(context);
+      return;
+    }
+
+    // Check if store is open
+    if (!_isShopOpen(product)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Store is currently closed'),
+          duration: Duration(seconds: 2),
+        ),
+      );
       return;
     }
 
@@ -412,11 +461,27 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       print(
         'Cart state changed: ${cartState.status}, error: ${cartState.errorMessage}',
       );
+      
+      // Handle successful cart addition - only show snackbar if we're adding to cart
+      if (mounted && 
+          cartState.status == CartStatus.success && 
+          _isAddingToCart && 
+          _productNameForSnackbar != null) {
+        _showAddToCartSuccessSnackBar(context, _productNameForSnackbar!);
+        // Reset flags after showing snackbar
+        _isAddingToCart = false;
+        _productNameForSnackbar = null;
+      }
+      
       if (mounted &&
           cartState.status == CartStatus.error &&
           cartState.errorMessage != null &&
           !_isShowingConflictDialog && // Don't show if already showing a dialog
           _lastConflictMessage != cartState.errorMessage) {
+        // Reset adding flag on error
+        _isAddingToCart = false;
+        _productNameForSnackbar = null;
+        
         // Don't show same error twice
         if (cartState.errorMessage!.startsWith('STORE_CONFLICT:')) {
           print('Showing store conflict dialog for product: ${product.name}');
@@ -441,6 +506,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             isStoreConflict: false,
           );
         }
+      }
+    });
+
+    // Set flag to track that we're adding to cart
+    _isAddingToCart = true;
+    _productNameForSnackbar = product.name;
+    
+    // Reset flag after timeout to prevent showing snackbar for unrelated cart operations
+    Future.delayed(Duration(seconds: 3), () {
+      if (mounted) {
+        _isAddingToCart = false;
+        _productNameForSnackbar = null;
       }
     });
 
@@ -916,6 +993,56 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     SnackBarHelper.showError(context, missingMessage);
   }
 
+  void _showAddToCartSuccessSnackBar(BuildContext context, String productName) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.check_circle_rounded,
+                color: Theme.of(context).colorScheme.onPrimary,
+                size: 20,
+              ),
+            ),
+            SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                '$productName added to cart',
+                style: TextStyle(
+                  fontFamily: FontFamily.fontsPoppinsSemiBold,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha:.9),
+        behavior: SnackBarBehavior.floating,
+        duration: Duration(seconds: 2),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        margin: EdgeInsets.only(
+          top: 16,
+          bottom: MediaQuery.heightOf(context)*0.75,
+          left: 16,
+          right: 16,
+          
+        ),
+        elevation: 8,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ProductDetailBloc, ProductDetailState>(
@@ -977,9 +1104,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         return LayoutBuilder(
           builder: (context, constraints) {
             final screenWidth = constraints.maxWidth;
-            final screenHeight = constraints.maxHeight;
             final isTablet = screenWidth >= 600;
-            final isLargeTablet = screenWidth >= 900;
 
             // Responsive values
             final horizontalPadding = isTablet ? 40.0 : 20.0;
@@ -993,7 +1118,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             final imageHeight = isTablet ? 250.0 : 200.0;
             final imageWidth =
                 isTablet ? context.widthPct(.45) : context.widthPct(.55);
-            final fabSize = isTablet ? 60.0 : 56.0;
             final fabIconSize = isTablet ? 28.0 : 25.0;
             final fabTopPosition = isTablet ? 55.0 : 45.0;
             final fabRightPosition = isTablet ? 30.0 : 20.0;
@@ -1012,7 +1136,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         automaticallyImplyLeading: false,
                         leading: IconButton(
                           style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(
+                            backgroundColor: WidgetStateProperty.all(
                               Theme.of(
                                 context,
                               ).colorScheme.primary.withValues(alpha: 0.5),
@@ -1439,7 +1563,69 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                       );
                                     },
                                   ),
+                                  SizedBox(height: isTablet ? 15 : 10),
 
+                                  // Row(
+                                  //   children: [
+                                  //     Text(
+                                  //       'Available From',
+                                  //       style: TextStyle(
+                                  //         fontFamily:
+                                  //             FontFamily.fontsPoppinsSemiBold,
+                                  //         color:
+                                  //             Theme.of(
+                                  //               context,
+                                  //             ).colorScheme.onSecondary,
+                                  //         fontSize: isTablet ? 16 : 14,
+                                  //       ),
+                                  //     ),
+                                  //     SizedBox(width: isTablet ? 15 : 10),
+                                  //     Text(
+                                  //       product.shop.openTime,
+                                  //       style: TextStyle(
+                                  //         fontFamily:
+                                  //             FontFamily.fontsPoppinsLight,
+                                  //         color:
+                                  //             Theme.of(
+                                  //               context,
+                                  //             ).colorScheme.onSecondary,
+                                  //         fontSize:
+                                  //             isTablet
+                                  //                 ? 14
+                                  //                 : context.scaledFont(12),
+                                  //       ),
+                                  //     ),
+                                  //     Spacer(),
+                                  //     Text(
+                                  //       'Available Till',
+                                  //       style: TextStyle(
+                                  //         fontFamily:
+                                  //             FontFamily.fontsPoppinsSemiBold,
+                                  //         color:
+                                  //             Theme.of(
+                                  //               context,
+                                  //             ).colorScheme.onSecondary,
+                                  //         fontSize: isTablet ? 16 : 14,
+                                  //       ),
+                                  //     ),
+                                  //     SizedBox(width: isTablet ? 15 : 10),
+                                  //     Text(
+                                  //       product.shop.closeTime,
+                                  //       style: TextStyle(
+                                  //         fontFamily:
+                                  //             FontFamily.fontsPoppinsLight,
+                                  //         color:
+                                  //             Theme.of(
+                                  //               context,
+                                  //             ).colorScheme.onSecondary,
+                                  //         fontSize:
+                                  //             isTablet
+                                  //                 ? 14
+                                  //                 : context.scaledFont(12),
+                                  //       ),
+                                  //     ),
+                                  //   ],
+                                  // ),
                                   SizedBox(height: isTablet ? 20 : 15),
 
                                   Text(
@@ -1693,7 +1879,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                       isTablet ? 55 : 50,
                                                     ),
                                                   ),
-                                              shape: MaterialStateProperty.all(
+                                              shape: WidgetStateProperty.all(
                                                 RoundedRectangleBorder(
                                                   borderRadius:
                                                       BorderRadius.circular(50),
@@ -1751,8 +1937,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                             child: ElevatedButton(
                                               style: ButtonStyle(
                                                 backgroundColor:
-                                                    MaterialStateProperty.all(
-                                                      _areVariationsValid(
+                                                    WidgetStateProperty.all(
+                                                      !_isShopOpen(product)
+                                                          ? Colors
+                                                              .grey // Closed state
+                                                          : _areVariationsValid(
                                                             product,
                                                           )
                                                           ? Theme.of(
@@ -1764,13 +1953,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                               ),
                                                     ),
                                                 minimumSize:
-                                                    MaterialStateProperty.all(
+                                                    WidgetStateProperty.all(
                                                       Size(
                                                         250,
                                                         isTablet ? 55 : 50,
                                                       ),
                                                     ),
-                                                shape: MaterialStateProperty.all(
+                                                shape: WidgetStateProperty.all(
                                                   RoundedRectangleBorder(
                                                     borderRadius:
                                                         BorderRadius.circular(
@@ -1780,7 +1969,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                 ),
                                               ),
                                               onPressed:
-                                                  _areVariationsValid(product)
+                                                  !_isShopOpen(product)
+                                                      ? () {
+                                                        // Optional: Show snackbar explaining why it's disabled
+
+                                                        SnackBarHelper.showError(context,
+                                                          'Shop is currently closed. Opens at ${product.shop.openTime}');
+                                                      }
+                                                      :
+                                                  _areVariationsValid(
+                                                        product,
+                                                      )
                                                       ? () {
                                                         _handleAddToCart(
                                                           context,
@@ -1800,7 +1999,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                         .spaceBetween,
                                                 children: [
                                                   Text(
-                                                    Labels.addToCart,
+                                                    !_isShopOpen(product)
+                                                        ? 'Closed • Opens at ${product.shop.openTime}'
+                                                        : Labels.addToCart,
                                                     style: TextStyle(
                                                       fontFamily:
                                                           FontFamily
@@ -1810,17 +2011,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                           isTablet ? 17 : 15,
                                                     ),
                                                   ),
-                                                  Text(
-                                                    '${calculateTotalPrice(product, state.quantity).toStringAsFixed(1)} ${CurrencyIcon.currencyIcon}',
-                                                    style: TextStyle(
-                                                      fontFamily:
-                                                          FontFamily
-                                                              .fontsPoppinsSemiBold,
-                                                      color: Colors.white,
-                                                      fontSize:
-                                                          isTablet ? 18 : 16,
+                                                  if (_isShopOpen(product))
+                                                    Text(
+                                                      '${calculateTotalPrice(product, state.quantity).toStringAsFixed(1)} ${CurrencyIcon.currencyIcon}',
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                            FontFamily
+                                                                .fontsPoppinsSemiBold,
+                                                        color: Colors.white,
+                                                        fontSize:
+                                                            isTablet ? 18 : 16,
+                                                      ),
                                                     ),
-                                                  ),
                                                 ],
                                               ),
                                             ),

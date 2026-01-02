@@ -38,7 +38,7 @@ dependencies:
   flutter_bloc: ^9.1.1
   shared_preferences: ^2.5.3
   dio: ^5.9.0
-  connectivity_plus: ^6.1.5
+  connectivity_plus: ^7.0.0
   flutter_localizations:
     sdk: flutter
   intl:
@@ -47,23 +47,23 @@ dependencies:
   flutter_spinkit: ^5.2.2
   cached_network_image: ^3.4.1
   flutter_credit_card: ^4.1.0
-  flutter_dotenv: ^5.1.0
+  flutter_dotenv: ^6.0.0
   carousel_slider: ^5.1.1
   path_provider: ^2.1.4
-  firebase_core: ^4.1.0
+  firebase_core: ^4.3.0
   flutter_local_notifications: ^19.4.1
-  firebase_messaging: ^16.0.1
+  firebase_messaging: ^16.1.0
   googleapis_auth: ^2.0.0
-  app_settings: ^5.1.1
+  app_settings: ^7.0.0
   svg_flutter: ^0.0.1
   photo_view: ^0.15.0
   flutter_staggered_grid_view: ^0.7.0
   google_maps_flutter: ^2.13.1
-  permission_handler: ^11.3.1
-  geolocator: ^11.0.0
+  permission_handler: ^12.0.1
+  geolocator: ^14.0.2
   google_directions_api: ^0.10.0
   shimmer: ^3.0.0
-  easy_stepper: ^0.8.5+1
+  easy_stepper: ^0.9.1
   flutter_rating_bar: ^4.0.1
   mobile_scanner: ^7.0.1
   pull_to_refresh: ^2.0.0
@@ -74,10 +74,9 @@ dependencies:
   confetti: ^0.8.0
   flutter_launcher_icons: ^0.14.4
   qr_flutter: ^4.1.0
-  flutter_polyline_points: ^2.1.0
+  flutter_polyline_points: ^3.1.0
   http: ^1.5.0
   font_awesome_flutter: ^10.12.0
-
 
 dev_dependencies:
   flutter_test:
@@ -88,7 +87,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

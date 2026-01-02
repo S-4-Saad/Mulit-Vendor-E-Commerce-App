@@ -109,8 +109,8 @@ class DirectionsService {
 
   /// Decode Google's encoded polyline format into LatLng points
   List<LatLng> _decodePolyline(String encoded) {
-    final polylinePoints = PolylinePoints();
-    final result = polylinePoints.decodePolyline(encoded);
+    final polylinePoints = PolylinePoints(apiKey: '');
+    final result = PolylinePoints.decodePolyline(encoded);
 
     return result
         .map((point) => LatLng(point.latitude, point.longitude))

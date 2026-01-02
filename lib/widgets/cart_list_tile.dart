@@ -164,10 +164,16 @@ class CartListTile extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            onPressed: onRemove,
-                            icon: const Icon(
+                            onPressed: quantity <= 1 ? null : onRemove,
+                            icon: Icon(
                               Icons.remove_circle_outline,
                               size: 20,
+                              color: quantity <= 1
+                                  ? Theme.of(context)
+                                      .colorScheme
+                                      .onSecondary
+                                      .withValues(alpha: 0.3)
+                                  : Theme.of(context).colorScheme.primary,
                             ),
                           ),
                           Text(
@@ -180,9 +186,10 @@ class CartListTile extends StatelessWidget {
                           ),
                           IconButton(
                             onPressed: onAdd,
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.add_circle_outline,
                               size: 20,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                           ),
                         ],

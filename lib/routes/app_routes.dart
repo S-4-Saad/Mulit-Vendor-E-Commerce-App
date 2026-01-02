@@ -25,6 +25,7 @@ class AppRoutes {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case RouteNames.splash:
+        debugPrint('✅ Splash route matched');
         return MaterialPageRoute(builder: (_) => const SplashScreen());
       case RouteNames.login:
         return MaterialPageRoute(builder: (_) => LoginScreen());
@@ -92,6 +93,7 @@ class AppRoutes {
       case RouteNames.addressBookScreen:
         return MaterialPageRoute(builder: (_) => AddressBookScreen());
       default:
+        debugPrint('❌ Unknown route: ${settings.name}');
         return MaterialPageRoute(
           builder:
               (_) =>

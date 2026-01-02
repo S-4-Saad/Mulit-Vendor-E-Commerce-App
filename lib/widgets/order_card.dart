@@ -203,8 +203,8 @@ class OrderCard extends StatelessWidget {
               ),
             ],
           ),
-        ] else if (status.toLowerCase() == "approved" ||
-            status.toLowerCase() == "pending") ...[
+        ] else if (status.toLowerCase() == "pending" ||
+            status.toLowerCase() == "pickedup") ...[
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [

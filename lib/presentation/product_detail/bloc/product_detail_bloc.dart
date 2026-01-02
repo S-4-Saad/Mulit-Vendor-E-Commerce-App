@@ -236,6 +236,8 @@ class ProductDetailBloc extends Bloc<ProductDetailEvent, ProductDetailState> {
 
     // Create shop box model
     final shopBoxModel = ShopBoxModel(
+      openTime: data['store']?['opening_time']?.toString() ?? '',
+      closeTime: data['store']?['closing_time']?.toString() ?? '',
       categoryName: categoryName,
       name: data['store']?['name']?.toString() ?? '',
       imageUrl:

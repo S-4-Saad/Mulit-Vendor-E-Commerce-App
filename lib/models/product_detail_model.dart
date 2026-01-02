@@ -11,13 +11,13 @@ class ProductDetail {
   final ShopBoxModel shop;
   final List<ProductVariation> variations;
   final List<RelatedProduct> relatedProducts;
-  final double rating ; // Example rating
-  final double price ; // Example price
-  final double originalPrice ; // Example original price
-  final bool isFavourite ; // Example favourite status
-  final bool isDeliveryAvailable;// Example delivery status
-  final bool isAvailable;// Example delivery status
-  final double productDiscountPercentage ;
+  final double rating; // Example rating
+  final double price; // Example price
+  final double originalPrice; // Example original price
+  final bool isFavourite; // Example favourite status
+  final bool isDeliveryAvailable; // Example delivery status
+  final bool isAvailable; // Example delivery status
+  final double productDiscountPercentage;
 
   ProductDetail({
     required this.id,
@@ -64,7 +64,7 @@ class ProductDetail {
     return ProductDetail(
       id: id ?? this.id,
       productDiscountPercentage:
-      productDiscountPercentage ?? this.productDiscountPercentage,
+          productDiscountPercentage ?? this.productDiscountPercentage,
       isAvailable: isAvailable ?? this.isAvailable,
       isDeliveryAvailable: isDeliveryAvailable ?? this.isDeliveryAvailable,
       price: price ?? this.price,
@@ -82,10 +82,9 @@ class ProductDetail {
       shop: shop ?? this.shop,
       variations: variations ?? List<ProductVariation>.from(this.variations),
       relatedProducts:
-      relatedProducts ?? List<RelatedProduct>.from(this.relatedProducts),
+          relatedProducts ?? List<RelatedProduct>.from(this.relatedProducts),
     );
   }
-
 }
 
 class ShopBoxModel {
@@ -93,6 +92,8 @@ class ShopBoxModel {
   final String imageUrl;
   final double rating;
   final String categoryName;
+  final String openTime;
+  final String closeTime;
   final int id;
 
   ShopBoxModel({
@@ -100,6 +101,8 @@ class ShopBoxModel {
     required this.imageUrl,
     required this.rating,
     required this.categoryName,
+    required this.openTime,
+    required this.closeTime,
     required this.id,
   });
 }
@@ -166,6 +169,6 @@ class RelatedProduct {
     required this.imageUrl,
     required this.categoryId,
     required this.categoryName,
-    required this.isProductFavourite
+    required this.isProductFavourite,
   });
 }

@@ -1,5 +1,4 @@
 {
-  "originHash" : "ec18c97ec7c19ec459f7fa4d18dffe3e4bbd41ecda60a9dc6be2d47fee4c59ba",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -24,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/firebase/firebase-ios-sdk",
       "state" : {
-        "revision" : "1cce11cf94d27e2fc194112cc7ad51e8fb279230",
-        "version" : "12.3.0"
+        "revision" : "45210bd1ea695779e6de016ab00fea8c0b7eb2ef",
+        "version" : "12.7.0"
       }
     },
     {
@@ -42,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/googleads/google-ads-on-device-conversion-ios-sdk",
       "state" : {
-        "revision" : "c7d04b7592d3a1d6f8b7ce4e103cfbcbd766f419",
-        "version" : "3.0.0"
+        "revision" : "35b601a60fbbea2de3ea461f604deaaa4d8bbd0c",
+        "version" : "3.2.0"
       }
     },
     {
@@ -51,8 +50,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/google/GoogleAppMeasurement.git",
       "state" : {
-        "revision" : "34f5306ed8c9d9493f6390b4c2a18f19ecad1da4",
-        "version" : "12.3.0"
+        "revision" : "c2d59acf17a8ba7ed80a763593c67c9c7c006ad1",
+        "version" : "12.5.0"
       }
     },
     {
@@ -123,8 +122,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pusher/NWWebSocket.git",
       "state" : {
-        "revision" : "da32dcf230d9b627a9ef9d79b83605d12b3fbcbd",
-        "version" : "0.5.7"
+        "revision" : "501c6bd6063628e1d50661a3742311d812ba6546",
+        "version" : "0.5.9"
       }
     },
     {
@@ -150,8 +149,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pusher/pusher-websocket-swift.git",
       "state" : {
-        "revision" : "d8d7a776fa92c733891790be6e8d3e3532e79c43",
-        "version" : "10.1.6"
+        "revision" : "abcdff7c2b42b9f159b2a387b82f67aac59c5f85",
+        "version" : "10.1.9"
       }
     },
     {
@@ -159,19 +158,19 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-protobuf.git",
       "state" : {
-        "revision" : "2547102afd04fe49f1b286090f13ebce07284980",
-        "version" : "1.31.1"
+        "revision" : "c169a5744230951031770e27e475ff6eefe51f9d",
+        "version" : "1.33.3"
       }
     },
     {
       "identity" : "tweetnacl-swiftwrap",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/bitmark-inc/tweetnacl-swiftwrap",
+      "location" : "https://github.com/pusher/tweetnacl-swiftwrap",
       "state" : {
-        "revision" : "f8fd111642bf2336b11ef9ea828510693106e954",
-        "version" : "1.1.0"
+        "revision" : "92375f83c3af1b8af011d3c0af1001929844b936",
+        "version" : "1.2.0"
       }
     }
   ],
-  "version" : 3
+  "version" : 2
 }

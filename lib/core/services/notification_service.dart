@@ -117,31 +117,65 @@ class NotificationService {
       return false;
     }
   }
-
-  //Fetch FCM Token
   Future<String> getDeviceToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
+
     try {
       requestNotificationPermission();
-      String? apnsToken;
+
       if (Platform.isIOS) {
-        do {
+        String? apnsToken;
+
+        // Wait max 3 seconds for APNs token
+        final start = DateTime.now();
+        while (apnsToken == null &&
+            DateTime.now().difference(start).inSeconds < 3) {
           apnsToken = await messaging.getAPNSToken();
-          await Future.delayed(Duration(milliseconds: 100));
-        } while (apnsToken == null);
-        debugPrint('APNS Token: $apnsToken');
+          await Future.delayed(const Duration(milliseconds: 300));
+        }
+
+        if (apnsToken == null) {
+          debugPrint('⚠️ APNs token not available yet (continuing)');
+        } else {
+          debugPrint('✅ APNS Token: $apnsToken');
+        }
       }
 
-      // Now safe to call FCM token
-      String? fcmToken = await messaging.getToken();
-      prefs.setString("fcm", fcmToken??"");
-      debugPrint('FCM Token: $fcmToken');
+      final fcmToken = await messaging.getToken();
+      prefs.setString("fcm", fcmToken ?? "");
+      debugPrint('✅ FCM Token: $fcmToken');
+
       return fcmToken ?? '';
     } catch (e) {
-      debugPrint('Error getting device token: $e');
+      debugPrint('❌ Error getting device token: $e');
       return '';
     }
   }
+
+  //Fetch FCM Token
+  // Future<String> getDeviceToken() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   try {
+  //     requestNotificationPermission();
+  //     String? apnsToken;
+  //     if (Platform.isIOS) {
+  //       do {
+  //         apnsToken = await messaging.getAPNSToken();
+  //         await Future.delayed(Duration(milliseconds: 100));
+  //       } while (apnsToken == null);
+  //       debugPrint('APNS Token: $apnsToken');
+  //     }
+  //
+  //     // Now safe to call FCM token
+  //     String? fcmToken = await messaging.getToken();
+  //     prefs.setString("fcm", fcmToken??"");
+  //     debugPrint('FCM Token: $fcmToken');
+  //     return fcmToken ?? '';
+  //   } catch (e) {
+  //     debugPrint('Error getting device token: $e');
+  //     return '';
+  //   }
+  // }
 
   Future<void> deleteDeviceToken() async {
     try {

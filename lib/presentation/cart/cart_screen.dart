@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:speezu/core/assets/font_family.dart';
 import 'package:speezu/core/utils/currency_icon.dart';
 import 'package:speezu/presentation/cart/bloc/cart_bloc.dart';
@@ -9,7 +8,6 @@ import 'package:speezu/presentation/cart/bloc/cart_state.dart';
 import 'package:speezu/models/cart_model.dart';
 import 'package:speezu/routes/route_names.dart';
 import 'package:speezu/widgets/custom_app_bar.dart';
-
 import '../../core/utils/labels.dart';
 import '../../widgets/cart_list_tile.dart';
 
@@ -149,7 +147,7 @@ class _CartScreenState extends State<CartScreen> {
                                                 : state.couponStatus ==
                                                     CouponStatus.notApplicable
                                                 ? Colors.orange.shade50
-                                                : Colors.grey.shade50,
+                                                : Theme.of(context).colorScheme.onPrimary,
                                         borderRadius: const BorderRadius.only(
                                           topLeft: Radius.circular(14),
                                           bottomLeft: Radius.circular(14),
@@ -164,7 +162,7 @@ class _CartScreenState extends State<CartScreen> {
                                                 ? Colors.green.shade600
                                                 : state.couponStatus ==
                                                     CouponStatus.wrong
-                                                ? Colors.red.shade600
+                                                ? Colors.red
                                                 : state.couponStatus ==
                                                     CouponStatus.notApplicable
                                                 ? Colors.orange.shade600
@@ -200,6 +198,8 @@ class _CartScreenState extends State<CartScreen> {
                                             fontWeight: FontWeight.w600,
                                           ),
                                           decoration: InputDecoration(
+                                            fillColor: Theme.of(context).colorScheme.onPrimary,
+                                            filled: true,
                                             hintText: Labels.haveCouponCode,
                                             hintStyle: TextStyle(
                                               fontFamily:
@@ -506,13 +506,13 @@ class _CartScreenState extends State<CartScreen> {
                             Center(
                               child: ElevatedButton(
                                 style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all(
+                                  backgroundColor: WidgetStateProperty.all(
                                     Theme.of(context).colorScheme.primary,
                                   ),
-                                  minimumSize: MaterialStateProperty.all(
+                                  minimumSize: WidgetStateProperty.all(
                                     Size(300, 50),
                                   ),
-                                  shape: MaterialStateProperty.all(
+                                  shape: WidgetStateProperty.all(
                                     RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(50),
                                     ),

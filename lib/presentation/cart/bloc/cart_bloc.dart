@@ -411,6 +411,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       orElse: () => throw Exception('Cart item not found'),
     );
 
+    // Don't allow decrementing below 1
     if (item.quantity > 1) {
       add(
         UpdateCartItemQuantity(
@@ -418,10 +419,8 @@ class CartBloc extends Bloc<CartEvent, CartState> {
           newQuantity: item.quantity - 1,
         ),
       );
-    } else {
-      // Remove item if quantity becomes 0
-      add(RemoveFromCart(cartItemId: event.cartItemId));
     }
+    // If quantity is 1, do nothing (button should be disabled in UI)
   }
 
   void _onClearCart(ClearCart event, Emitter<CartState> emit) {
